@@ -1,0 +1,932 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>Sight Word Bingo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #fdf6e9;
+        --bg-soft: #fffdf7;
+        --panel: #ffffff;
+        --ink: #26324a;
+        --ink-soft: #5a6a86;
+        --line: #ecdcc0;
+        --accent: #f59e0b;        /* sunny amber */
+        --accent-ink: #4a2f00;
+        --teal: #0e9594;
+        --teal-ink: #ffffff;
+        --coral: #ef6351;
+        --mark: #34b26b;          /* marked square green */
+        --mark-deep: #1e7a46;
+        --cell: #ffffff;
+        --cell-line: #e8dcc4;
+        --cell-hover: #fff3d6;
+        --free-bg: #ffe9a8;
+        --win: #ffd23f;
+        --shadow: 0 10px 24px rgba(90, 64, 10, .12);
+        --radius: 18px;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #141a26;
+          --bg-soft: #1a2233;
+          --panel: #1e2739;
+          --ink: #f2f5fb;
+          --ink-soft: #a9b6cc;
+          --line: #33405c;
+          --accent: #fbbf24;
+          --accent-ink: #3a2703;
+          --teal: #2dd4bf;
+          --teal-ink: #06302b;
+          --coral: #fb7185;
+          --mark: #2f9e5f;
+          --mark-deep: #7be3a8;
+          --cell: #232f47;
+          --cell-line: #3a4a6b;
+          --cell-hover: #2c3a58;
+          --free-bg: #6b5510;
+          --win: #ffd23f;
+          --shadow: 0 10px 24px rgba(0, 0, 0, .45);
+        }
+      }
+
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; }
+      body {
+        font-family: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+        background: var(--bg);
+        color: var(--ink);
+        min-height: 100dvh;
+        -webkit-tap-highlight-color: transparent;
+      }
+      h1, h2, .display-font { font-family: "Fredoka", "Nunito", system-ui, sans-serif; }
+
+      .page {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 14px 16px 28px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      /* ---------- Top bar ---------- */
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+      }
+      .title-badge {
+        width: 52px; height: 52px;
+        border-radius: 14px;
+        background: var(--accent);
+        display: grid; place-items: center;
+        flex: 0 0 auto;
+        box-shadow: var(--shadow);
+      }
+      .title-badge svg { width: 32px; height: 32px; }
+      .title h1 {
+        margin: 0;
+        font-size: clamp(1.5rem, 3.4vw, 2.2rem);
+        font-weight: 700;
+        letter-spacing: .01em;
+        line-height: 1.05;
+      }
+      .title p {
+        margin: 2px 0 0;
+        color: var(--ink-soft);
+        font-weight: 700;
+        font-size: .95rem;
+      }
+      .top-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+      /* ---------- Buttons ---------- */
+      button {
+        font-family: inherit;
+        cursor: pointer;
+        border: none;
+        font-weight: 800;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 20px;
+        border-radius: 999px;
+        font-size: 1.05rem;
+        line-height: 1;
+        transition: transform .08s ease, filter .15s ease;
+        box-shadow: var(--shadow);
+      }
+      .btn:active { transform: scale(.96); }
+      .btn:focus-visible, .cell:focus-visible {
+        outline: 4px solid var(--teal);
+        outline-offset: 2px;
+      }
+      .btn-call {
+        background: var(--accent);
+        color: var(--accent-ink);
+        font-family: "Fredoka", sans-serif;
+        font-weight: 600;
+        font-size: clamp(1.25rem, 2.6vw, 1.6rem);
+        padding: 16px 30px;
+        width: 100%;
+        justify-content: center;
+      }
+      .btn-call:hover { filter: brightness(1.06); }
+      .btn-hear {
+        background: var(--teal);
+        color: var(--teal-ink);
+        font-size: 1.1rem;
+        padding: 14px 22px;
+        flex: 1;
+        justify-content: center;
+      }
+      .btn-ghost {
+        background: var(--panel);
+        color: var(--ink);
+        border: 2px solid var(--line);
+        box-shadow: none;
+        font-size: 1rem;
+        padding: 11px 18px;
+      }
+      .btn[disabled] { opacity: .45; cursor: not-allowed; }
+      .btn svg { width: 22px; height: 22px; flex: 0 0 auto; }
+
+      /* ---------- Layout ---------- */
+      .layout {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+        align-items: start;
+      }
+      @media (min-width: 920px) {
+        .layout { grid-template-columns: 350px 1fr; }
+        .page { height: 100dvh; }
+        .layout { flex: 1; min-height: 0; }
+        /* Keep the whole 5x5 board on one projector screen: cap the board's
+           width by the viewport height left over after the top bar. */
+        .board-wrap {
+          width: min(100%, calc(100dvh - 245px));
+          min-width: 480px;
+          justify-self: center;
+        }
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 2px solid var(--line);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .panel-label {
+        font-family: "Fredoka", sans-serif;
+        font-weight: 600;
+        font-size: 1rem;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+        margin: 0;
+        text-align: center;
+      }
+
+      /* Called word display */
+      .called-box {
+        background: var(--bg-soft);
+        border: 3px dashed var(--accent);
+        border-radius: 14px;
+        min-height: 128px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        padding: 12px;
+        text-align: center;
+      }
+      .called-word {
+        font-family: "Fredoka", sans-serif;
+        font-weight: 700;
+        font-size: clamp(2.6rem, 7vw, 4rem);
+        line-height: 1;
+        letter-spacing: .02em;
+        color: var(--ink);
+        word-break: break-word;
+      }
+      .called-word.pop { animation: pop .35s ease; }
+      @keyframes pop {
+        0% { transform: scale(.6); }
+        60% { transform: scale(1.12); }
+        100% { transform: scale(1); }
+      }
+      .called-hint {
+        color: var(--ink-soft);
+        font-weight: 700;
+        font-size: 1rem;
+        margin: 0;
+      }
+      .btn-row { display: flex; gap: 10px; }
+
+      .feedback {
+        min-height: 30px;
+        text-align: center;
+        font-weight: 800;
+        font-size: 1.15rem;
+        margin: 0;
+      }
+      .feedback.good { color: var(--mark-deep); }
+      .feedback.try { color: var(--coral); }
+
+      .progress-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        font-weight: 800;
+        color: var(--ink-soft);
+        font-size: 1rem;
+      }
+      .stars { display: flex; gap: 3px; flex-wrap: wrap; justify-content: flex-end; }
+      .stars svg { width: 20px; height: 20px; }
+      .stars .off { opacity: .18; }
+
+      .called-list-wrap { border-top: 2px solid var(--line); padding-top: 12px; }
+      .called-list-title {
+        margin: 0 0 8px;
+        font-weight: 800;
+        color: var(--ink-soft);
+        font-size: .95rem;
+      }
+      .called-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        max-height: 118px;
+        overflow-y: auto;
+      }
+      .chip {
+        background: var(--bg-soft);
+        border: 2px solid var(--line);
+        border-radius: 999px;
+        padding: 3px 11px;
+        font-weight: 800;
+        font-size: .9rem;
+      }
+      .chip.current { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+      .chip.found { background: var(--mark); border-color: var(--mark); color: #fff; }
+      @media (prefers-color-scheme: dark) {
+        .chip.found { color: #0c2417; }
+      }
+      .called-empty { color: var(--ink-soft); font-weight: 700; font-size: .95rem; margin: 0; }
+
+      /* ---------- Board ---------- */
+      .board-wrap {
+        background: var(--panel);
+        border: 2px solid var(--line);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: clamp(10px, 2vw, 20px);
+      }
+      .board-head {
+        display: flex;
+        justify-content: center;
+        gap: clamp(4px, 1.6vw, 14px);
+        margin-bottom: clamp(8px, 1.6vw, 14px);
+      }
+      .board-head span {
+        font-family: "Fredoka", sans-serif;
+        font-weight: 700;
+        font-size: clamp(1.6rem, 5vw, 2.6rem);
+        line-height: 1;
+        width: 15%;
+        max-width: 96px;
+        text-align: center;
+        border-radius: 12px;
+        padding: 6px 0 8px;
+        color: #fff;
+      }
+      .bh-1 { background: #ef6351; }
+      .bh-2 { background: #f59e0b; }
+      .bh-3 { background: #34b26b; }
+      .bh-4 { background: #0e9594; }
+      .bh-5 { background: #e56399; }
+      @media (prefers-color-scheme: dark) {
+        .board-head span { color: #141a26; }
+      }
+
+      .board {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: clamp(6px, 1.4vw, 12px);
+      }
+      .cell {
+        position: relative;
+        aspect-ratio: 1 / 1;
+        background: var(--cell);
+        border: 3px solid var(--cell-line);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4px;
+        font-family: "Fredoka", sans-serif;
+        font-weight: 600;
+        font-size: clamp(1rem, 3.6vw, 1.9rem);
+        letter-spacing: .02em;
+        color: var(--ink);
+        transition: background .15s ease, transform .1s ease, border-color .15s ease;
+        user-select: none;
+        -webkit-user-select: none;
+        touch-action: manipulation;
+        overflow: hidden;
+        text-align: center;
+        line-height: 1.05;
+      }
+      .cell.long { font-size: clamp(.82rem, 3vw, 1.55rem); }
+      .cell.xlong { font-size: clamp(.74rem, 2.7vw, 1.38rem); }
+      @media (min-width: 920px) {
+        .cell { font-size: clamp(1.1rem, 2vw, 1.75rem); }
+        .cell.long { font-size: clamp(.95rem, 1.7vw, 1.45rem); }
+        .cell.xlong { font-size: clamp(.88rem, 1.55vw, 1.3rem); }
+      }
+      .cell:not(.marked):hover { background: var(--cell-hover); }
+      .cell:not(.marked):active { transform: scale(.95); }
+      .cell.marked {
+        background: var(--mark);
+        border-color: var(--mark);
+        color: #fff;
+        cursor: default;
+      }
+      @media (prefers-color-scheme: dark) {
+        .cell.marked { color: #0c2417; }
+      }
+      .cell .marker {
+        position: absolute;
+        top: 4px; right: 6px;
+        width: clamp(16px, 3.4vw, 26px);
+        height: clamp(16px, 3.4vw, 26px);
+        pointer-events: none;
+      }
+      .cell.free {
+        background: var(--free-bg);
+        border-color: var(--accent);
+        color: var(--ink);
+        flex-direction: column;
+        gap: 2px;
+        cursor: default;
+      }
+      .cell.free .free-star { width: clamp(22px, 5vw, 40px); height: clamp(22px, 5vw, 40px); }
+      .cell.free .free-text {
+        font-size: clamp(.7rem, 2.2vw, 1rem);
+        font-weight: 700;
+        letter-spacing: .12em;
+      }
+      .cell.shake { animation: shake .35s ease; }
+      @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-6px); }
+        75% { transform: translateX(6px); }
+      }
+      .cell.win {
+        background: var(--win);
+        border-color: var(--accent);
+        color: #4a2f00;
+        animation: winPulse .7s ease-in-out infinite alternate;
+      }
+      @keyframes winPulse {
+        from { transform: scale(1); }
+        to { transform: scale(1.07); }
+      }
+
+      /* ---------- Celebration overlay ---------- */
+      .overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(20, 16, 4, .55);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 40;
+        padding: 20px;
+      }
+      .overlay.show { display: flex; }
+      .celebration {
+        background: var(--panel);
+        border-radius: 24px;
+        border: 4px solid var(--accent);
+        box-shadow: var(--shadow);
+        padding: 34px 30px;
+        text-align: center;
+        max-width: 440px;
+        width: 100%;
+        animation: pop .4s ease;
+      }
+      .celebration .big-star { width: 84px; height: 84px; margin: 0 auto 6px; display: block; }
+      .celebration h2 {
+        margin: 0;
+        font-size: clamp(3rem, 10vw, 4.4rem);
+        font-weight: 700;
+        line-height: 1;
+        color: var(--ink);
+      }
+      .celebration p {
+        margin: 10px 0 22px;
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: var(--ink-soft);
+      }
+      .celebration .btn-row { justify-content: center; }
+      .btn-again {
+        background: var(--mark);
+        color: #fff;
+        font-family: "Fredoka", sans-serif;
+        font-weight: 600;
+        font-size: 1.25rem;
+        padding: 14px 26px;
+      }
+      @media (prefers-color-scheme: dark) { .btn-again { color: #0c2417; } }
+      .btn-keep {
+        background: var(--panel);
+        color: var(--ink);
+        border: 2px solid var(--line);
+        font-size: 1.1rem;
+        padding: 13px 22px;
+      }
+
+      #confetti {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 50;
+        display: none;
+      }
+      #confetti.show { display: block; }
+
+      @media (max-width: 480px) {
+        .cell { letter-spacing: 0; font-size: .82rem; border-width: 2px; padding: 2px; }
+        .cell.long { font-size: .62rem; }
+        .cell.xlong { font-size: .54rem; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .cell.win, .called-word.pop, .celebration { animation: none; }
+        .cell.shake { animation: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header class="topbar">
+        <div class="title">
+          <div class="title-badge" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2l2.6 6.2 6.7.5-5.1 4.4 1.6 6.5L12 16.2 6.2 19.6l1.6-6.5L2.7 8.7l6.7-.5z"/></svg>
+          </div>
+          <div>
+            <h1>Sight Word Bingo</h1>
+            <p>Listen for the word, then tap it on your board!</p>
+          </div>
+        </div>
+        <div class="top-actions">
+          <button class="btn btn-ghost" id="soundBtn" type="button" aria-pressed="true">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3z"/><path d="M16.5 8.6a4.5 4.5 0 010 6.8l-1-1.2a3.2 3.2 0 000-4.4l1-1.2zm2.4-2.9a8 8 0 010 12.6l-1-1.2a6.6 6.6 0 000-10.2l1-1.2z"/></svg>
+            <span id="soundLabel">Sound On</span>
+          </button>
+          <button class="btn btn-ghost" id="newGameBtn" type="button">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 5V1L7 6l5 5V7a6 6 0 11-6 6H4a8 8 0 108-8z"/></svg>
+            New Game
+          </button>
+        </div>
+      </header>
+
+      <div class="layout">
+        <!-- Teacher / caller panel -->
+        <section class="panel" aria-label="Word caller">
+          <p class="panel-label">The word is…</p>
+          <div class="called-box">
+            <div class="called-word" id="calledWord" aria-live="polite">Ready?</div>
+            <p class="called-hint" id="calledHint">Press Call Word to start!</p>
+          </div>
+          <button class="btn btn-call" id="callBtn" type="button">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 10v4h4l5 5V5L7 10H3z"/><path d="M16 8.8a4.6 4.6 0 010 6.4l-1.1-1.3a3.3 3.3 0 000-3.8L16 8.8zm2.5-3a8.2 8.2 0 010 12.4L17.4 17a6.8 6.8 0 000-10l1.1-1.2z"/></svg>
+            Call Word
+          </button>
+          <div class="btn-row">
+            <button class="btn btn-hear" id="hearBtn" type="button" disabled>
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3a3 3 0 00-3 3v5a3 3 0 006 0V6a3 3 0 00-3-3zm5 8a5 5 0 01-10 0H5a7 7 0 006 6.9V21h2v-3.1A7 7 0 0019 11h-2z"/></svg>
+              Hear It
+            </button>
+          </div>
+          <p class="feedback" id="feedback" aria-live="polite"></p>
+          <div class="progress-row">
+            <span id="foundCount">Found: 0 of 24</span>
+            <div class="stars" id="stars" aria-hidden="true"></div>
+          </div>
+          <div class="called-list-wrap">
+            <p class="called-list-title">Words called so far</p>
+            <div class="called-list" id="calledList">
+              <p class="called-empty">No words called yet.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Bingo board -->
+        <section class="board-wrap" aria-label="Bingo board">
+          <div class="board-head" aria-hidden="true">
+            <span class="bh-1">B</span><span class="bh-2">I</span><span class="bh-3">N</span><span class="bh-4">G</span><span class="bh-5">O</span>
+          </div>
+          <div class="board" id="board" role="grid" aria-label="Sight word bingo board"></div>
+        </section>
+      </div>
+    </div>
+
+    <!-- Celebration -->
+    <div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="bingoTitle">
+      <div class="celebration">
+        <svg class="big-star" viewBox="0 0 24 24" fill="#f59e0b" aria-hidden="true"><path d="M12 2l2.6 6.2 6.7.5-5.1 4.4 1.6 6.5L12 16.2 6.2 19.6l1.6-6.5L2.7 8.7l6.7-.5z"/></svg>
+        <h2 id="bingoTitle">BINGO!</h2>
+        <p id="bingoMsg">You got a whole line — great reading!</p>
+        <div class="btn-row">
+          <button class="btn btn-again" id="againBtn" type="button">New Game</button>
+          <button class="btn btn-keep" id="keepBtn" type="button">Keep Playing</button>
+        </div>
+      </div>
+    </div>
+    <canvas id="confetti" aria-hidden="true"></canvas>
+
+    <script>
+      (function () {
+        "use strict";
+
+        var WORDS = ["THE","SAID","TO","DO","OF","SEE","HE","BE","ME","FROM","LOOK","ARE","WAS","YOU","WHAT","HAVE","YOUR","WANT","GO","NO","SO","SHE","WE","THEY","THEIR","WERE","COULD","WOULD","SHOULD","FOR","THERE","WHERE","WHO","BY","MY","ONE","ONCE","TWO","DOES","MANY","ANY","BEEN","INTO","FRIEND","BECAUSE"];
+
+        var boardEl = document.getElementById("board");
+        var calledWordEl = document.getElementById("calledWord");
+        var calledHintEl = document.getElementById("calledHint");
+        var feedbackEl = document.getElementById("feedback");
+        var foundCountEl = document.getElementById("foundCount");
+        var starsEl = document.getElementById("stars");
+        var calledListEl = document.getElementById("calledList");
+        var callBtn = document.getElementById("callBtn");
+        var hearBtn = document.getElementById("hearBtn");
+        var newGameBtn = document.getElementById("newGameBtn");
+        var soundBtn = document.getElementById("soundBtn");
+        var soundLabel = document.getElementById("soundLabel");
+        var overlay = document.getElementById("overlay");
+        var againBtn = document.getElementById("againBtn");
+        var keepBtn = document.getElementById("keepBtn");
+        var bingoMsg = document.getElementById("bingoMsg");
+        var confettiCanvas = document.getElementById("confetti");
+
+        var STAR_SVG = '<svg viewBox="0 0 24 24" fill="#f59e0b" aria-hidden="true"><path d="M12 2l2.6 6.2 6.7.5-5.1 4.4 1.6 6.5L12 16.2 6.2 19.6l1.6-6.5L2.7 8.7l6.7-.5z"/></svg>';
+        var MARKER_SVG = '<svg class="marker" viewBox="0 0 24 24" fill="#ffffff" aria-hidden="true"><path d="M12 2l2.6 6.2 6.7.5-5.1 4.4 1.6 6.5L12 16.2 6.2 19.6l1.6-6.5L2.7 8.7l6.7-.5z"/></svg>';
+
+        var soundOn = true;
+        var boardWords = [];      // 25 entries, index 12 is null (free space)
+        var marked = [];          // 25 booleans
+        var cells = [];           // 25 button elements
+        var callQueue = [];       // shuffled board words still to call
+        var calledWords = [];     // words already called, in order
+        var currentWord = null;   // word students are looking for now
+        var foundCount = 0;
+        var wonLines = {};        // line keys already celebrated
+        var audioCtx = null;
+
+        function shuffle(arr) {
+          var a = arr.slice();
+          for (var i = a.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var t = a[i]; a[i] = a[j]; a[j] = t;
+          }
+          return a;
+        }
+
+        /* ---------- Sound (WebAudio, in-browser only) ---------- */
+        function ensureAudio() {
+          if (!audioCtx) {
+            var AC = window.AudioContext || window.webkitAudioContext;
+            if (AC) audioCtx = new AC();
+          }
+          if (audioCtx && audioCtx.state === "suspended") audioCtx.resume();
+          return audioCtx;
+        }
+        function tone(freq, start, dur, type, vol) {
+          if (!soundOn) return;
+          var ctx = ensureAudio();
+          if (!ctx) return;
+          var osc = ctx.createOscillator();
+          var gain = ctx.createGain();
+          osc.type = type || "triangle";
+          osc.frequency.value = freq;
+          var t0 = ctx.currentTime + start;
+          gain.gain.setValueAtTime(0.0001, t0);
+          gain.gain.exponentialRampToValueAtTime(vol || 0.22, t0 + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.start(t0); osc.stop(t0 + dur + 0.05);
+        }
+        function playHappy() { tone(659.25, 0, 0.16); tone(880, 0.1, 0.24); }
+        function playTry() { tone(220, 0, 0.18, "sine", 0.12); tone(196, 0.12, 0.22, "sine", 0.1); }
+        function playFanfare() {
+          var notes = [523.25, 659.25, 783.99, 1046.5, 783.99, 1046.5];
+          for (var i = 0; i < notes.length; i++) tone(notes[i], i * 0.13, 0.3, "triangle", 0.24);
+        }
+        function playPop() { tone(523.25, 0, 0.1, "sine", 0.15); }
+
+        /* ---------- Speech ---------- */
+        function speak(text) {
+          if (!("speechSynthesis" in window)) return;
+          try {
+            window.speechSynthesis.cancel();
+            var u = new SpeechSynthesisUtterance(text.toLowerCase());
+            u.rate = 0.82;
+            u.pitch = 1.05;
+            u.lang = "en-US";
+            window.speechSynthesis.speak(u);
+          } catch (e) { /* speech unavailable — word is still shown large */ }
+        }
+
+        /* ---------- Game setup ---------- */
+        function newGame() {
+          var picked = shuffle(WORDS).slice(0, 24);
+          boardWords = [];
+          marked = [];
+          for (var i = 0; i < 25; i++) {
+            if (i === 12) { boardWords.push(null); marked.push(true); }
+            else { boardWords.push(picked[i < 12 ? i : i - 1]); marked.push(false); }
+          }
+          callQueue = shuffle(picked);
+          calledWords = [];
+          currentWord = null;
+          foundCount = 0;
+          wonLines = {};
+          overlay.classList.remove("show");
+          stopConfetti();
+          renderBoard();
+          renderCalledList();
+          updateProgress();
+          calledWordEl.textContent = "Ready?";
+          calledWordEl.classList.remove("pop");
+          calledHintEl.textContent = "Press Call Word to start!";
+          feedbackEl.textContent = "";
+          feedbackEl.className = "feedback";
+          hearBtn.disabled = true;
+          callBtn.disabled = false;
+        }
+
+        function renderBoard() {
+          boardEl.innerHTML = "";
+          cells = [];
+          for (var i = 0; i < 25; i++) {
+            var btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "cell";
+            btn.setAttribute("role", "gridcell");
+            if (i === 12) {
+              btn.classList.add("free", "marked");
+              btn.setAttribute("aria-label", "Free space");
+              btn.innerHTML = '<svg class="free-star" viewBox="0 0 24 24" fill="#f59e0b" aria-hidden="true"><path d="M12 2l2.6 6.2 6.7.5-5.1 4.4 1.6 6.5L12 16.2 6.2 19.6l1.6-6.5L2.7 8.7l6.7-.5z"/></svg><span class="free-text">FREE</span>';
+              btn.disabled = true;
+            } else {
+              var w = boardWords[i];
+              btn.textContent = w;
+              if (w.length >= 7) btn.classList.add("xlong");
+              else if (w.length >= 6) btn.classList.add("long");
+              btn.setAttribute("aria-label", "Word " + w);
+              btn.dataset.index = i;
+              btn.addEventListener("click", onCellTap);
+            }
+            boardEl.appendChild(btn);
+            cells.push(btn);
+          }
+        }
+
+        function renderCalledList() {
+          calledListEl.innerHTML = "";
+          if (!calledWords.length) {
+            var p = document.createElement("p");
+            p.className = "called-empty";
+            p.textContent = "No words called yet.";
+            calledListEl.appendChild(p);
+            return;
+          }
+          calledWords.forEach(function (w) {
+            var chip = document.createElement("span");
+            chip.className = "chip";
+            if (w === currentWord) chip.classList.add("current");
+            if (boardWords.indexOf(w) !== -1 && marked[boardWords.indexOf(w)]) chip.classList.add("found");
+            chip.textContent = w;
+            calledListEl.appendChild(chip);
+          });
+        }
+
+        function updateProgress() {
+          foundCountEl.textContent = "Found: " + foundCount + " of 24";
+          starsEl.innerHTML = "";
+          var litStars = Math.floor(foundCount / 3); // one star per 3 words, up to 8
+          for (var i = 0; i < 8; i++) {
+            var s = document.createElement("span");
+            s.innerHTML = STAR_SVG;
+            if (i >= litStars) s.className = "off";
+            starsEl.appendChild(s);
+          }
+        }
+
+        function setFeedback(msg, kind) {
+          feedbackEl.textContent = msg;
+          feedbackEl.className = "feedback" + (kind ? " " + kind : "");
+        }
+
+        /* ---------- Calling words ---------- */
+        function callWord() {
+          ensureAudio();
+          if (!callQueue.length) {
+            calledWordEl.textContent = "All done!";
+            calledHintEl.textContent = "Every word has been called. Start a New Game!";
+            currentWord = null;
+            hearBtn.disabled = true;
+            callBtn.disabled = true;
+            renderCalledList();
+            return;
+          }
+          currentWord = callQueue.shift();
+          calledWords.push(currentWord);
+          calledWordEl.textContent = currentWord;
+          calledWordEl.classList.remove("pop");
+          void calledWordEl.offsetWidth; // restart animation
+          calledWordEl.classList.add("pop");
+          calledHintEl.textContent = "Find " + currentWord + " on your board!";
+          hearBtn.disabled = false;
+          setFeedback("", "");
+          playPop();
+          speak(currentWord);
+          renderCalledList();
+        }
+
+        /* ---------- Tapping the board ---------- */
+        function onCellTap(evt) {
+          var idx = parseInt(evt.currentTarget.dataset.index, 10);
+          if (marked[idx]) return;
+          if (!currentWord) {
+            setFeedback("Press Call Word first!", "try");
+            playTry();
+            return;
+          }
+          var word = boardWords[idx];
+          if (word === currentWord) {
+            marked[idx] = true;
+            foundCount++;
+            var cell = cells[idx];
+            cell.classList.add("marked");
+            cell.innerHTML = word + MARKER_SVG;
+            if (word.length >= 7) cell.classList.add("xlong");
+            else if (word.length >= 6) cell.classList.add("long");
+            cell.setAttribute("aria-label", "Word " + word + ", found");
+            playHappy();
+            setFeedback("Yes! You found " + word + "!", "good");
+            updateProgress();
+            renderCalledList();
+            checkBingo();
+          } else {
+            var c = cells[idx];
+            c.classList.remove("shake");
+            void c.offsetWidth;
+            c.classList.add("shake");
+            playTry();
+            setFeedback("Try again — listen for " + currentWord + ".", "try");
+          }
+        }
+
+        /* ---------- Bingo check ---------- */
+        var LINES = [
+          [0,1,2,3,4],[5,6,7,8,9],[10,11,12,13,14],[15,16,17,18,19],[20,21,22,23,24],
+          [0,5,10,15,20],[1,6,11,16,21],[2,7,12,17,22],[3,8,13,18,23],[4,9,14,19,24],
+          [0,6,12,18,24],[4,8,12,16,20]
+        ];
+        function checkBingo() {
+          for (var li = 0; li < LINES.length; li++) {
+            var line = LINES[li];
+            var key = "L" + li;
+            if (wonLines[key]) continue;
+            var complete = true;
+            for (var k = 0; k < line.length; k++) {
+              if (!marked[line[k]]) { complete = false; break; }
+            }
+            if (complete) {
+              wonLines[key] = true;
+              line.forEach(function (idx) { cells[idx].classList.add("win"); });
+              celebrate();
+              return;
+            }
+          }
+        }
+
+        function celebrate() {
+          playFanfare();
+          speak("Bingo!");
+          bingoMsg.textContent = Object.keys(wonLines).length > 1
+            ? "Another line — you are a super reader!"
+            : "You got a whole line — great reading!";
+          overlay.classList.add("show");
+          startConfetti();
+        }
+
+        /* ---------- Confetti (canvas, hand-rolled) ---------- */
+        var confettiPieces = [];
+        var confettiRAF = null;
+        var confettiCtx = confettiCanvas.getContext("2d");
+        var CONFETTI_COLORS = ["#ef6351", "#f59e0b", "#34b26b", "#0e9594", "#e56399", "#ffd23f"];
+        function sizeConfetti() {
+          confettiCanvas.width = window.innerWidth;
+          confettiCanvas.height = window.innerHeight;
+        }
+        function startConfetti() {
+          if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+          sizeConfetti();
+          confettiPieces = [];
+          for (var i = 0; i < 140; i++) {
+            confettiPieces.push({
+              x: Math.random() * confettiCanvas.width,
+              y: -20 - Math.random() * confettiCanvas.height * 0.4,
+              w: 7 + Math.random() * 7,
+              h: 10 + Math.random() * 8,
+              vy: 2 + Math.random() * 3.2,
+              vx: -1.4 + Math.random() * 2.8,
+              rot: Math.random() * Math.PI * 2,
+              vr: -0.12 + Math.random() * 0.24,
+              color: CONFETTI_COLORS[i % CONFETTI_COLORS.length]
+            });
+          }
+          confettiCanvas.classList.add("show");
+          var start = performance.now();
+          cancelAnimationFrame(confettiRAF);
+          function frame(now) {
+            var elapsed = now - start;
+            confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+            confettiPieces.forEach(function (p) {
+              p.x += p.vx; p.y += p.vy; p.rot += p.vr;
+              confettiCtx.save();
+              confettiCtx.translate(p.x, p.y);
+              confettiCtx.rotate(p.rot);
+              confettiCtx.fillStyle = p.color;
+              confettiCtx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+              confettiCtx.restore();
+            });
+            if (elapsed < 3400) {
+              confettiRAF = requestAnimationFrame(frame);
+            } else {
+              stopConfetti();
+            }
+          }
+          confettiRAF = requestAnimationFrame(frame);
+        }
+        function stopConfetti() {
+          cancelAnimationFrame(confettiRAF);
+          confettiCtx && confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+          confettiCanvas.classList.remove("show");
+        }
+        window.addEventListener("resize", function () {
+          if (confettiCanvas.classList.contains("show")) sizeConfetti();
+        });
+
+        /* ---------- Controls ---------- */
+        callBtn.addEventListener("click", callWord);
+        hearBtn.addEventListener("click", function () {
+          if (currentWord) { ensureAudio(); speak(currentWord); }
+        });
+        newGameBtn.addEventListener("click", function () { ensureAudio(); playPop(); newGame(); });
+        againBtn.addEventListener("click", function () { ensureAudio(); newGame(); });
+        keepBtn.addEventListener("click", function () {
+          overlay.classList.remove("show");
+          stopConfetti();
+        });
+        soundBtn.addEventListener("click", function () {
+          soundOn = !soundOn;
+          soundLabel.textContent = soundOn ? "Sound On" : "Sound Off";
+          soundBtn.setAttribute("aria-pressed", soundOn ? "true" : "false");
+          if (!soundOn && "speechSynthesis" in window) window.speechSynthesis.cancel();
+          if (soundOn) { ensureAudio(); playHappy(); }
+        });
+
+        newGame();
+      })();
+    </script>
+  </body>
+</html>

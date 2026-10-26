@@ -1,0 +1,614 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>Pattern Builder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #fdf6ec;
+        --panel: #ffffff;
+        --ink: #2b2118;
+        --ink-soft: #6b5d4f;
+        --line: #ead9c2;
+        --accent: #e8641c;
+        --accent-ink: #ffffff;
+        --good: #1e9e4f;
+        --good-bg: #e2f6e9;
+        --try-bg: #fdeeda;
+        --tile-bg: #ffffff;
+        --tile-line: #e3d3ba;
+        --missing-bg: #fff3df;
+        --missing-line: #e8a33d;
+        --shadow: 0 4px 0 rgba(120, 72, 20, 0.16), 0 10px 24px rgba(120, 72, 20, 0.10);
+        --btn-shadow: 0 4px 0 rgba(120, 72, 20, 0.22);
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #17140f;
+          --panel: #241f18;
+          --ink: #f7ecdd;
+          --ink-soft: #c4b096;
+          --line: #453827;
+          --accent: #ff8a3d;
+          --accent-ink: #241203;
+          --good: #4ccb7d;
+          --good-bg: #173325;
+          --try-bg: #3a2a12;
+          --tile-bg: #2c251b;
+          --tile-line: #4d3e28;
+          --missing-bg: #3a2a12;
+          --missing-line: #e8a33d;
+          --shadow: 0 4px 0 rgba(0, 0, 0, 0.35), 0 10px 24px rgba(0, 0, 0, 0.35);
+          --btn-shadow: 0 4px 0 rgba(0, 0, 0, 0.45);
+        }
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; }
+      body {
+        font-family: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+        background: var(--bg);
+        color: var(--ink);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .wrap {
+        width: 100%;
+        max-width: 1080px;
+        padding: clamp(12px, 3vw, 28px);
+        display: flex;
+        flex-direction: column;
+        gap: clamp(12px, 2.5vh, 22px);
+        flex: 1;
+      }
+
+      /* ---------- Top bar ---------- */
+      .topbar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+      }
+      .stars {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--panel);
+        border: 2px solid var(--line);
+        border-radius: 999px;
+        padding: 8px 18px 8px 12px;
+        font-family: "Fredoka", sans-serif;
+        font-weight: 600;
+        font-size: clamp(1.25rem, 3vw, 1.6rem);
+        box-shadow: var(--shadow);
+      }
+      .stars .star-glyph { color: #f5a800; font-size: 1.25em; line-height: 1; }
+      .stars.pop { animation: pop 0.45s ease; }
+      @keyframes pop {
+        0% { transform: scale(1); }
+        40% { transform: scale(1.18) rotate(-3deg); }
+        100% { transform: scale(1); }
+      }
+      .topbar .spacer { flex: 1; }
+      .btn {
+        font-family: "Fredoka", sans-serif;
+        font-weight: 600;
+        font-size: clamp(1rem, 2.4vw, 1.2rem);
+        border: 2px solid var(--line);
+        background: var(--panel);
+        color: var(--ink);
+        border-radius: 999px;
+        padding: 10px 20px;
+        cursor: pointer;
+        box-shadow: var(--btn-shadow);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .btn:active { transform: translateY(3px); box-shadow: none; }
+      .btn.primary {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: var(--accent-ink);
+      }
+      .btn svg { width: 1.15em; height: 1.15em; flex: none; }
+
+      /* ---------- Prompt ---------- */
+      .prompt {
+        text-align: center;
+        font-family: "Fredoka", sans-serif;
+        font-weight: 600;
+        font-size: clamp(1.7rem, 5vw, 2.6rem);
+        margin: 0;
+        line-height: 1.15;
+      }
+      .kind-chip {
+        align-self: center;
+        font-family: "Fredoka", sans-serif;
+        font-weight: 500;
+        font-size: clamp(0.95rem, 2.4vw, 1.15rem);
+        letter-spacing: 0.04em;
+        color: var(--ink-soft);
+        background: var(--panel);
+        border: 2px dashed var(--line);
+        border-radius: 999px;
+        padding: 4px 16px;
+        margin-top: -6px;
+      }
+
+      /* ---------- Pattern row ---------- */
+      .pattern-panel {
+        background: var(--panel);
+        border: 2px solid var(--line);
+        border-radius: 28px;
+        box-shadow: var(--shadow);
+        padding: clamp(16px, 3.5vw, 34px);
+      }
+      .pattern-row {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: clamp(8px, 1.8vw, 16px);
+      }
+      .tile {
+        width: clamp(64px, 13.5vw, 118px);
+        height: clamp(64px, 13.5vw, 118px);
+        border-radius: 22px;
+        background: var(--tile-bg);
+        border: 3px solid var(--tile-line);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        padding: 6px;
+        user-select: none;
+      }
+      .tile svg { width: 72%; height: 72%; }
+      .tile .swatch {
+        width: 68%;
+        height: 52%;
+        border-radius: 14px;
+        border: 3px solid rgba(0, 0, 0, 0.14);
+      }
+      .tile .word {
+        font-family: "Fredoka", sans-serif;
+        font-weight: 600;
+        font-size: clamp(0.8rem, 2.2vw, 1.05rem);
+        line-height: 1;
+        color: var(--ink);
+        text-transform: capitalize;
+      }
+      .tile .digit {
+        font-family: "Fredoka", sans-serif;
+        font-weight: 700;
+        font-size: clamp(2rem, 6vw, 3.4rem);
+        line-height: 1;
+      }
+      .tile.missing {
+        background: var(--missing-bg);
+        border: 4px dashed var(--missing-line);
+        font-family: "Fredoka", sans-serif;
+        font-weight: 700;
+        font-size: clamp(2rem, 6vw, 3.4rem);
+        color: var(--missing-line);
+        animation: wiggle 1.6s ease-in-out infinite;
+      }
+      @keyframes wiggle {
+        0%, 100% { transform: rotate(0deg); }
+        25% { transform: rotate(-2.5deg); }
+        75% { transform: rotate(2.5deg); }
+      }
+      .tile.revealed {
+        border-color: var(--good);
+        background: var(--good-bg);
+        animation: pop 0.45s ease;
+      }
+
+      /* ---------- Feedback ---------- */
+      .feedback {
+        min-height: 2.2em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-family: "Fredoka", sans-serif;
+        font-weight: 600;
+        font-size: clamp(1.3rem, 4vw, 1.9rem);
+        margin: 0;
+        border-radius: 20px;
+        padding: 6px 14px;
+      }
+      .feedback.good { color: var(--good); background: var(--good-bg); }
+      .feedback.try { color: var(--ink); background: var(--try-bg); }
+
+      /* ---------- Choices ---------- */
+      .choices-label {
+        text-align: center;
+        font-family: "Fredoka", sans-serif;
+        font-weight: 500;
+        font-size: clamp(1.05rem, 3vw, 1.35rem);
+        color: var(--ink-soft);
+        margin: 0;
+      }
+      .choices {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: clamp(12px, 3vw, 26px);
+      }
+      .choice {
+        border: 3px solid var(--tile-line);
+        background: var(--panel);
+        border-radius: 26px;
+        padding: clamp(10px, 2vw, 18px);
+        cursor: pointer;
+        box-shadow: var(--btn-shadow);
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .choice .tile {
+        width: clamp(84px, 20vw, 140px);
+        height: clamp(84px, 20vw, 140px);
+        border: none;
+        background: transparent;
+      }
+      .choice:hover, .choice:focus-visible { border-color: var(--accent); outline: none; }
+      .choice:active { transform: translateY(3px); box-shadow: none; }
+      .choice.right { border-color: var(--good); background: var(--good-bg); animation: pop 0.45s ease; }
+      .choice.wrong { opacity: 0.38; pointer-events: none; animation: shake 0.35s ease; }
+      .choice:disabled { cursor: default; }
+      @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-7px); }
+        75% { transform: translateX(7px); }
+      }
+
+      .confetti-bit {
+        position: fixed;
+        width: 12px;
+        height: 12px;
+        border-radius: 3px;
+        pointer-events: none;
+        z-index: 50;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .tile.missing, .stars.pop, .tile.revealed, .choice.right { animation: none; }
+        .choice.wrong { animation: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="topbar">
+        <div class="stars" id="starsBox" aria-label="Stars earned">
+          <span class="star-glyph" aria-hidden="true">★</span>
+          <span id="starCount">0</span>
+        </div>
+        <div class="spacer"></div>
+        <button class="btn" id="hearBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Hear It
+        </button>
+        <button class="btn" id="soundBtn" type="button" aria-pressed="true">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 0 1 0 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <span id="soundLabel">Sound: On</span>
+        </button>
+        <button class="btn primary" id="newBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v4h-4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          New Game
+        </button>
+      </div>
+
+      <h1 class="prompt">What comes next?</h1>
+      <div class="kind-chip" id="kindChip">AB Pattern</div>
+
+      <div class="pattern-panel">
+        <div class="pattern-row" id="patternRow" aria-live="polite"></div>
+      </div>
+
+      <p class="feedback" id="feedback" aria-live="polite"></p>
+
+      <p class="choices-label">Tap the piece that finishes the pattern</p>
+      <div class="choices" id="choices"></div>
+    </div>
+
+    <script>
+      "use strict";
+
+      /* ---------------- Item pools ---------------- */
+      var COLORS = [
+        { name: "red",    hex: "#e23b3b" },
+        { name: "blue",   hex: "#2f6fd6" },
+        { name: "yellow", hex: "#f4b41a" },
+        { name: "green",  hex: "#2fa84f" },
+        { name: "orange", hex: "#f07f23" },
+        { name: "pink",   hex: "#ef6fb0" }
+      ];
+      var SHAPES = [
+        { name: "star",     hex: "#f5a800", svg: '<polygon points="50,4 62,37 97,37 68,58 79,92 50,71 21,92 32,58 3,37 38,37"/>' },
+        { name: "circle",   hex: "#2f6fd6", svg: '<circle cx="50" cy="50" r="42"/>' },
+        { name: "triangle", hex: "#2fa84f", svg: '<polygon points="50,10 93,88 7,88"/>' },
+        { name: "square",   hex: "#e23b3b", svg: '<rect x="12" y="12" width="76" height="76" rx="10"/>' },
+        { name: "heart",    hex: "#ef4f7d", svg: '<path d="M50 88 C18 63 8 46 8 31 C8 17 19 8 31 8 C40 8 47 13 50 22 C53 13 60 8 69 8 C81 8 92 17 92 31 C92 46 82 63 50 88 Z"/>' },
+        { name: "diamond",  hex: "#12a5a5", svg: '<polygon points="50,5 92,50 50,95 8,50"/>' }
+      ];
+      var NUMBER_WORDS = ["zero","one","two","three","four","five","six","seven","eight","nine"];
+      var NUMBERS = [];
+      for (var n = 1; n <= 9; n++) {
+        NUMBERS.push({ name: NUMBER_WORDS[n], digit: String(n) });
+      }
+
+      var KINDS = [
+        { id: "AB",  label: "AB Pattern",  unit: [0, 1] },
+        { id: "ABB", label: "ABB Pattern", unit: [0, 1, 1] },
+        { id: "ABC", label: "ABC Pattern", unit: [0, 1, 2] }
+      ];
+
+      /* ---------------- State ---------------- */
+      var state = {
+        stars: 0,
+        sound: true,
+        current: null,   // { shown:[item], answer:item, speakText:string, kindLabel }
+        locked: false
+      };
+
+      var els = {
+        row: document.getElementById("patternRow"),
+        choices: document.getElementById("choices"),
+        feedback: document.getElementById("feedback"),
+        starCount: document.getElementById("starCount"),
+        starsBox: document.getElementById("starsBox"),
+        kindChip: document.getElementById("kindChip"),
+        soundBtn: document.getElementById("soundBtn"),
+        soundLabel: document.getElementById("soundLabel"),
+        hearBtn: document.getElementById("hearBtn"),
+        newBtn: document.getElementById("newBtn")
+      };
+
+      /* ---------------- Helpers ---------------- */
+      function shuffle(arr) {
+        var a = arr.slice();
+        for (var i = a.length - 1; i > 0; i--) {
+          var j = Math.floor(Math.random() * (i + 1));
+          var t = a[i]; a[i] = a[j]; a[j] = t;
+        }
+        return a;
+      }
+      function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+      function makeItems(type) {
+        if (type === "color") {
+          return COLORS.map(function (c) {
+            return { type: "color", key: "c-" + c.name, label: c.name, speak: c.name, hex: c.hex };
+          });
+        }
+        if (type === "shape") {
+          return SHAPES.map(function (s) {
+            return { type: "shape", key: "s-" + s.name, label: s.name, speak: s.name, hex: s.hex, svg: s.svg };
+          });
+        }
+        return NUMBERS.map(function (num) {
+          return { type: "number", key: "n-" + num.digit, label: num.digit, speak: num.name, digit: num.digit };
+        });
+      }
+
+      function tileHTML(item) {
+        if (item.type === "color") {
+          return '<div class="swatch" style="background:' + item.hex + '"></div>' +
+                 '<div class="word">' + item.label + "</div>";
+        }
+        if (item.type === "shape") {
+          return '<svg viewBox="0 0 100 100" aria-hidden="true"><g fill="' + item.hex + '">' + item.svg + "</g></svg>" +
+                 '<div class="word">' + item.label + "</div>";
+        }
+        return '<div class="digit">' + item.digit + "</div>";
+      }
+
+      /* ---------------- Pattern generation ---------------- */
+      function newPattern() {
+        var type = pick(["color", "shape", "number"]);
+        var kind = pick(KINDS);
+        var pool = makeItems(type);
+        var chosen = shuffle(pool).slice(0, kind.id === "AB" ? 2 : 3);
+
+        // Build the full sequence: repeat the unit until we have 5 or 6 tiles.
+        var total = pick([5, 6]);
+        var full = [];
+        for (var i = 0; i < total; i++) {
+          full.push(chosen[kind.unit[i % kind.unit.length]]);
+        }
+        var answer = full[full.length - 1];
+        var shown = full.slice(0, full.length - 1);
+
+        // Two distractors from the same pool, different from the answer.
+        var others = pool.filter(function (it) { return it.key !== answer.key; });
+        var distractors = shuffle(others).slice(0, 2);
+        var options = shuffle([answer].concat(distractors));
+
+        state.current = {
+          shown: shown,
+          answer: answer,
+          options: options,
+          kindLabel: kind.label,
+          speakText: shown.map(function (it) { return it.speak; }).join(", ") + ". What comes next?"
+        };
+        state.locked = false;
+        render();
+      }
+
+      function render() {
+        var cur = state.current;
+        els.kindChip.textContent = cur.kindLabel;
+        els.feedback.textContent = "";
+        els.feedback.className = "feedback";
+
+        els.row.innerHTML = "";
+        cur.shown.forEach(function (item) {
+          var d = document.createElement("div");
+          d.className = "tile";
+          d.innerHTML = tileHTML(item);
+          els.row.appendChild(d);
+        });
+        var miss = document.createElement("div");
+        miss.className = "tile missing";
+        miss.id = "missingTile";
+        miss.textContent = "?";
+        miss.setAttribute("aria-label", "missing piece");
+        els.row.appendChild(miss);
+
+        els.choices.innerHTML = "";
+        cur.options.forEach(function (item) {
+          var b = document.createElement("button");
+          b.type = "button";
+          b.className = "choice";
+          b.setAttribute("aria-label", "Choose " + item.speak);
+          b.innerHTML = '<div class="tile">' + tileHTML(item) + "</div>";
+          b.addEventListener("click", function () { choose(item, b); });
+          els.choices.appendChild(b);
+        });
+      }
+
+      /* ---------------- Sound (WebAudio, in-browser only) ---------------- */
+      var audioCtx = null;
+      function ensureAudio() {
+        if (!audioCtx) {
+          var AC = window.AudioContext || window.webkitAudioContext;
+          if (AC) audioCtx = new AC();
+        }
+        if (audioCtx && audioCtx.state === "suspended") audioCtx.resume();
+        return audioCtx;
+      }
+      function tone(freq, start, dur, type, vol) {
+        if (!audioCtx) return;
+        var t0 = audioCtx.currentTime + start;
+        var osc = audioCtx.createOscillator();
+        var gain = audioCtx.createGain();
+        osc.type = type || "sine";
+        osc.frequency.setValueAtTime(freq, t0);
+        gain.gain.setValueAtTime(0.0001, t0);
+        gain.gain.exponentialRampToValueAtTime(vol || 0.22, t0 + 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(t0); osc.stop(t0 + dur + 0.05);
+      }
+      function happySound() {
+        if (!state.sound || !ensureAudio()) return;
+        tone(523.25, 0, 0.22, "triangle");
+        tone(659.25, 0.09, 0.22, "triangle");
+        tone(783.99, 0.18, 0.34, "triangle");
+        tone(1046.5, 0.27, 0.4, "sine", 0.16);
+      }
+      function tryAgainSound() {
+        if (!state.sound || !ensureAudio()) return;
+        tone(392, 0, 0.2, "sine", 0.14);
+        tone(329.63, 0.14, 0.28, "sine", 0.14);
+      }
+      document.addEventListener("pointerdown", function () { ensureAudio(); }, { once: true });
+
+      /* ---------------- Speech ---------------- */
+      function speakPattern() {
+        if (!("speechSynthesis" in window) || !state.current) return;
+        window.speechSynthesis.cancel();
+        var u = new SpeechSynthesisUtterance(state.current.speakText);
+        u.rate = 0.92;
+        u.pitch = 1.05;
+        window.speechSynthesis.speak(u);
+      }
+
+      /* ---------------- Confetti ---------------- */
+      var CONFETTI_COLORS = ["#e23b3b", "#2f6fd6", "#f4b41a", "#2fa84f", "#f07f23", "#ef6fb0"];
+      function confetti() {
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        for (var i = 0; i < 16; i++) {
+          var bit = document.createElement("div");
+          bit.className = "confetti-bit";
+          bit.style.background = pick(CONFETTI_COLORS);
+          bit.style.left = (38 + Math.random() * 24) + "vw";
+          bit.style.top = "38vh";
+          document.body.appendChild(bit);
+          var dx = (Math.random() - 0.5) * 320;
+          var dy = 120 + Math.random() * 260;
+          var rot = (Math.random() - 0.5) * 540;
+          bit.animate(
+            [
+              { transform: "translate(0,0) rotate(0deg)", opacity: 1 },
+              { transform: "translate(" + dx + "px," + dy + "px) rotate(" + rot + "deg)", opacity: 0 }
+            ],
+            { duration: 850 + Math.random() * 450, easing: "cubic-bezier(.2,.7,.3,1)" }
+          ).onfinish = (function (el) { return function () { el.remove(); }; })(bit);
+        }
+      }
+
+      /* ---------------- Gameplay ---------------- */
+      var PRAISE = ["Great job!", "You did it!", "Way to go!", "Super work!", "That's right!"];
+      function choose(item, btn) {
+        if (state.locked) return;
+        ensureAudio();
+        var cur = state.current;
+        if (item.key === cur.answer.key) {
+          state.locked = true;
+          btn.classList.add("right");
+          var buttons = els.choices.querySelectorAll(".choice");
+          buttons.forEach(function (b) { b.disabled = true; });
+
+          var miss = document.getElementById("missingTile");
+          if (miss) {
+            miss.classList.remove("missing");
+            miss.classList.add("revealed");
+            miss.innerHTML = tileHTML(cur.answer);
+            miss.removeAttribute("id");
+          }
+
+          state.stars += 1;
+          els.starCount.textContent = state.stars;
+          els.starsBox.classList.remove("pop");
+          void els.starsBox.offsetWidth;
+          els.starsBox.classList.add("pop");
+
+          els.feedback.textContent = "★ " + pick(PRAISE) + " It was " + cur.answer.speak + "!";
+          els.feedback.className = "feedback good";
+          happySound();
+          confetti();
+          setTimeout(newPattern, 1500);
+        } else {
+          btn.classList.add("wrong");
+          btn.disabled = true;
+          els.feedback.textContent = "Good try! Look at the pattern and try again.";
+          els.feedback.className = "feedback try";
+          tryAgainSound();
+        }
+      }
+
+      /* ---------------- Controls ---------------- */
+      els.newBtn.addEventListener("click", function () {
+        ensureAudio();
+        state.stars = 0;
+        els.starCount.textContent = "0";
+        if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+        newPattern();
+      });
+      els.soundBtn.addEventListener("click", function () {
+        state.sound = !state.sound;
+        els.soundLabel.textContent = state.sound ? "Sound: On" : "Sound: Off";
+        els.soundBtn.setAttribute("aria-pressed", state.sound ? "true" : "false");
+        if (state.sound) { ensureAudio(); tone(659.25, 0, 0.15, "triangle"); }
+      });
+      els.hearBtn.addEventListener("click", speakPattern);
+
+      newPattern();
+    </script>
+  </body>
+</html>

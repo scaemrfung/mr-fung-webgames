@@ -1,0 +1,506 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>Rhyming Match</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #eef7fb;
+        --panel: #ffffff;
+        --panel-edge: #cfe6f2;
+        --ink: #173a4d;
+        --ink-soft: #4a6b7d;
+        --accent: #e8553e;
+        --accent-ink: #ffffff;
+        --choice: #ffffff;
+        --choice-edge: #9ecfe8;
+        --choice-hover: #e3f3fc;
+        --good: #1f9d55;
+        --good-bg: #dcf5e5;
+        --try: #b7791f;
+        --try-bg: #fdf0d3;
+        --star: #f5a623;
+        --btn: #173a4d;
+        --btn-ink: #ffffff;
+        --btn-soft: #ffffff;
+        --btn-soft-edge: #b9d6e6;
+        --shadow: 0 6px 0 rgba(23, 58, 77, 0.12);
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0e2231;
+          --panel: #16344a;
+          --panel-edge: #2a4f6b;
+          --ink: #eaf6fd;
+          --ink-soft: #a9c8da;
+          --accent: #ff7a5c;
+          --accent-ink: #1c1206;
+          --choice: #1b3e57;
+          --choice-edge: #3d7295;
+          --choice-hover: #24506e;
+          --good: #4ade80;
+          --good-bg: #14432a;
+          --try: #fbbf24;
+          --try-bg: #4a3a12;
+          --star: #fbbf24;
+          --btn: #eaf6fd;
+          --btn-ink: #173a4d;
+          --btn-soft: #1b3e57;
+          --btn-soft-edge: #3d7295;
+          --shadow: 0 6px 0 rgba(0, 0, 0, 0.35);
+        }
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; }
+      body {
+        font-family: "Fredoka", "Comic Sans MS", system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--ink);
+        min-height: 100vh;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .wrap {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 14px 16px 28px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      /* Top bar: stars + controls */
+      .topbar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+      }
+      .stars-box {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--panel);
+        border: 3px solid var(--panel-edge);
+        border-radius: 999px;
+        padding: 8px 18px 8px 12px;
+        font-size: 1.35rem;
+        font-weight: 700;
+        box-shadow: var(--shadow);
+      }
+      .stars-box .star-ico { font-size: 1.6rem; line-height: 1; color: var(--star); }
+      .progress {
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: var(--ink-soft);
+        margin-left: 2px;
+      }
+      .controls { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+      .ctl-btn {
+        font-family: inherit;
+        font-size: 1.05rem;
+        font-weight: 600;
+        border-radius: 999px;
+        border: 3px solid var(--btn-soft-edge);
+        background: var(--btn-soft);
+        color: var(--ink);
+        padding: 9px 18px;
+        cursor: pointer;
+        box-shadow: var(--shadow);
+      }
+      .ctl-btn:active { transform: translateY(3px); box-shadow: none; }
+      .ctl-btn.primary {
+        background: var(--btn);
+        color: var(--btn-ink);
+        border-color: var(--btn);
+      }
+      /* Target card */
+      .target-card {
+        background: var(--panel);
+        border: 4px solid var(--panel-edge);
+        border-radius: 28px;
+        box-shadow: var(--shadow);
+        padding: 22px 16px 26px;
+        text-align: center;
+      }
+      .prompt {
+        font-size: clamp(1.15rem, 3.4vw, 1.6rem);
+        font-weight: 600;
+        color: var(--ink-soft);
+        margin: 0 0 6px;
+      }
+      .target-pic {
+        font-size: clamp(84px, 20vw, 140px);
+        line-height: 1.15;
+      }
+      .target-word {
+        font-size: clamp(56px, 13vw, 104px);
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        line-height: 1.05;
+        color: var(--accent);
+      }
+      .hear-row { margin-top: 16px; }
+      .hear-btn {
+        font-family: inherit;
+        font-size: 1.25rem;
+        font-weight: 700;
+        border: none;
+        border-radius: 999px;
+        background: var(--accent);
+        color: var(--accent-ink);
+        padding: 13px 30px;
+        cursor: pointer;
+        box-shadow: var(--shadow);
+      }
+      .hear-btn:active { transform: translateY(3px); box-shadow: none; }
+      /* Choices */
+      .choices {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+      }
+      .choice-btn {
+        font-family: inherit;
+        background: var(--choice);
+        border: 4px solid var(--choice-edge);
+        border-radius: 24px;
+        box-shadow: var(--shadow);
+        padding: 16px 6px 14px;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        color: var(--ink);
+      }
+      .choice-btn:hover { background: var(--choice-hover); }
+      .choice-btn:active { transform: translateY(3px); box-shadow: none; }
+      .choice-pic { font-size: clamp(46px, 11vw, 76px); line-height: 1.15; }
+      .choice-word {
+        font-size: clamp(30px, 7vw, 52px);
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        line-height: 1.1;
+      }
+      .choice-btn.correct {
+        border-color: var(--good);
+        background: var(--good-bg);
+      }
+      .choice-btn.tryagain {
+        border-color: var(--try);
+        background: var(--try-bg);
+      }
+      .choice-btn:disabled { cursor: default; opacity: 1; }
+      /* Feedback */
+      .feedback {
+        min-height: 3.2rem;
+        text-align: center;
+        font-size: clamp(1.3rem, 4.5vw, 1.9rem);
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .feedback.good { color: var(--good); }
+      .feedback.try { color: var(--try); }
+      /* Celebration */
+      .celebration {
+        display: none;
+        background: var(--panel);
+        border: 4px solid var(--panel-edge);
+        border-radius: 28px;
+        box-shadow: var(--shadow);
+        padding: 30px 20px 34px;
+        text-align: center;
+      }
+      .celebration.show { display: block; }
+      .celebration .big { font-size: clamp(2.2rem, 8vw, 3.4rem); font-weight: 700; margin: 0 0 6px; }
+      .celebration .sub { font-size: clamp(1.15rem, 4vw, 1.5rem); color: var(--ink-soft); font-weight: 600; margin: 0 0 20px; }
+      .confetti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 50; }
+      .confetti span {
+        position: absolute;
+        top: -40px;
+        font-size: 28px;
+        animation: fall linear forwards;
+      }
+      @keyframes fall {
+        to { transform: translateY(110vh) rotate(340deg); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .confetti span { animation: none; display: none; }
+        .choice-btn:active, .ctl-btn:active, .hear-btn:active { transform: none; }
+      }
+      @media (max-width: 560px) {
+        .choices { grid-template-columns: 1fr; }
+        .choice-btn { flex-direction: row; justify-content: center; gap: 14px; padding: 12px 10px; }
+        .controls { margin-left: 0; }
+        .topbar { justify-content: center; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <div class="topbar">
+        <div class="stars-box" aria-live="polite">
+          <span class="star-ico" aria-hidden="true">★</span>
+          <span id="starCount">0</span>
+          <span class="progress" id="progress">Word 1 of 15</span>
+        </div>
+        <div class="controls">
+          <button class="ctl-btn" id="soundBtn" type="button" aria-pressed="true">🔊 Sound: On</button>
+          <button class="ctl-btn primary" id="newGameBtn" type="button">↻ New Game</button>
+        </div>
+      </div>
+
+      <section id="gameArea">
+        <div class="target-card">
+          <p class="prompt">Which word rhymes with…</p>
+          <div class="target-pic" id="targetPic" aria-hidden="true">🐱</div>
+          <div class="target-word" id="targetWord">CAT</div>
+          <div class="hear-row">
+            <button class="hear-btn" id="hearBtn" type="button">🔊 Hear It</button>
+          </div>
+        </div>
+
+        <div class="feedback" id="feedback" aria-live="polite"></div>
+
+        <div class="choices" id="choices" role="group" aria-label="Word choices"></div>
+      </section>
+
+      <section class="celebration" id="celebration">
+        <p class="big">🎉 Great Job! 🎉</p>
+        <p class="sub" id="celebrationSub">You found all the rhyming words!</p>
+        <button class="hear-btn" id="playAgainBtn" type="button">▶ Play Again</button>
+      </section>
+    </main>
+
+    <div class="confetti" id="confetti" aria-hidden="true"></div>
+
+    <script>
+      // Rhyming pairs: [target, targetPic, rhyme, rhymePic]
+      var PAIRS = [
+        ["CAT",  "🐱", "HAT",  "🎩"],
+        ["SUN",  "☀️", "FUN",  "🎉"],
+        ["DOG",  "🐶", "FROG", "🐸"],
+        ["PIG",  "🐷", "WIG",  "💇"],
+        ["BED",  "🛏️", "RED",  "🔴"],
+        ["MAP",  "🗺️", "CAP",  "🧢"],
+        ["BALL", "⚽", "FALL", "🍂"],
+        ["CAKE", "🎂", "LAKE", "🏞️"],
+        ["DUCK", "🦆", "LUCK", "🍀"],
+        ["HEN",  "🐔", "PEN",  "🖊️"],
+        ["BOOK", "📖", "LOOK", "👀"],
+        ["CAR",  "🚗", "STAR", "⭐"],
+        ["ANT",  "🐜", "PANT", "👖"],
+        ["BEE",  "🐝", "TREE", "🌳"],
+        ["FOX",  "🦊", "BOX",  "📦"]
+      ];
+
+      var queue = [];
+      var current = null;
+      var round = 0;
+      var stars = 0;
+      var locked = false;
+      var soundOn = true;
+      var audioCtx = null;
+
+      var targetPicEl = document.getElementById("targetPic");
+      var targetWordEl = document.getElementById("targetWord");
+      var choicesEl = document.getElementById("choices");
+      var feedbackEl = document.getElementById("feedback");
+      var starCountEl = document.getElementById("starCount");
+      var progressEl = document.getElementById("progress");
+      var gameAreaEl = document.getElementById("gameArea");
+      var celebrationEl = document.getElementById("celebration");
+      var celebrationSubEl = document.getElementById("celebrationSub");
+      var confettiEl = document.getElementById("confetti");
+
+      function shuffle(arr) {
+        var a = arr.slice();
+        for (var i = a.length - 1; i > 0; i--) {
+          var j = Math.floor(Math.random() * (i + 1));
+          var t = a[i]; a[i] = a[j]; a[j] = t;
+        }
+        return a;
+      }
+
+      function ensureAudio() {
+        if (!audioCtx) {
+          var AC = window.AudioContext || window.webkitAudioContext;
+          if (AC) audioCtx = new AC();
+        }
+        if (audioCtx && audioCtx.state === "suspended") audioCtx.resume();
+      }
+
+      function tone(freq, start, dur, type) {
+        if (!soundOn || !audioCtx) return;
+        var t = audioCtx.currentTime + start;
+        var osc = audioCtx.createOscillator();
+        var gain = audioCtx.createGain();
+        osc.type = type || "sine";
+        osc.frequency.setValueAtTime(freq, t);
+        gain.gain.setValueAtTime(0.0001, t);
+        gain.gain.exponentialRampToValueAtTime(0.22, t + 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(t); osc.stop(t + dur + 0.05);
+      }
+
+      function happySound() {
+        ensureAudio();
+        tone(523.25, 0, 0.22);
+        tone(659.25, 0.1, 0.22);
+        tone(783.99, 0.2, 0.34);
+        tone(1046.5, 0.3, 0.4);
+      }
+
+      function trySound() {
+        ensureAudio();
+        tone(330, 0, 0.2, "triangle");
+        tone(262, 0.14, 0.28, "triangle");
+      }
+
+      function fanfareSound() {
+        ensureAudio();
+        var notes = [523.25, 659.25, 783.99, 1046.5, 783.99, 1046.5];
+        for (var i = 0; i < notes.length; i++) tone(notes[i], i * 0.13, 0.3);
+      }
+
+      function speak(text) {
+        if (!("speechSynthesis" in window)) return;
+        try {
+          window.speechSynthesis.cancel();
+          var u = new SpeechSynthesisUtterance(text);
+          u.rate = 0.85;
+          u.pitch = 1.05;
+          window.speechSynthesis.speak(u);
+        } catch (e) { /* speech unavailable — game still works */ }
+      }
+
+      function newGame() {
+        queue = shuffle(PAIRS);
+        round = 0;
+        stars = 0;
+        starCountEl.textContent = "0";
+        celebrationEl.classList.remove("show");
+        gameAreaEl.style.display = "";
+        nextRound();
+      }
+
+      function nextRound() {
+        if (round >= queue.length) {
+          finishGame();
+          return;
+        }
+        current = queue[round];
+        locked = false;
+        feedbackEl.textContent = "";
+        feedbackEl.className = "feedback";
+        progressEl.textContent = "Word " + (round + 1) + " of " + queue.length;
+        targetPicEl.textContent = current[1];
+        targetWordEl.textContent = current[0];
+
+        // Two distractors: rhyme-words from other pairs (different rimes, so they never rhyme with the target)
+        var others = shuffle(PAIRS.filter(function (p) { return p !== current; }));
+        var d1 = others[0], d2 = others[1];
+        var options = shuffle([
+          { word: current[2], pic: current[3], right: true },
+          { word: d1[2], pic: d1[3], right: false },
+          { word: d2[2], pic: d2[3], right: false }
+        ]);
+
+        choicesEl.innerHTML = "";
+        options.forEach(function (opt) {
+          var btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "choice-btn";
+          btn.setAttribute("aria-label", opt.word);
+          var pic = document.createElement("span");
+          pic.className = "choice-pic";
+          pic.setAttribute("aria-hidden", "true");
+          pic.textContent = opt.pic;
+          var word = document.createElement("span");
+          word.className = "choice-word";
+          word.textContent = opt.word;
+          btn.appendChild(pic);
+          btn.appendChild(word);
+          btn.addEventListener("click", function () { pick(btn, opt); });
+          choicesEl.appendChild(btn);
+        });
+      }
+
+      function pick(btn, opt) {
+        if (locked) return;
+        ensureAudio();
+        if (opt.right) {
+          locked = true;
+          stars++;
+          starCountEl.textContent = String(stars);
+          btn.classList.add("correct");
+          var all = choicesEl.querySelectorAll("button");
+          for (var i = 0; i < all.length; i++) all[i].disabled = true;
+          feedbackEl.textContent = "⭐ Yes! " + current[0] + " rhymes with " + current[2] + "!";
+          feedbackEl.className = "feedback good";
+          happySound();
+          round++;
+          setTimeout(nextRound, 1600);
+        } else {
+          btn.classList.add("tryagain");
+          btn.disabled = true;
+          feedbackEl.textContent = "Good try! " + opt.word + " doesn't rhyme with " + current[0] + ". Try again!";
+          feedbackEl.className = "feedback try";
+          trySound();
+        }
+      }
+
+      function finishGame() {
+        gameAreaEl.style.display = "none";
+        celebrationEl.classList.add("show");
+        celebrationSubEl.textContent = "You found all " + queue.length + " rhyming words and earned " + stars + " stars!";
+        progressEl.textContent = "All done!";
+        fanfareSound();
+        launchConfetti();
+      }
+
+      function launchConfetti() {
+        var pieces = ["⭐", "🎉", "🌟", "✨", "🎈"];
+        confettiEl.innerHTML = "";
+        for (var i = 0; i < 36; i++) {
+          var s = document.createElement("span");
+          s.textContent = pieces[i % pieces.length];
+          s.style.left = Math.random() * 100 + "vw";
+          s.style.animationDuration = (2.2 + Math.random() * 1.8) + "s";
+          s.style.animationDelay = (Math.random() * 0.7) + "s";
+          confettiEl.appendChild(s);
+        }
+        setTimeout(function () { confettiEl.innerHTML = ""; }, 5200);
+      }
+
+      document.getElementById("hearBtn").addEventListener("click", function () {
+        if (!current) return;
+        var words = [];
+        var btns = choicesEl.querySelectorAll(".choice-word");
+        for (var i = 0; i < btns.length; i++) words.push(btns[i].textContent);
+        speak("Which word rhymes with " + current[0] + "? " + words.join(", ") + ".");
+      });
+
+      document.getElementById("soundBtn").addEventListener("click", function () {
+        soundOn = !soundOn;
+        this.textContent = soundOn ? "🔊 Sound: On" : "🔇 Sound: Off";
+        this.setAttribute("aria-pressed", soundOn ? "true" : "false");
+        if (soundOn) { ensureAudio(); tone(660, 0, 0.15); }
+      });
+
+      document.getElementById("newGameBtn").addEventListener("click", newGame);
+      document.getElementById("playAgainBtn").addEventListener("click", newGame);
+
+      newGame();
+    </script>
+  </body>
+</html>

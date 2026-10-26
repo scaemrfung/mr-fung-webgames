@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:," />
+<title>Shape Sorter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FFF7E6; --bg2:#FFEFC2;
+    --card:#FFFFFF; --card-border:#F2D492;
+    --ink:#1E2A1A; --muted:#6B7280;
+    --bin:#FFFFFF; --bin-border:#E5DCC8;
+    --accent:#FF6B35; --accent2:#0EA47A; --yellow:#FFC914;
+    --header:#FFFFFF;
+    --shadow:0 10px 30px rgba(90,60,0,.12);
+    --stage:#FFFDF6;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#141A2E; --bg2:#1A2340;
+      --card:#1F2942; --card-border:#33406B;
+      --ink:#F8FAFC; --muted:#A8B3CF;
+      --bin:#232F4E; --bin-border:#3A4A73;
+      --accent:#FF8A5B; --accent2:#2DD4A8; --yellow:#FFD93D;
+      --header:#1F2942;
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+      --stage:#1A233E;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Nunito",system-ui,sans-serif;background:radial-gradient(900px 500px at 15% -5%, var(--bg2), transparent 60%), var(--bg);color:var(--ink);min-height:100dvh}
+  button{font-family:inherit;cursor:pointer}
+  .wrap{max-width:980px;margin:0 auto;padding:14px 16px 20px}
+  /* top bar */
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:12px}
+  .brand-icons{display:flex;gap:4px;font-size:28px;line-height:1}
+  h1{font-family:"Fredoka",sans-serif;font-size:32px;line-height:1;margin:0;letter-spacing:.2px}
+  h1 span{color:var(--accent)}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .stars-pill{display:flex;align-items:center;gap:8px;background:var(--card);border:2px solid var(--card-border);border-radius:999px;padding:8px 14px;font-weight:900;font-size:18px;box-shadow:var(--shadow)}
+  .stars-pill .star-icons{letter-spacing:1px;color:#FFB800;font-size:18px}
+  .btn{border:2px solid var(--card-border);background:var(--card);color:var(--ink);border-radius:999px;padding:10px 16px;font-weight:900;font-size:16px;box-shadow:0 3px 0 rgba(0,0,0,.06)}
+  .btn:active{transform:translateY(1px)}
+  .btn.primary{background:var(--accent);color:white;border-color:#E85A28}
+  /* mode selector */
+  .mode-label{margin:16px 0 8px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;font-size:13px;color:var(--muted);text-align:center}
+  .modes{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .mode-btn{border-radius:18px;border:3px solid var(--bin-border);background:var(--card);padding:12px 8px;text-align:center}
+  .mode-btn .emoji{font-size:26px;display:block}
+  .mode-btn .label{font-family:"Fredoka",sans-serif;font-weight:700;font-size:18px;display:block;margin-top:2px}
+  .mode-btn .sub{font-size:13px;color:var(--muted);font-weight:800}
+  .mode-btn.active{border-color:var(--accent2);background:color-mix(in srgb, var(--accent2) 12%, var(--card));box-shadow:0 0 0 3px color-mix(in srgb, var(--accent2) 22%, transparent)}
+  /* stage */
+  .stage{margin-top:14px;background:var(--card);border:2px solid var(--card-border);border-radius:28px;box-shadow:var(--shadow);padding:16px 16px 18px;display:grid;grid-template-columns:1.05fr .95fr;gap:8px;overflow:hidden;position:relative}
+  .stage:before{content:"";position:absolute;inset:0;background-image:radial-gradient(var(--card-border) 1.2px, transparent 1.2px);background-size:22px 22px;opacity:.35;pointer-events:none}
+  .shape-side{position:relative;text-align:center;padding:6px 8px 0}
+  .prompt{font-weight:900;font-size:16px;color:var(--muted);letter-spacing:.02em}
+  .prompt strong{color:var(--ink)}
+  .shape-svg-wrap{height:238px;display:flex;align-items:center;justify-content:center}
+  .shape-svg-wrap svg{width:224px;height:224px;filter:drop-shadow(0 10px 14px rgba(0,0,0,.16));transition:transform .25s}
+  .shape-svg-wrap.bounce svg{animation:bounce .55s ease}
+  @keyframes bounce{0%{transform:scale(1)}30%{transform:scale(1.12) rotate(-2deg)}60%{transform:scale(.96)}100%{transform:scale(1)}}
+  .shape-name{font-family:"Fredoka",sans-serif;font-size:44px;line-height:1;font-weight:700;margin:2px 0 2px}
+  .shape-fact{font-size:17px;font-weight:800;color:var(--muted)}
+  .fact-chip{display:inline-flex;gap:6px;align-items:center;background:var(--stage);border:1.5px solid var(--bin-border);border-radius:999px;padding:6px 10px;margin:3px}
+  .dot{width:14px;height:14px;border-radius:50%;display:inline-block;border:2px solid rgba(0,0,0,.15);vertical-align:middle}
+  .hear-btn{margin-top:10px;background:var(--ink);color:var(--bg);border:none;border-radius:999px;padding:12px 20px;font-weight:900;font-size:17px;display:inline-flex;gap:8px;align-items:center}
+  @media (prefers-color-scheme: dark){ .hear-btn{background:#F8FAFC;color:#141A2E} }
+  /* bins side */
+  .bins-side{position:relative;padding:4px 4px 0 8px}
+  .bins-title{font-family:"Fredoka",sans-serif;font-size:20px;font-weight:700;text-align:center;margin:4px 0 10px}
+  .bins{display:grid;gap:12px}
+  .bin{width:100%;text-align:left;background:var(--bin);border:3px dashed var(--bin-border);border-radius:20px;padding:14px 16px;display:flex;align-items:center;gap:14px;min-height:76px;transition:.15s}
+  .bin:hover{border-color:var(--accent2);transform:translateY(-1px)}
+  .bin:active{transform:scale(.99)}
+  .bin-icon{width:52px;height:52px;flex:0 0 52px;border-radius:14px;display:grid;place-items:center;font-size:28px;background:var(--stage);border:1.5px solid var(--bin-border)}
+  .bin-icon svg{width:36px;height:36px}
+  .bin-main{flex:1}
+  .bin-word{font-family:"Fredoka",sans-serif;font-size:26px;line-height:1;font-weight:700}
+  .bin-sub{font-size:14px;font-weight:800;color:var(--muted);margin-top:2px}
+  .bin-arrow{font-size:22px;opacity:.5}
+  .bin.correct{border-style:solid;border-color:#22C55E;background:#DCFCE7;color:#14532D}
+  @media (prefers-color-scheme: dark){ .bin.correct{background:#14532D;color:#DCFCE7} }
+  .bin.wrong{animation:shake .4s}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+  /* feedback + progress */
+  .feedback{min-height:54px;margin-top:12px;border-radius:18px;display:flex;align-items:center;justify-content:center;text-align:center;padding:10px 14px;font-weight:900;font-size:19px;border:2px solid transparent}
+  .feedback.good{background:#DCFCE7;border-color:#86EFAC;color:#14532D}
+  .feedback.try{background:#FEF3C7;border-color:#FCD34D;color:#92400E}
+  .feedback.idle{background:var(--card);border-color:var(--card-border);color:var(--muted)}
+  @media (prefers-color-scheme: dark){ .feedback.good{background:#052E16;color:#BBF7D0} .feedback.try{background:#451A03;color:#FDE68A} }
+  .bottom{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:12px;flex-wrap:wrap}
+  .dots{display:flex;gap:6px;flex-wrap:wrap}
+  .pdot{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:16px;background:var(--card);border:2px solid var(--card-border)}
+  .pdot.done{background:var(--yellow);border-color:#EAB308}
+  .pdot.now{border-color:var(--accent);box-shadow:0 0 0 3px rgba(255,107,53,.2)}
+  .progress-text{font-weight:900;color:var(--muted);font-size:15px}
+  /* finish overlay */
+  .finish{display:none;margin-top:14px;background:var(--card);border:2px solid var(--card-border);border-radius:24px;padding:22px;text-align:center;box-shadow:var(--shadow)}
+  .finish.show{display:block}
+  .finish h2{font-family:"Fredoka",sans-serif;font-size:36px;margin:0}
+  .finish p{font-weight:800;color:var(--muted);font-size:17px}
+  .big-stars{font-size:34px;letter-spacing:4px}
+  .confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:20}
+  .confetti i{position:absolute;top:-12px;width:10px;height:14px;border-radius:3px;animation:fall linear forwards}
+  @keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+  @media (max-width:720px){
+    h1{font-size:28px}
+    .stage{grid-template-columns:1fr}
+    .shape-svg-wrap{height:200px}.shape-svg-wrap svg{width:186px;height:186px}
+    .shape-name{font-size:38px}
+    .modes{grid-template-columns:repeat(3,1fr);gap:8px}
+    .mode-btn .label{font-size:15px}.mode-btn .sub{display:none}
+    .bin{min-height:70px;padding:12px 14px}
+    .bin-word{font-size:23px}
+    .bins-side{padding-left:4px}
+  }
+  @media (min-width:721px) and (max-height:760px){
+    .shape-svg-wrap{height:190px}.shape-svg-wrap svg{width:176px;height:176px}
+    .shape-name{font-size:36px} .stage{padding:12px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-icons" aria-hidden="true">🟠 🟦 🔺</div>
+      <h1>Shape <span>Sorter</span></h1>
+    </div>
+    <div class="controls">
+      <div class="stars-pill" aria-label="Stars earned"><span>⭐ Stars</span><span id="starCount">0</span><span class="star-icons" id="starRow">☆☆☆☆☆☆☆☆</span></div>
+      <button class="btn" id="soundBtn">🔊 Sound On</button>
+      <button class="btn primary" id="newBtn">↻ New Game</button>
+    </div>
+  </div>
+
+  <div class="mode-label">How do you want to sort?</div>
+  <div class="modes" role="tablist" aria-label="Sort by">
+    <button class="mode-btn active" data-mode="name"><span class="emoji">🔤</span><span class="label">By Name</span><span class="sub">Circle, Square…</span></button>
+    <button class="mode-btn" data-mode="sides"><span class="emoji">🔢</span><span class="label">By Sides</span><span class="sub">0, 3, 4, 10 sides</span></button>
+    <button class="mode-btn" data-mode="colour"><span class="emoji">🎨</span><span class="label">By Colour</span><span class="sub">Red, Blue, Green…</span></button>
+  </div>
+
+  <section class="stage" aria-label="Shape to sort">
+    <div class="shape-side">
+      <div class="prompt" id="promptText">Tap the bin with the right <strong>name</strong>!</div>
+      <div class="shape-svg-wrap" id="shapeWrap"></div>
+      <div class="shape-name" id="shapeName">Circle</div>
+      <div class="shape-fact" id="shapeFact"></div>
+      <button class="hear-btn" id="hearBtn">🔊 Hear It</button>
+    </div>
+    <div class="bins-side">
+      <div class="bins-title" id="binsTitle">Sorting Bins — Pick One!</div>
+      <div class="bins" id="bins"></div>
+      <div class="feedback idle" id="feedback">Look at the shape. Tap the correct bin!</div>
+      <div class="bottom">
+        <div class="dots" id="dots"></div>
+        <div class="progress-text" id="progressText">Shape 1 of 8</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="finish" id="finish">
+    <div class="big-stars">⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐</div>
+    <h2>Great Job! You sorted all the shapes!</h2>
+    <p id="finishText">You earned 8 stars!</p>
+    <button class="btn primary" id="againBtn" style="font-size:18px;padding:14px 22px">▶ Play Again — New Game</button>
+  </div>
+  <p style="text-align:center;color:var(--muted);font-weight:800;font-size:13px;margin:14px 0 0">Tap a bin to sort • Wrong taps never take stars away — just try again!</p>
+</div>
+<div class="confetti" id="confetti"></div>
+
+<script>
+const COLOURS=[
+  {name:'Red',hex:'#EF4444',dark:'#B91C1C'},
+  {name:'Blue',hex:'#3B82F6',dark:'#1D4ED8'},
+  {name:'Green',hex:'#22C55E',dark:'#15803D'},
+  {name:'Yellow',hex:'#FACC15',dark:'#A16207'},
+  {name:'Orange',hex:'#F97316',dark:'#C2410C'},
+  {name:'Purple',hex:'#A855F7',dark:'#7E22CE'},
+  {name:'Pink',hex:'#EC4899',dark:'#BE185D'},
+  {name:'Teal',hex:'#14B8A6',dark:'#0F766E'},
+];
+const SHAPES=[
+  {id:'circle',name:'Circle',sides:0},
+  {id:'square',name:'Square',sides:4},
+  {id:'triangle',name:'Triangle',sides:3},
+  {id:'rectangle',name:'Rectangle',sides:4},
+  {id:'star',name:'Star',sides:10,points:5},
+  {id:'heart',name:'Heart',sides:0},
+  {id:'oval',name:'Oval',sides:0},
+  {id:'diamond',name:'Diamond',sides:4},
+];
+function shapeSVG(shape, colour, size){
+  const f=colour.hex, s=colour.dark;
+  const common=`fill="${f}" stroke="${s}" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"`;
+  let inner='';
+  if(shape.id==='circle') inner=`<circle cx="100" cy="100" r="78" ${common}/>`;
+  else if(shape.id==='square') inner=`<rect x="28" y="28" width="144" height="144" rx="14" ${common}/>`;
+  else if(shape.id==='triangle') inner=`<polygon points="100,22 182,172 18,172" ${common}/>`;
+  else if(shape.id==='rectangle') inner=`<rect x="12" y="52" width="176" height="96" rx="14" ${common}/>`;
+  else if(shape.id==='star') inner=`<polygon points="100,12 123,72 186,74 136,113 152,176 100,140 48,176 64,113 14,74 77,72" ${common}/>`;
+  else if(shape.id==='heart') inner=`<path d="M100 176 C 20 118 22 52 58 36 C 78 27 96 40 100 56 C 104 40 122 27 142 36 C 178 52 180 118 100 176 Z" ${common}/>`;
+  else if(shape.id==='oval') inner=`<ellipse cx="100" cy="100" rx="88" ry="58" ${common}/>`;
+  else if(shape.id==='diamond') inner=`<polygon points="100,14 176,100 100,186 24,100" ${common}/>`;
+  return `<svg viewBox="0 0 200 200" width="${size||200}" height="${size||200}" aria-label="${shape.name}">${inner}</svg>`;
+}
+function smallShapeSVG(shape, colourHex){
+  // mini icon for bins in name mode
+  const c = colourHex ? COLOURS.find(x=>x.hex===colourHex) || COLOURS[1] : {hex:'#94A3B8',dark:'#64748B'};
+  return shapeSVG(shape,c,36);
+}
+let mode='name';
+let queue=[]; // array of {shape, colour}
+let idx=0;
+let stars=0;
+let soundOn=true;
+let locked=false;
+let audioCtx=null;
+
+function shuffle(a){ const arr=[...a]; for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr; }
+function ensureAudio(){ if(!audioCtx){ try{ audioCtx=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } if(audioCtx && audioCtx.state==='suspended') audioCtx.resume(); }
+function tone(freq, t, dur, type, vol){
+  if(!soundOn || !audioCtx) return;
+  const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+  o.type=type||'sine'; o.frequency.value=freq;
+  g.gain.setValueAtTime(0.0001, audioCtx.currentTime+t);
+  g.gain.exponentialRampToValueAtTime(vol||0.18, audioCtx.currentTime+t+0.02);
+  g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime+t+dur);
+  o.connect(g); g.connect(audioCtx.destination); o.start(audioCtx.currentTime+t); o.stop(audioCtx.currentTime+t+dur+0.05);
+}
+function happySound(){ ensureAudio(); tone(523,0,0.18,'sine',0.2); tone(659,0.09,0.18,'sine',0.2); tone(784,0.18,0.28,'sine',0.22); tone(1046,0.28,0.32,'triangle',0.16); }
+function trySound(){ ensureAudio(); tone(330,0,0.18,'sine',0.12); tone(262,0.12,0.22,'sine',0.12); }
+function clickSound(){ ensureAudio(); tone(660,0,0.08,'triangle',0.08); }
+
+function newGame(){
+  const shuffledShapes=shuffle(SHAPES);
+  const shuffledColours=shuffle(COLOURS);
+  queue=shuffledShapes.map((s,i)=>({shape:s, colour:shuffledColours[i % shuffledColours.length]}));
+  // re-randomize colours a bit for variety on replays
+  queue=queue.map(q=>({shape:q.shape, colour: COLOURS[Math.floor(Math.random()*COLOURS.length)]}));
+  // ensure not all same colour in colour mode confusion - keep as is, distractors handle it
+  idx=0; stars=0; locked=false;
+  document.getElementById('finish').classList.remove('show');
+  updateStars(); render();
+}
+function updateStars(){
+  document.getElementById('starCount').textContent=stars;
+  document.getElementById('starRow').textContent='★'.repeat(stars)+'☆'.repeat(Math.max(0,8-stars));
+  const dots=document.getElementById('dots'); dots.innerHTML='';
+  queue.forEach((q,i)=>{
+    const d=document.createElement('div'); d.className='pdot'+(i<idx?' done':'')+(i===idx?' now':'');
+    d.textContent=i<idx?'⭐':'•'; d.title=q.shape.name; dots.appendChild(d);
+  });
+  document.getElementById('progressText').textContent = idx>=queue.length ? 'All done!' : `Shape ${idx+1} of ${queue.length}`;
+}
+function current(){ return queue[idx]; }
+
+function sidesLabel(n, shape){ if(shape && shape.id==='star') return '5 points • 10 sides'; return n===0 ? '0 sides • round' : n===1 ? '1 side' : `${n} sides`; }
+
+function render(){
+  if(idx>=queue.length){ showFinish(); return; }
+  const cur=current();
+  document.getElementById('shapeWrap').innerHTML=shapeSVG(cur.shape, cur.colour, 224);
+  document.getElementById('shapeName').textContent=cur.shape.name;
+  const prompt=document.getElementById('promptText');
+  const fact=document.getElementById('shapeFact');
+  if(mode==='name'){ prompt.innerHTML='Tap the bin with the right <strong>name</strong>!'; fact.innerHTML=`<span class="fact-chip"><span class="dot" style="background:${cur.colour.hex}"></span> ${cur.colour.name}</span><span class="fact-chip">${sidesLabel(cur.shape.sides, cur.shape)}</span>`; }
+  else if(mode==='sides'){ prompt.innerHTML='How many <strong>sides</strong> does it have? Tap that bin!'; fact.innerHTML=`<span class="fact-chip"><span class="dot" style="background:${cur.colour.hex}"></span> ${cur.colour.name} ${cur.shape.name}</span>`; }
+  else { prompt.innerHTML='What <strong>colour</strong> is it? Tap that bin!'; fact.innerHTML=`<span class="fact-chip">${sidesLabel(cur.shape.sides, cur.shape)}</span><span class="fact-chip">${cur.shape.name}</span>`; }
+  document.getElementById('binsTitle').textContent = mode==='name' ? 'Which bin says its name?' : mode==='sides' ? 'Which bin shows its sides?' : 'Which bin shows its colour?';
+  setFeedback('idle', mode==='name' ? `Look at the shape. Tap the bin that says “${cur.shape.name}”.` : mode==='sides' ? `Count the sides. Tap the correct number!` : `Look at the colour. Tap the ${cur.colour.name} bin!`);
+  renderBins();
+  updateStars();
+}
+function setFeedback(type, text){ const fb=document.getElementById('feedback'); fb.className='feedback '+type; fb.textContent=text; }
+
+function renderBins(){
+  const cur=current(); const binsEl=document.getElementById('bins'); binsEl.innerHTML='';
+  let options=[];
+  if(mode==='name'){
+    const others=shuffle(SHAPES.filter(s=>s.id!==cur.shape.id)).slice(0,2);
+    options=shuffle([{label:cur.shape.name, sub:cur.shape.name+' bin', correct:true, shape:cur.shape}, ...others.map(s=>({label:s.name, sub:s.name+' bin', correct:false, shape:s}))]);
+    options.forEach(opt=>{
+      const b=document.createElement('button'); b.className='bin'; b.innerHTML=`<span class="bin-icon">${smallShapeSVG(opt.shape)}</span><span class="bin-main"><span class="bin-word">${opt.label}</span><span class="bin-sub" style="display:block">Sort by name</span></span><span class="bin-arrow">→</span>`;
+      b.onclick=()=>handlePick(b, opt.correct, opt.label); binsEl.appendChild(b);
+    });
+  } else if(mode==='sides'){
+    const allSides=[0,3,4,10];
+    const others=shuffle(allSides.filter(n=>n!==cur.shape.sides)).slice(0,2);
+    const vals=shuffle([cur.shape.sides, ...others]);
+    vals.forEach(n=>{
+      const b=document.createElement('button'); b.className='bin';
+      const starsStr='★'.repeat(n)||'○';
+      b.innerHTML=`<span class="bin-icon" style="font-size:30px;font-weight:900">${n}</span><span class="bin-main"><span class="bin-word">${n} sides</span><span class="bin-sub" style="display:block">${n===0?'No straight sides — it is round': n+' straight sides'}</span></span><span class="bin-arrow">→</span>`;
+      b.onclick=()=>handlePick(b, n===cur.shape.sides, n+' sides'); binsEl.appendChild(b);
+    });
+  } else {
+    const others=shuffle(COLOURS.filter(c=>c.name!==cur.colour.name)).slice(0,2);
+    const opts=shuffle([{c:cur.colour, correct:true}, ...others.map(c=>({c, correct:false}))]);
+    opts.forEach(opt=>{
+      const b=document.createElement('button'); b.className='bin';
+      b.innerHTML=`<span class="bin-icon"><span class="dot" style="width:34px;height:34px;background:${opt.c.hex}"></span></span><span class="bin-main"><span class="bin-word">${opt.c.name}</span><span class="bin-sub" style="display:block">Colour bin</span></span><span class="bin-arrow">→</span>`;
+      b.onclick=()=>handlePick(b, opt.correct, opt.c.name); binsEl.appendChild(b);
+    });
+  }
+}
+function handlePick(btn, correct, label){
+  if(locked) return; ensureAudio();
+  const cur=current();
+  if(correct){
+    locked=true; btn.classList.add('correct');
+    stars++; updateStars();
+    document.getElementById('shapeWrap').classList.add('bounce');
+    happySound();
+    const praise=['Great job!','Yes! Well done!','Super sorting!','You got it!','Brilliant!'][Math.floor(Math.random()*5)];
+    setFeedback('good', `⭐ ${praise} That is ${mode==='name'? 'the '+label+' bin' : mode==='sides'? label : 'the '+label+' bin'}!`);
+    // speak short praise if sound on? keep visual, sound already played
+    setTimeout(()=>{ document.getElementById('shapeWrap').classList.remove('bounce'); idx++; locked=false; if(idx>=queue.length){ updateStars(); showFinish(); confettiBurst(); happySound(); } else render(); }, 1100);
+  } else {
+    btn.classList.add('wrong'); trySound();
+    setFeedback('try', `Good try! That was the ${label} bin. Look again and try another bin — you can do it!`);
+    setTimeout(()=>btn.classList.remove('wrong'),450);
+  }
+}
+function showFinish(){
+  document.getElementById('finish').classList.add('show');
+  document.getElementById('finishText').textContent=`You earned ${stars} star${stars===1?'':'s'} sorting by ${mode==='name'?'name':mode==='sides'?'sides':'colour'}!`;
+  setFeedback('good','🎉 All shapes sorted! Press Play Again for a new game.');
+  document.getElementById('progressText').textContent='All done!';
+}
+function confettiBurst(){
+  const wrap=document.getElementById('confetti'); wrap.innerHTML='';
+  const colors=['#EF4444','#3B82F6','#22C55E','#FACC15','#F97316','#A855F7','#EC4899'];
+  for(let i=0;i<70;i++){ const el=document.createElement('i'); el.style.left=Math.random()*100+'%'; el.style.background=colors[i%colors.length]; el.style.animationDuration=(1.6+Math.random()*1.4)+'s'; el.style.animationDelay=(Math.random()*0.4)+'s'; el.style.transform=`rotate(${Math.random()*360}deg)`; wrap.appendChild(el); }
+  setTimeout(()=>wrap.innerHTML='',3600);
+}
+function speakCurrent(){
+  ensureAudio(); clickSound();
+  const cur=current(); if(!cur) return;
+  let text='';
+  if(mode==='name') text=`${cur.shape.name}. This is a ${cur.colour.name} ${cur.shape.name}.`;
+  else if(mode==='sides') text= cur.shape.id==='star' ? `Star. It has 5 points and 10 sides.` : `${cur.shape.name}. It has ${cur.shape.sides} sides.`;
+  else text=`This ${cur.shape.name} is ${cur.colour.name}.`;
+  try{
+    window.speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text); u.rate=0.92; u.pitch=1.05; window.speechSynthesis.speak(u);
+  }catch(e){}
+}
+// events
+document.querySelectorAll('.mode-btn').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.mode-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active');
+    mode=b.dataset.mode; ensureAudio(); clickSound(); render();
+  });
+});
+document.getElementById('soundBtn').addEventListener('click',function(){
+  soundOn=!soundOn; this.textContent=soundOn?'🔊 Sound On':'🔇 Sound Off'; if(soundOn){ ensureAudio(); happySound(); } if(!soundOn && window.speechSynthesis) window.speechSynthesis.cancel();
+});
+document.getElementById('newBtn').addEventListener('click',()=>{ ensureAudio(); clickSound(); newGame(); });
+document.getElementById('againBtn').addEventListener('click',()=>{ ensureAudio(); clickSound(); newGame(); window.scrollTo({top:0,behavior:'smooth'}); });
+document.getElementById('hearBtn').addEventListener('click',speakCurrent);
+newGame();
+</script>
+</body>
+</html>

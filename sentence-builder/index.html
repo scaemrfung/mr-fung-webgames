@@ -1,0 +1,784 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>Sentence Builder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --bg: #fdf8ee;
+        --surface: #ffffff;
+        --surface-2: #fff3d6;
+        --ink: #263238;
+        --ink-soft: #546e7a;
+        --line: #e8dcc3;
+        --accent: #0e7c66;
+        --accent-dark: #0a5f4f;
+        --accent-soft: #d9f2ea;
+        --tile: #ffffff;
+        --tile-border: #0e7c66;
+        --tile-ink: #14342c;
+        --gold: #f5a623;
+        --gold-soft: #ffe9b8;
+        --coral: #e4572e;
+        --btn: #ffffff;
+        --btn-border: #cfd8dc;
+        --shadow: 0 4px 0 rgba(38, 50, 56, 0.14);
+        --answer-bg: #eefaf5;
+        --answer-border: #0e7c66;
+        --good: #0e7c66;
+        --try: #b3541e;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #17202a;
+          --surface: #212f3d;
+          --surface-2: #2b2a1e;
+          --ink: #f2f5f7;
+          --ink-soft: #b0bec5;
+          --line: #37474f;
+          --accent: #2fbf9b;
+          --accent-dark: #25a582;
+          --accent-soft: #173f35;
+          --tile: #2b3d4d;
+          --tile-border: #2fbf9b;
+          --tile-ink: #eafff8;
+          --gold: #ffb62e;
+          --gold-soft: #4a3a10;
+          --coral: #ff8a5c;
+          --btn: #2b3d4d;
+          --btn-border: #455a64;
+          --shadow: 0 4px 0 rgba(0, 0, 0, 0.4);
+          --answer-bg: #1d332b;
+          --answer-border: #2fbf9b;
+          --good: #5fe3bd;
+          --try: #ffb27a;
+        }
+      }
+
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; }
+      body {
+        font-family: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+        background: var(--bg);
+        color: var(--ink);
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .app {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: clamp(12px, 2.5vh, 28px) clamp(14px, 3vw, 32px) clamp(16px, 3vh, 32px);
+        min-height: 100dvh;
+        display: flex;
+        flex-direction: column;
+        gap: clamp(10px, 2vh, 20px);
+      }
+
+      /* ---------- Top bar ---------- */
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .stars {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--surface);
+        border: 2px solid var(--line);
+        border-radius: 999px;
+        padding: 8px 20px 8px 14px;
+        font-family: "Fredoka", sans-serif;
+        font-weight: 600;
+        font-size: clamp(1.3rem, 3.5vw, 1.8rem);
+      }
+      .stars .star-glyph {
+        color: var(--gold);
+        font-size: 1.35em;
+        line-height: 1;
+        text-shadow: 0 2px 0 rgba(0,0,0,0.12);
+      }
+      .stars.pop { animation: pop 0.45s ease; }
+      @keyframes pop {
+        0% { transform: scale(1); }
+        40% { transform: scale(1.18) rotate(-3deg); }
+        100% { transform: scale(1); }
+      }
+
+      /* ---------- Buttons ---------- */
+      button {
+        font-family: "Fredoka", sans-serif;
+        font-weight: 600;
+        cursor: pointer;
+        border-radius: 16px;
+        border: 2px solid var(--btn-border);
+        background: var(--btn);
+        color: var(--ink);
+        box-shadow: var(--shadow);
+        transition: transform 0.08s ease, background 0.15s ease;
+        touch-action: manipulation;
+        user-select: none;
+        -webkit-user-select: none;
+      }
+      button:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0,0,0,0.15); }
+      button:focus-visible { outline: 4px solid var(--gold); outline-offset: 2px; }
+
+      .btn-sound {
+        font-size: clamp(1rem, 2.5vw, 1.2rem);
+        padding: 12px 20px;
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+      }
+      .btn-sound svg { width: 22px; height: 22px; flex: none; }
+      .btn-sound .sound-state { color: var(--accent); }
+
+      /* ---------- Prompt ---------- */
+      .prompt {
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: clamp(8px, 1.6vh, 14px);
+      }
+      .prompt h1 {
+        font-family: "Fredoka", sans-serif;
+        font-weight: 600;
+        font-size: clamp(1.6rem, 5vw, 2.6rem);
+        margin: 0;
+        line-height: 1.15;
+        letter-spacing: 0.01em;
+      }
+      .prompt p {
+        margin: 0;
+        font-size: clamp(1.05rem, 3vw, 1.3rem);
+        font-weight: 700;
+        color: var(--ink-soft);
+      }
+      .btn-hear {
+        background: var(--accent);
+        border-color: var(--accent-dark);
+        color: #ffffff;
+        font-size: clamp(1.15rem, 3.2vw, 1.45rem);
+        padding: 14px 30px;
+        display: inline-flex;
+        align-items: center;
+        gap: 11px;
+        border-radius: 999px;
+      }
+      .btn-hear svg { width: 27px; height: 27px; }
+      @media (prefers-color-scheme: dark) {
+        .btn-hear { color: #0c231d; }
+      }
+
+      /* ---------- Answer line ---------- */
+      .answer-wrap { display: flex; flex-direction: column; gap: 8px; }
+      .zone-label {
+        font-family: "Fredoka", sans-serif;
+        font-weight: 600;
+        font-size: clamp(1rem, 2.6vw, 1.2rem);
+        color: var(--ink-soft);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      .answer-line {
+        background: var(--answer-bg);
+        border: 3px dashed var(--answer-border);
+        border-radius: 20px;
+        min-height: clamp(84px, 15vh, 118px);
+        padding: 14px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        align-content: center;
+        gap: 10px;
+      }
+      .answer-line.solved { border-style: solid; background: var(--gold-soft); border-color: var(--gold); }
+      .answer-line.wobble { animation: wobble 0.45s ease; }
+      @keyframes wobble {
+        0%, 100% { transform: translateX(0); }
+        20% { transform: translateX(-7px); }
+        45% { transform: translateX(6px); }
+        70% { transform: translateX(-4px); }
+        90% { transform: translateX(2px); }
+      }
+      .answer-placeholder {
+        font-size: clamp(1.1rem, 3vw, 1.35rem);
+        font-weight: 700;
+        color: var(--ink-soft);
+        padding: 6px 4px;
+      }
+      .answer-period {
+        font-family: "Fredoka", sans-serif;
+        font-weight: 700;
+        font-size: clamp(2rem, 6vw, 3rem);
+        color: var(--ink);
+        margin-left: -4px;
+      }
+
+      /* ---------- Word tiles ---------- */
+      .bank {
+        background: var(--surface);
+        border: 2px solid var(--line);
+        border-radius: 20px;
+        padding: clamp(14px, 2.4vh, 22px);
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: clamp(10px, 1.8vw, 16px);
+        min-height: clamp(84px, 14vh, 116px);
+        align-content: center;
+      }
+      .tile {
+        font-family: "Fredoka", sans-serif;
+        font-weight: 600;
+        font-size: clamp(1.55rem, 5.2vw, 2.5rem);
+        letter-spacing: 0.05em;
+        padding: clamp(10px, 1.6vh, 16px) clamp(16px, 3vw, 28px);
+        background: var(--tile);
+        border: 3px solid var(--tile-border);
+        border-radius: 16px;
+        color: var(--tile-ink);
+        box-shadow: 0 5px 0 var(--tile-border);
+        line-height: 1.1;
+      }
+      .tile:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--tile-border); }
+      .tile.in-answer {
+        background: var(--surface-2);
+        border-color: var(--gold);
+        box-shadow: 0 5px 0 var(--gold);
+      }
+      .tile.enter { animation: tileIn 0.22s ease; }
+      @keyframes tileIn {
+        from { transform: scale(0.8); opacity: 0.3; }
+        to { transform: scale(1); opacity: 1; }
+      }
+      .bank-empty {
+        font-size: clamp(1.05rem, 3vw, 1.3rem);
+        font-weight: 800;
+        color: var(--ink-soft);
+      }
+
+      /* ---------- Feedback ---------- */
+      .feedback {
+        min-height: clamp(2.6rem, 7vh, 3.6rem);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-family: "Fredoka", sans-serif;
+        font-weight: 600;
+        font-size: clamp(1.4rem, 4.4vw, 2.1rem);
+        line-height: 1.2;
+        padding: 0 8px;
+      }
+      .feedback.good { color: var(--good); }
+      .feedback.try { color: var(--try); }
+      .feedback .fb-star { color: var(--gold); }
+
+      /* ---------- Controls ---------- */
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: clamp(10px, 2vw, 16px);
+        margin-top: auto;
+      }
+      .controls button {
+        font-size: clamp(1.1rem, 3vw, 1.35rem);
+        padding: 14px 26px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+      }
+      .controls button svg { width: 23px; height: 23px; flex: none; }
+      .btn-next {
+        background: var(--accent);
+        border-color: var(--accent-dark);
+        color: #ffffff;
+      }
+      @media (prefers-color-scheme: dark) {
+        .btn-next { color: #0c231d; }
+      }
+      .controls .btn-read {
+        background: var(--gold);
+        border-color: #c77f0a;
+        color: #3a2703;
+        display: none;
+      }
+      .controls .btn-read.show { display: inline-flex; }
+
+      #confetti-canvas {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 50;
+      }
+
+      @media (max-width: 560px) {
+        .controls button { flex: 1 1 44%; justify-content: center; padding: 14px 10px; }
+        .btn-read.show { flex: 1 1 100%; }
+        .btn-next { flex: 1 1 100%; order: 5; }
+        .topbar { justify-content: space-between; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .answer-line.wobble, .stars.pop, .tile.enter { animation: none; }
+        button { transition: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="confetti-canvas" aria-hidden="true"></canvas>
+
+    <main class="app">
+      <!-- Top bar: star counter + sound toggle -->
+      <div class="topbar">
+        <div class="stars" id="stars-box" aria-label="Stars earned">
+          <span class="star-glyph" aria-hidden="true">★</span>
+          <span>Stars: <span id="star-count">0</span></span>
+        </div>
+        <button class="btn-sound" id="btn-sound" type="button" aria-pressed="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor" stroke="none"></path>
+            <path class="sound-waves" d="M15.5 8.5a5 5 0 0 1 0 7"></path>
+            <path class="sound-waves" d="M18.2 6a9 9 0 0 1 0 12"></path>
+          </svg>
+          Sound: <span class="sound-state" id="sound-state">On</span>
+        </button>
+      </div>
+
+      <!-- Prompt -->
+      <section class="prompt">
+        <h1>Build the Sentence!</h1>
+        <p>Tap the words in order. Tap a word in your sentence to put it back.</p>
+        <button class="btn-hear" id="btn-hear" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor" stroke="none"></path>
+            <path d="M15.5 8.5a5 5 0 0 1 0 7"></path>
+            <path d="M18.2 6a9 9 0 0 1 0 12"></path>
+          </svg>
+          Hear It
+        </button>
+      </section>
+
+      <!-- Answer line -->
+      <section class="answer-wrap">
+        <span class="zone-label" id="answer-label">My Sentence</span>
+        <div class="answer-line" id="answer-line" role="group" aria-labelledby="answer-label"></div>
+      </section>
+
+      <!-- Word bank -->
+      <section class="answer-wrap">
+        <span class="zone-label" id="bank-label">Word Bank</span>
+        <div class="bank" id="bank" role="group" aria-labelledby="bank-label"></div>
+      </section>
+
+      <!-- Feedback -->
+      <div class="feedback" id="feedback" aria-live="polite"></div>
+
+      <!-- Controls -->
+      <div class="controls">
+        <button id="btn-clear" type="button">Clear</button>
+        <button id="btn-shuffle" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M16 3h5v5"></path>
+            <path d="M4 20 21 3"></path>
+            <path d="M21 16v5h-5"></path>
+            <path d="m15 15 6 6"></path>
+            <path d="M4 4l5 5"></path>
+          </svg>
+          Shuffle
+        </button>
+        <button class="btn-read" id="btn-read" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor" stroke="none"></path>
+            <path d="M15.5 8.5a5 5 0 0 1 0 7"></path>
+            <path d="M18.2 6a9 9 0 0 1 0 12"></path>
+          </svg>
+          Read It
+        </button>
+        <button class="btn-next" id="btn-next" type="button">Next Sentence →</button>
+      </div>
+    </main>
+
+    <script>
+      (function () {
+        "use strict";
+
+        /* ---------------- Sentences (Grade One) ---------------- */
+        var SENTENCES = [
+          "THE CAT SAT ON THE MAT",
+          "THE DOG CAN RUN FAST",
+          "I SEE A BIG SUN",
+          "THE PIG CAN JUMP UP",
+          "A FROG SAT ON A LOG",
+          "I LIKE MY RED BUS",
+          "WE CAN RUN AND JUMP",
+          "THE HEN IS IN THE PEN",
+          "I SEE A BIG RED ANT",
+          "A BIG FISH CAN SWIM",
+          "THE COW SAYS MOO MOO",
+          "MY CAT HAS A HAT",
+          "I CAN HOP ON ONE FOOT",
+          "THE SUN IS UP NOW"
+        ];
+
+        /* ---------------- State ---------------- */
+        var tiles = [];        // [{id, word}] all tiles for current sentence
+        var answerIds = [];    // tile ids in answer order
+        var bankIds = [];      // tile ids in bank order
+        var targetWords = [];  // correct word sequence
+        var sentenceText = "";
+        var stars = 0;
+        var solved = false;
+        var soundOn = true;
+        var lastIndex = -1;
+
+        /* ---------------- Elements ---------------- */
+        var answerLine = document.getElementById("answer-line");
+        var bankEl = document.getElementById("bank");
+        var feedbackEl = document.getElementById("feedback");
+        var starCountEl = document.getElementById("star-count");
+        var starsBox = document.getElementById("stars-box");
+        var btnRead = document.getElementById("btn-read");
+        var btnSound = document.getElementById("btn-sound");
+        var soundStateEl = document.getElementById("sound-state");
+
+        function tileById(id) {
+          for (var i = 0; i < tiles.length; i++) if (tiles[i].id === id) return tiles[i];
+          return null;
+        }
+
+        /* ---------------- Sound (Web Audio, in-browser only) ---------------- */
+        var audioCtx = null;
+        function ensureAudio() {
+          if (!audioCtx) {
+            var AC = window.AudioContext || window.webkitAudioContext;
+            if (AC) audioCtx = new AC();
+          }
+          if (audioCtx && audioCtx.state === "suspended") audioCtx.resume();
+          return audioCtx;
+        }
+        function tone(freq, start, dur, type, vol) {
+          if (!soundOn) return;
+          var ctx = ensureAudio();
+          if (!ctx) return;
+          var osc = ctx.createOscillator();
+          var gain = ctx.createGain();
+          osc.type = type || "sine";
+          osc.frequency.value = freq;
+          var t = ctx.currentTime + start;
+          gain.gain.setValueAtTime(0.0001, t);
+          gain.gain.exponentialRampToValueAtTime(vol || 0.22, t + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(t);
+          osc.stop(t + dur + 0.05);
+        }
+        function sndTap()    { tone(620, 0, 0.12, "triangle", 0.16); }
+        function sndReturn() { tone(420, 0, 0.12, "triangle", 0.14); }
+        function sndTry() {
+          tone(330, 0, 0.22, "sine", 0.15);
+          tone(262, 0.18, 0.3, "sine", 0.15);
+        }
+        function sndWin() {
+          var notes = [523.25, 659.25, 783.99, 1046.5];
+          for (var i = 0; i < notes.length; i++) tone(notes[i], i * 0.11, 0.34, "triangle", 0.22);
+          tone(1318.5, 0.46, 0.5, "sine", 0.16);
+        }
+
+        /* ---------------- Speech ---------------- */
+        function speak(text) {
+          if (!("speechSynthesis" in window)) {
+            setFeedback("Sorry, my voice is not working on this device.", "try");
+            return;
+          }
+          try {
+            window.speechSynthesis.cancel();
+            var u = new SpeechSynthesisUtterance(text);
+            u.rate = 0.82;
+            u.pitch = 1.05;
+            u.lang = "en-US";
+            window.speechSynthesis.speak(u);
+          } catch (e) { /* speech unavailable — stay silent */ }
+        }
+
+        /* ---------------- Helpers ---------------- */
+        function shuffleArray(arr) {
+          var a = arr.slice();
+          for (var i = a.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var t = a[i]; a[i] = a[j]; a[j] = t;
+          }
+          return a;
+        }
+        function sameWords(a, b) {
+          if (a.length !== b.length) return false;
+          for (var i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
+          return true;
+        }
+        function setFeedback(html, cls) {
+          feedbackEl.innerHTML = html;
+          feedbackEl.className = "feedback" + (cls ? " " + cls : "");
+        }
+
+        /* ---------------- Rendering ---------------- */
+        function makeTile(id, inAnswer) {
+          var t = tileById(id);
+          var b = document.createElement("button");
+          b.type = "button";
+          b.className = "tile enter" + (inAnswer ? " in-answer" : "");
+          b.textContent = t.word;
+          b.setAttribute("aria-label", (inAnswer ? "Remove word " : "Add word ") + t.word);
+          b.addEventListener("click", function () {
+            if (inAnswer) returnTile(id); else placeTile(id);
+          });
+          return b;
+        }
+
+        function render() {
+          /* Answer line */
+          answerLine.innerHTML = "";
+          answerLine.classList.toggle("solved", solved);
+          if (answerIds.length === 0) {
+            var ph = document.createElement("span");
+            ph.className = "answer-placeholder";
+            ph.textContent = "Tap words below to build your sentence…";
+            answerLine.appendChild(ph);
+          } else {
+            for (var i = 0; i < answerIds.length; i++) {
+              answerLine.appendChild(makeTile(answerIds[i], true));
+            }
+            if (solved) {
+              var dot = document.createElement("span");
+              dot.className = "answer-period";
+              dot.textContent = ".";
+              dot.setAttribute("aria-hidden", "true");
+              answerLine.appendChild(dot);
+            }
+          }
+          /* Bank */
+          bankEl.innerHTML = "";
+          if (bankIds.length === 0) {
+            var done = document.createElement("span");
+            done.className = "bank-empty";
+            done.textContent = solved ? "All done!" : "All the words are in your sentence.";
+            bankEl.appendChild(done);
+          } else {
+            for (var j = 0; j < bankIds.length; j++) {
+              bankEl.appendChild(makeTile(bankIds[j], false));
+            }
+          }
+          btnRead.classList.toggle("show", solved);
+        }
+
+        /* ---------------- Game actions ---------------- */
+        function placeTile(id) {
+          if (solved) return;
+          var i = bankIds.indexOf(id);
+          if (i === -1) return;
+          bankIds.splice(i, 1);
+          answerIds.push(id);
+          sndTap();
+          if (feedbackEl.classList.contains("try")) setFeedback("", "");
+          render();
+          if (answerIds.length === targetWords.length) {
+            setTimeout(checkAnswer, 260);
+          }
+        }
+
+        function returnTile(id) {
+          if (solved) return;
+          var i = answerIds.indexOf(id);
+          if (i === -1) return;
+          answerIds.splice(i, 1);
+          bankIds.push(id);
+          sndReturn();
+          if (feedbackEl.classList.contains("try")) setFeedback("", "");
+          render();
+        }
+
+        function checkAnswer() {
+          if (solved) return;
+          var built = answerIds.map(function (id) { return tileById(id).word; });
+          if (sameWords(built, targetWords)) {
+            solved = true;
+            stars++;
+            starCountEl.textContent = stars;
+            starsBox.classList.remove("pop");
+            void starsBox.offsetWidth;
+            starsBox.classList.add("pop");
+            setFeedback('<span class="fb-star" aria-hidden="true">★</span> Great job! You built the sentence! <span class="fb-star" aria-hidden="true">★</span>', "good");
+            sndWin();
+            launchConfetti();
+            render();
+          } else {
+            setFeedback("Good try! Tap a word to put it back and try again.", "try");
+            sndTry();
+            answerLine.classList.remove("wobble");
+            void answerLine.offsetWidth;
+            answerLine.classList.add("wobble");
+          }
+        }
+
+        function newSentence() {
+          var idx;
+          do { idx = Math.floor(Math.random() * SENTENCES.length); }
+          while (SENTENCES.length > 1 && idx === lastIndex);
+          lastIndex = idx;
+          sentenceText = SENTENCES[idx];
+          targetWords = sentenceText.split(" ");
+          tiles = targetWords.map(function (w, i) { return { id: i, word: w }; });
+          /* Scramble until the bank order is not the correct order */
+          var order = tiles.map(function (t) { return t.id; });
+          var scrambled = shuffleArray(order);
+          var guard = 0;
+          while (sameWords(scrambled.map(function (id) { return tileById(id).word; }), targetWords) && guard < 60) {
+            scrambled = shuffleArray(order);
+            guard++;
+          }
+          bankIds = scrambled;
+          answerIds = [];
+          solved = false;
+          setFeedback("", "");
+          render();
+        }
+
+        /* ---------------- Confetti ---------------- */
+        var canvas = document.getElementById("confetti-canvas");
+        var cctx = canvas.getContext("2d");
+        var pieces = [];
+        var confettiRunning = false;
+        var COLORS = ["#f5a623", "#0e7c66", "#e4572e", "#2f9fd8", "#ffd94d", "#7ac74f"];
+        function sizeCanvas() {
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+        }
+        window.addEventListener("resize", sizeCanvas);
+        sizeCanvas();
+
+        function launchConfetti() {
+          if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+          sizeCanvas();
+          pieces = [];
+          for (var i = 0; i < 140; i++) {
+            pieces.push({
+              x: Math.random() * canvas.width,
+              y: -20 - Math.random() * canvas.height * 0.35,
+              w: 7 + Math.random() * 8,
+              h: 10 + Math.random() * 10,
+              vy: 2.2 + Math.random() * 3.2,
+              vx: -1.4 + Math.random() * 2.8,
+              rot: Math.random() * Math.PI * 2,
+              vr: -0.12 + Math.random() * 0.24,
+              color: COLORS[i % COLORS.length],
+              circle: Math.random() < 0.3
+            });
+          }
+          if (!confettiRunning) {
+            confettiRunning = true;
+            requestAnimationFrame(confettiStep);
+          }
+        }
+        function confettiStep() {
+          cctx.clearRect(0, 0, canvas.width, canvas.height);
+          var alive = false;
+          for (var i = 0; i < pieces.length; i++) {
+            var p = pieces[i];
+            p.x += p.vx + Math.sin(p.y / 28) * 0.9;
+            p.y += p.vy;
+            p.rot += p.vr;
+            if (p.y < canvas.height + 30) alive = true;
+            cctx.save();
+            cctx.translate(p.x, p.y);
+            cctx.rotate(p.rot);
+            cctx.fillStyle = p.color;
+            if (p.circle) {
+              cctx.beginPath();
+              cctx.arc(0, 0, p.w / 2, 0, Math.PI * 2);
+              cctx.fill();
+            } else {
+              cctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h * Math.abs(Math.sin(p.y / 20)) + 2);
+            }
+            cctx.restore();
+          }
+          if (alive) {
+            requestAnimationFrame(confettiStep);
+          } else {
+            confettiRunning = false;
+            cctx.clearRect(0, 0, canvas.width, canvas.height);
+          }
+        }
+
+        /* ---------------- Controls ---------------- */
+        document.getElementById("btn-clear").addEventListener("click", function () {
+          if (solved) return;
+          if (answerIds.length === 0) return;
+          bankIds = bankIds.concat(answerIds);
+          answerIds = [];
+          sndReturn();
+          setFeedback("", "");
+          render();
+        });
+
+        document.getElementById("btn-shuffle").addEventListener("click", function () {
+          if (bankIds.length < 2) return;
+          var before = bankIds.map(function (id) { return tileById(id).word; }).join(" ");
+          bankIds = shuffleArray(bankIds);
+          var guard = 0;
+          while (bankIds.map(function (id) { return tileById(id).word; }).join(" ") === before && guard < 30) {
+            bankIds = shuffleArray(bankIds);
+            guard++;
+          }
+          sndTap();
+          render();
+        });
+
+        document.getElementById("btn-next").addEventListener("click", function () {
+          sndTap();
+          newSentence();
+        });
+
+        document.getElementById("btn-hear").addEventListener("click", function () {
+          ensureAudio();
+          speak(sentenceText);
+        });
+
+        btnRead.addEventListener("click", function () {
+          speak(sentenceText + ".");
+        });
+
+        btnSound.addEventListener("click", function () {
+          soundOn = !soundOn;
+          soundStateEl.textContent = soundOn ? "On" : "Off";
+          btnSound.setAttribute("aria-pressed", soundOn ? "true" : "false");
+          var waves = btnSound.querySelectorAll(".sound-waves");
+          for (var i = 0; i < waves.length; i++) {
+            waves[i].style.opacity = soundOn ? "1" : "0.25";
+          }
+          if (soundOn) sndTap();
+        });
+
+        /* Keyboard shortcut: N = next sentence */
+        document.addEventListener("keydown", function (e) {
+          if (e.key === "n" || e.key === "N") { newSentence(); }
+        });
+
+        /* ---------------- Start ---------------- */
+        newSentence();
+      })();
+    </script>
+  </body>
+</html>

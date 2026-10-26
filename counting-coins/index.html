@@ -1,0 +1,693 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>Counting Coins</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --bg: #e8f3ff;
+        --bg-2: #fdf3d8;
+        --panel: #ffffff;
+        --panel-edge: #d7e5f5;
+        --ink: #1d2b45;
+        --ink-soft: #51638a;
+        --red: #d80621;
+        --red-dark: #a8041a;
+        --gold: #f2b824;
+        --gold-deep: #b97e0c;
+        --green: #1d9e57;
+        --green-dark: #14703c;
+        --orange: #e07b12;
+        --tray: #f2f7ff;
+        --shadow: 0 10px 24px rgba(29, 43, 69, 0.14);
+        --btn-shadow: 0 5px 0 rgba(29, 43, 69, 0.18);
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0e1626;
+          --bg-2: #1a2440;
+          --panel: #1b2742;
+          --panel-edge: #33477a;
+          --ink: #f2f6ff;
+          --ink-soft: #a9bcdf;
+          --red: #ff4d5e;
+          --red-dark: #d92c3e;
+          --gold: #ffc93c;
+          --gold-deep: #e0a41a;
+          --green: #35c173;
+          --green-dark: #239654;
+          --orange: #ffa03c;
+          --tray: #141f38;
+          --shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
+          --btn-shadow: 0 5px 0 rgba(0, 0, 0, 0.4);
+        }
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; }
+      body {
+        font-family: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background:
+          radial-gradient(1100px 500px at 85% -10%, var(--bg-2), transparent 60%),
+          var(--bg);
+        min-height: 100dvh;
+      }
+      .wrap {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: clamp(10px, 2.5vmin, 22px);
+        display: flex;
+        flex-direction: column;
+        gap: clamp(10px, 2vmin, 18px);
+        min-height: 100dvh;
+      }
+
+      /* ---------- top bar ---------- */
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .stars {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--panel);
+        border: 3px solid var(--panel-edge);
+        border-radius: 999px;
+        padding: 8px 20px 8px 14px;
+        box-shadow: var(--shadow);
+        font-family: "Fredoka", "Nunito", sans-serif;
+        font-weight: 600;
+        font-size: clamp(1.3rem, 3.5vmin, 1.8rem);
+      }
+      .stars svg { width: 34px; height: 34px; flex: none; }
+      .stars .pop { animation: starPop 0.45s ease; }
+      @keyframes starPop {
+        0% { transform: scale(1); }
+        40% { transform: scale(1.45) rotate(-10deg); }
+        100% { transform: scale(1); }
+      }
+      .controls { display: flex; gap: 10px; flex-wrap: wrap; }
+      .btn {
+        font-family: "Fredoka", "Nunito", sans-serif;
+        font-weight: 600;
+        font-size: clamp(1.05rem, 2.8vmin, 1.3rem);
+        border: none;
+        border-radius: 16px;
+        padding: 12px 22px;
+        min-height: 56px;
+        cursor: pointer;
+        color: #fff;
+        box-shadow: var(--btn-shadow);
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .btn:active { transform: translateY(3px); box-shadow: 0 2px 0 rgba(0,0,0,0.2); }
+      .btn:focus-visible { outline: 4px solid var(--gold); outline-offset: 2px; }
+      .btn svg { width: 24px; height: 24px; flex: none; }
+      .btn-new { background: var(--red); }
+      .btn-new:hover { background: var(--red-dark); }
+      .btn-sound { background: #2f6fd0; }
+      .btn-sound:hover { background: #265cb0; }
+      .btn-sound.off { background: #7186ab; }
+      .btn-hear { background: var(--green); font-size: clamp(1.15rem, 3vmin, 1.45rem); padding: 14px 26px; }
+      .btn-hear:hover { background: var(--green-dark); }
+      .btn-clear { background: var(--orange); }
+      .btn-clear:hover { background: #c96a0d; }
+
+      /* ---------- target panel ---------- */
+      .target-panel {
+        background: var(--panel);
+        border: 3px solid var(--panel-edge);
+        border-radius: 26px;
+        box-shadow: var(--shadow);
+        padding: clamp(14px, 3vmin, 26px);
+        text-align: center;
+      }
+      .target-label {
+        font-family: "Fredoka", "Nunito", sans-serif;
+        font-weight: 500;
+        font-size: clamp(1.15rem, 3vmin, 1.5rem);
+        color: var(--ink-soft);
+        letter-spacing: 0.02em;
+      }
+      .target-amount {
+        font-family: "Fredoka", "Nunito", sans-serif;
+        font-weight: 700;
+        font-size: clamp(3.4rem, 13vmin, 6.2rem);
+        line-height: 1.05;
+        color: var(--red);
+        margin: 2px 0 10px;
+      }
+      .message {
+        min-height: 1.6em;
+        font-family: "Fredoka", "Nunito", sans-serif;
+        font-weight: 600;
+        font-size: clamp(1.25rem, 3.6vmin, 1.8rem);
+        margin-top: 12px;
+      }
+      .message.good { color: var(--green); }
+      .message.over { color: var(--orange); }
+
+      /* ---------- coin bank ---------- */
+      .bank {
+        display: flex;
+        justify-content: center;
+        align-items: flex-end;
+        gap: clamp(8px, 2.4vmin, 22px);
+        flex-wrap: wrap;
+        padding: 4px 2px;
+      }
+      .coin-btn {
+        background: none;
+        border: none;
+        padding: 4px;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        border-radius: 22px;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .coin-btn .coin-name {
+        font-family: "Fredoka", "Nunito", sans-serif;
+        font-weight: 600;
+        font-size: clamp(1rem, 2.8vmin, 1.3rem);
+        color: var(--ink);
+        background: var(--panel);
+        border: 2.5px solid var(--panel-edge);
+        border-radius: 999px;
+        padding: 3px 16px;
+      }
+      .coin-btn:hover .coin-svg, .coin-btn:focus-visible .coin-svg { transform: translateY(-6px) scale(1.04); }
+      .coin-btn:focus-visible { outline: 4px solid var(--gold); outline-offset: 2px; }
+      .coin-btn:active .coin-svg { transform: scale(0.94); }
+      .coin-btn:disabled { opacity: 0.55; cursor: default; }
+      .coin-btn:disabled .coin-svg { transform: none; }
+      .coin-svg { transition: transform 0.15s ease; filter: drop-shadow(0 6px 8px rgba(29,43,69,0.28)); display: block; }
+
+      /* ---------- tray ---------- */
+      .tray-panel {
+        background: var(--panel);
+        border: 3px solid var(--panel-edge);
+        border-radius: 26px;
+        box-shadow: var(--shadow);
+        padding: clamp(12px, 2.6vmin, 22px);
+        margin-top: auto;
+      }
+      .tray-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .total-line {
+        font-family: "Fredoka", "Nunito", sans-serif;
+        font-weight: 600;
+        font-size: clamp(1.5rem, 4.5vmin, 2.3rem);
+      }
+      .total-line .total-amt { color: #2f6fd0; }
+      @media (prefers-color-scheme: dark) {
+        .total-line .total-amt { color: #7db1ff; }
+      }
+      .total-line.over .total-amt { color: var(--orange); }
+      .need-line {
+        font-weight: 800;
+        font-size: clamp(1rem, 2.8vmin, 1.25rem);
+        color: var(--ink-soft);
+        margin-top: 2px;
+      }
+      .tray {
+        margin-top: 12px;
+        background: var(--tray);
+        border: 3px dashed var(--panel-edge);
+        border-radius: 20px;
+        min-height: 108px;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 12px 14px;
+      }
+      .tray.shake { animation: shake 0.45s ease; }
+      @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        20% { transform: translateX(-9px); }
+        40% { transform: translateX(9px); }
+        60% { transform: translateX(-6px); }
+        80% { transform: translateX(6px); }
+      }
+      .tray-empty {
+        font-weight: 800;
+        color: var(--ink-soft);
+        font-size: clamp(1.05rem, 3vmin, 1.3rem);
+        width: 100%;
+        text-align: center;
+        padding: 14px 0;
+      }
+      .tray-coin {
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        border-radius: 50%;
+        animation: coinIn 0.28s ease;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .tray-coin:focus-visible { outline: 4px solid var(--gold); outline-offset: 2px; }
+      @keyframes coinIn {
+        0% { transform: scale(0.3) translateY(-16px); opacity: 0; }
+        70% { transform: scale(1.12); opacity: 1; }
+        100% { transform: scale(1); }
+      }
+      .tray-hint {
+        margin-top: 10px;
+        text-align: center;
+        color: var(--ink-soft);
+        font-weight: 700;
+        font-size: clamp(0.95rem, 2.4vmin, 1.1rem);
+      }
+
+      /* ---------- confetti ---------- */
+      #confetti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 50; }
+      .confetti-piece {
+        position: absolute;
+        top: -4vh;
+        border-radius: 3px;
+        animation: confettiFall linear forwards;
+      }
+      @keyframes confettiFall {
+        to { transform: translateY(112vh) rotate(680deg); opacity: 0.9; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .tray.shake, .tray-coin, .stars .pop { animation: none; }
+        .coin-svg { transition: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <!-- Top bar: stars + controls -->
+      <div class="topbar">
+        <div class="stars" aria-label="Stars earned">
+          <svg id="starIcon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.8l3.1 6.6 7.2.8-5.3 4.9 1.4 7.1L12 17.7l-6.4 3.5 1.4-7.1L1.7 9.2l7.2-.8z" fill="#f2b824" stroke="#b97e0c" stroke-width="1.4" stroke-linejoin="round"/></svg>
+          <span><span id="starCount">0</span> Stars</span>
+        </div>
+        <div class="controls">
+          <button class="btn btn-sound" id="soundBtn" type="button" aria-pressed="true">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="#fff"/><path id="soundWaves" d="M16 9c1.2 1 1.2 5 0 6M18.5 7c2 1.8 2 8.2 0 10" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+            <span id="soundLabel">Sound: On</span>
+          </button>
+          <button class="btn btn-new" id="newGameBtn" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 3v4h-4" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            New Game
+          </button>
+        </div>
+      </div>
+
+      <!-- Target -->
+      <section class="target-panel" aria-label="Target amount">
+        <div class="target-label">Can you make…</div>
+        <div class="target-amount" id="targetAmount">45¢</div>
+        <button class="btn btn-hear" id="hearBtn" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="#fff"/><path d="M16 9c1.2 1 1.2 5 0 6M18.5 7c2 1.8 2 8.2 0 10" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+          Hear It
+        </button>
+        <div class="message" id="message" role="status" aria-live="polite">Tap the coins to make the amount!</div>
+      </section>
+
+      <!-- Coin bank -->
+      <div class="bank" id="bank" role="group" aria-label="Canadian coins"></div>
+
+      <!-- Tray -->
+      <section class="tray-panel" aria-label="Your coins">
+        <div class="tray-head">
+          <div>
+            <div class="total-line" id="totalLine">You have: <span class="total-amt" id="totalAmt">0¢</span></div>
+            <div class="need-line" id="needLine"></div>
+          </div>
+          <button class="btn btn-clear" id="clearBtn" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>
+            Clear
+          </button>
+        </div>
+        <div class="tray" id="tray">
+          <div class="tray-empty" id="trayEmpty">Your coins will go here</div>
+        </div>
+        <div class="tray-hint">Tap a coin in your tray to take it back.</div>
+      </section>
+    </div>
+
+    <div id="confetti" aria-hidden="true"></div>
+
+    <script>
+      "use strict";
+
+      /* ============ Canadian coins only (no pennies — discontinued in Canada) ============ */
+      var COINS = [
+        { id: "nickel",  name: "Nickel",  cents: 5,   label: "5¢",  size: 0.86, kind: "silver" },
+        { id: "dime",    name: "Dime",    cents: 10,  label: "10¢", size: 0.74, kind: "silver" },
+        { id: "quarter", name: "Quarter", cents: 25,  label: "25¢", size: 0.97, kind: "silver" },
+        { id: "loonie",  name: "Loonie",  cents: 100, label: "$1",  size: 1.06, kind: "gold"   },
+        { id: "toonie",  name: "Toonie",  cents: 200, label: "$2",  size: 1.14, kind: "toonie" }
+      ];
+      var COIN_BY_ID = {};
+      COINS.forEach(function (c) { COIN_BY_ID[c.id] = c; });
+
+      var LEAF = "M50 4 L58 21 L73 12 L70 29 L87 25 L78 39 L93 41 L80 51 L89 62 L72 61 L74 78 L62 67 L60 89 L54 73 L50 84 L46 73 L40 89 L38 67 L26 78 L28 61 L11 62 L20 51 L7 41 L22 39 L13 25 L30 29 L27 12 L42 21 Z";
+
+      var gradSeq = 0;
+      function coinSVG(coin, px) {
+        gradSeq += 1;
+        var gSilver = "gs" + gradSeq, gGold = "gg" + gradSeq;
+        var dark = coin.kind === "silver" ? "#39404d" : "#6e4d00";
+        var leafFill = coin.kind === "silver" ? "rgba(40,48,64,0.28)" : "rgba(110,77,0,0.35)";
+        var defs =
+          "<defs>" +
+          "<radialGradient id='" + gSilver + "' cx='38%' cy='32%' r='80%'>" +
+          "<stop offset='0%' stop-color='#ffffff'/><stop offset='55%' stop-color='#d6dbe3'/><stop offset='100%' stop-color='#98a1af'/></radialGradient>" +
+          "<radialGradient id='" + gGold + "' cx='38%' cy='32%' r='80%'>" +
+          "<stop offset='0%' stop-color='#ffedb3'/><stop offset='55%' stop-color='#f4c542'/><stop offset='100%' stop-color='#c9920e'/></radialGradient>" +
+          "</defs>";
+        var body;
+        if (coin.kind === "toonie") {
+          body =
+            "<circle cx='50' cy='50' r='48' fill='url(#" + gSilver + ")' stroke='#7c8593' stroke-width='1.6'/>" +
+            "<circle cx='50' cy='50' r='45' fill='none' stroke='rgba(40,48,64,0.25)' stroke-width='2' stroke-dasharray='2.6 2.3'/>" +
+            "<circle cx='50' cy='50' r='31.5' fill='url(#" + gGold + ")' stroke='#a87c10' stroke-width='1.6'/>" +
+            "<path d='" + LEAF + "' transform='translate(39.5,7) scale(0.21)' fill='" + leafFill + "'/>" +
+            "<text x='50' y='60' text-anchor='middle' font-family='Fredoka, Nunito, sans-serif' font-weight='700' font-size='27' fill='" + dark + "'>" + coin.label + "</text>" +
+            "<text x='50' y='74' text-anchor='middle' font-family='Fredoka, Nunito, sans-serif' font-weight='600' font-size='9.5' letter-spacing='1.2' fill='" + dark + "'>TOONIE</text>";
+        } else {
+          var fillId = coin.kind === "gold" ? gGold : gSilver;
+          var edge = coin.kind === "gold" ? "#a87c10" : "#7c8593";
+          body =
+            "<circle cx='50' cy='50' r='48' fill='url(#" + fillId + ")' stroke='" + edge + "' stroke-width='1.6'/>" +
+            "<circle cx='50' cy='50' r='45' fill='none' stroke='rgba(40,48,64,0.22)' stroke-width='2' stroke-dasharray='2.6 2.3'/>" +
+            "<circle cx='50' cy='50' r='39' fill='none' stroke='rgba(255,255,255,0.45)' stroke-width='1.4'/>" +
+            "<path d='" + LEAF + "' transform='translate(38,6) scale(0.24)' fill='" + leafFill + "'/>" +
+            "<text x='50' y='63' text-anchor='middle' font-family='Fredoka, Nunito, sans-serif' font-weight='700' font-size='29' fill='" + dark + "'>" + coin.label + "</text>" +
+            "<text x='50' y='79' text-anchor='middle' font-family='Fredoka, Nunito, sans-serif' font-weight='600' font-size='10' letter-spacing='1.4' fill='" + dark + "'>" + coin.name.toUpperCase() + "</text>";
+        }
+        return "<svg class='coin-svg' width='" + px + "' height='" + px + "' viewBox='0 0 100 100' aria-hidden='true'>" + defs + body + "</svg>";
+      }
+
+      /* ============ Money formatting & words ============ */
+      function fmt(cents) {
+        if (cents < 100) return cents + "¢";
+        return "$" + (cents / 100).toFixed(2);
+      }
+      var ONES = ["zero","one","two","three","four","five","six","seven","eight","nine","ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen"];
+      var TENS = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"];
+      function numWords(n) {
+        if (n < 20) return ONES[n];
+        var t = Math.floor(n / 10), r = n % 10;
+        return r === 0 ? TENS[t] : TENS[t] + "-" + ONES[r];
+      }
+      function moneyWords(cents) {
+        var dollars = Math.floor(cents / 100), rem = cents % 100, parts = [];
+        if (dollars > 0) parts.push(numWords(dollars) + (dollars === 1 ? " dollar" : " dollars"));
+        if (rem > 0) parts.push(numWords(rem) + (rem === 1 ? " cent" : " cents"));
+        return parts.join(" and ");
+      }
+
+      /* ============ Sound (WebAudio, in-browser only) ============ */
+      var soundOn = true;
+      var actx = null;
+      function audio() {
+        if (!actx) {
+          var AC = window.AudioContext || window.webkitAudioContext;
+          if (!AC) return null;
+          actx = new AC();
+        }
+        if (actx.state === "suspended") actx.resume();
+        return actx;
+      }
+      function tone(freq, startDelay, dur, type, vol) {
+        if (!soundOn) return;
+        try {
+          var ctx = audio();
+          if (!ctx) return;
+          var t0 = ctx.currentTime + startDelay;
+          var osc = ctx.createOscillator();
+          var gain = ctx.createGain();
+          osc.type = type || "sine";
+          osc.frequency.setValueAtTime(freq, t0);
+          gain.gain.setValueAtTime(0.0001, t0);
+          gain.gain.exponentialRampToValueAtTime(vol || 0.16, t0 + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.start(t0); osc.stop(t0 + dur + 0.05);
+        } catch (e) { /* sound is a bonus, never break the game */ }
+      }
+      function playClick() { tone(740, 0, 0.09, "triangle", 0.14); tone(1180, 0.03, 0.07, "sine", 0.08); }
+      function playHappy() {
+        var notes = [523.25, 659.25, 783.99, 1046.5];
+        for (var i = 0; i < notes.length; i++) tone(notes[i], i * 0.1, 0.28, "triangle", 0.18);
+        tone(1318.5, 0.42, 0.4, "sine", 0.12);
+      }
+      function playOops() { tone(392, 0, 0.22, "triangle", 0.1); tone(329.63, 0.16, 0.3, "triangle", 0.1); }
+      function playClear() { tone(520, 0, 0.08, "sine", 0.1); tone(380, 0.06, 0.1, "sine", 0.09); }
+
+      /* ============ Speech (Hear It) ============ */
+      function speakTarget() {
+        try {
+          if (!("speechSynthesis" in window)) {
+            setMessage("Sorry, this device cannot talk out loud.", "");
+            return;
+          }
+          window.speechSynthesis.cancel();
+          var u = new SpeechSynthesisUtterance("Make " + moneyWords(state.target) + ".");
+          u.rate = 0.92;
+          u.pitch = 1.05;
+          var voices = window.speechSynthesis.getVoices();
+          for (var i = 0; i < voices.length; i++) {
+            if (/en[-_]CA/i.test(voices[i].lang)) { u.voice = voices[i]; break; }
+          }
+          if (!u.voice) {
+            for (var j = 0; j < voices.length; j++) {
+              if (/^en/i.test(voices[j].lang)) { u.voice = voices[j]; break; }
+            }
+          }
+          window.speechSynthesis.speak(u);
+        } catch (e) { /* ignore */ }
+      }
+      if ("speechSynthesis" in window) {
+        window.speechSynthesis.getVoices();
+        window.speechSynthesis.onvoiceschanged = function () { window.speechSynthesis.getVoices(); };
+      }
+
+      /* ============ Game state ============ */
+      var state = { target: 45, tray: [], total: 0, stars: 0, busy: false, lastTarget: 0 };
+
+      var el = {
+        bank: document.getElementById("bank"),
+        tray: document.getElementById("tray"),
+        trayEmpty: document.getElementById("trayEmpty"),
+        targetAmount: document.getElementById("targetAmount"),
+        totalAmt: document.getElementById("totalAmt"),
+        totalLine: document.getElementById("totalLine"),
+        needLine: document.getElementById("needLine"),
+        message: document.getElementById("message"),
+        starCount: document.getElementById("starCount"),
+        starIcon: document.getElementById("starIcon"),
+        soundBtn: document.getElementById("soundBtn"),
+        soundLabel: document.getElementById("soundLabel"),
+        soundWaves: document.getElementById("soundWaves"),
+        confetti: document.getElementById("confetti")
+      };
+
+      function setMessage(text, kind) {
+        el.message.textContent = text;
+        el.message.className = "message" + (kind ? " " + kind : "");
+      }
+
+      function pickTarget() {
+        var t;
+        do {
+          if (Math.random() < 0.62) {
+            t = 10 + 5 * Math.floor(Math.random() * 18);       /* 10¢ … 95¢ */
+          } else {
+            t = 100 + 5 * Math.floor(Math.random() * 21);      /* $1.00 … $2.00 */
+          }
+        } while (t === state.lastTarget);
+        state.lastTarget = t;
+        return t;
+      }
+
+      function renderTray() {
+        el.tray.querySelectorAll(".tray-coin").forEach(function (n) { n.remove(); });
+        el.trayEmpty.style.display = state.tray.length ? "none" : "block";
+        state.tray.forEach(function (coinId, idx) {
+          var coin = COIN_BY_ID[coinId];
+          var b = document.createElement("button");
+          b.type = "button";
+          b.className = "tray-coin";
+          b.setAttribute("aria-label", "Take back the " + coin.name + " (" + fmt(coin.cents) + ")");
+          b.innerHTML = coinSVG(coin, Math.round(64 * coin.size) + 14);
+          b.addEventListener("click", function () { removeCoin(idx); });
+          el.tray.appendChild(b);
+        });
+        el.totalAmt.textContent = fmt(state.total);
+        el.totalLine.classList.toggle("over", state.total > state.target);
+        if (state.total < state.target) {
+          el.needLine.textContent = "You need " + fmt(state.target - state.total) + " more.";
+        } else if (state.total === state.target && state.total > 0) {
+          el.needLine.textContent = "That is exactly right!";
+        } else if (state.total > state.target) {
+          el.needLine.textContent = "That is " + fmt(state.total - state.target) + " too much.";
+        } else {
+          el.needLine.textContent = "";
+        }
+      }
+
+      function setBankEnabled(on) {
+        el.bank.querySelectorAll(".coin-btn").forEach(function (b) { b.disabled = !on; });
+      }
+
+      function newRound(msg) {
+        state.target = pickTarget();
+        state.tray = [];
+        state.total = 0;
+        state.busy = false;
+        el.targetAmount.textContent = fmt(state.target);
+        renderTray();
+        setBankEnabled(true);
+        setMessage(msg || "Tap the coins to make the amount!", "");
+      }
+
+      function addCoin(coin) {
+        if (state.busy) return;
+        state.tray.push(coin.id);
+        state.total += coin.cents;
+        playClick();
+        renderTray();
+        if (state.total === state.target) {
+          onWin();
+        } else if (state.total > state.target) {
+          setMessage("Oops! That is too much. Take a coin back, or tap Clear and try again!", "over");
+          playOops();
+          el.tray.classList.remove("shake");
+          void el.tray.offsetWidth;
+          el.tray.classList.add("shake");
+        } else {
+          setMessage("Keep going — you need " + fmt(state.target - state.total) + " more!", "");
+        }
+      }
+
+      function removeCoin(idx) {
+        if (state.busy) return;
+        var coin = COIN_BY_ID[state.tray[idx]];
+        state.tray.splice(idx, 1);
+        state.total -= coin.cents;
+        playClear();
+        renderTray();
+        if (state.total <= state.target) {
+          setMessage(state.total === 0 ? "Tap the coins to make the amount!" : "Keep going — you need " + fmt(state.target - state.total) + " more!", "");
+        }
+      }
+
+      function onWin() {
+        state.busy = true;
+        state.stars += 1;
+        el.starCount.textContent = state.stars;
+        el.starIcon.classList.remove("pop");
+        void el.starIcon.getBoundingClientRect();
+        el.starIcon.classList.add("pop");
+        setMessage("You did it! " + fmt(state.target) + " — great counting!", "good");
+        playHappy();
+        launchConfetti();
+        setBankEnabled(false);
+        window.setTimeout(function () { newRound("Great job! Here is a new amount."); }, 2100);
+      }
+
+      function launchConfetti() {
+        if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        var colors = ["#d80621", "#ffffff", "#f2b824", "#2f6fd0", "#1d9e57"];
+        for (var i = 0; i < 42; i++) {
+          var p = document.createElement("div");
+          p.className = "confetti-piece";
+          var size = 7 + Math.random() * 8;
+          p.style.left = (Math.random() * 100) + "vw";
+          p.style.width = size + "px";
+          p.style.height = (size * (0.5 + Math.random() * 0.8)) + "px";
+          p.style.background = colors[i % colors.length];
+          p.style.animationDuration = (1.1 + Math.random() * 1.1) + "s";
+          p.style.animationDelay = (Math.random() * 0.25) + "s";
+          p.style.transform = "rotate(" + (Math.random() * 360) + "deg)";
+          el.confetti.appendChild(p);
+          (function (node) { window.setTimeout(function () { node.remove(); }, 2600); })(p);
+        }
+      }
+
+      /* ============ Build the coin bank ============ */
+      function bankCoinSize() {
+        var w = Math.min(window.innerWidth, 1080);
+        return Math.max(72, Math.min(138, Math.floor(w / 6.4)));
+      }
+      function buildBank() {
+        el.bank.innerHTML = "";
+        var base = bankCoinSize();
+        COINS.forEach(function (coin) {
+          var b = document.createElement("button");
+          b.type = "button";
+          b.className = "coin-btn";
+          b.setAttribute("aria-label", "Add a " + coin.name + ", worth " + fmt(coin.cents));
+          b.innerHTML = coinSVG(coin, Math.round(base * coin.size)) +
+            "<span class='coin-name'>" + coin.name + " · " + coin.label + "</span>";
+          b.addEventListener("click", function () { addCoin(coin); });
+          el.bank.appendChild(b);
+        });
+      }
+      var resizeTimer = null;
+      window.addEventListener("resize", function () {
+        window.clearTimeout(resizeTimer);
+        resizeTimer = window.setTimeout(buildBank, 200);
+      });
+
+      /* ============ Controls ============ */
+      document.getElementById("clearBtn").addEventListener("click", function () {
+        if (state.busy) return;
+        state.tray = [];
+        state.total = 0;
+        playClear();
+        renderTray();
+        setMessage("All clear! Try again — make " + fmt(state.target) + ".", "");
+      });
+      document.getElementById("newGameBtn").addEventListener("click", function () {
+        state.stars = 0;
+        el.starCount.textContent = "0";
+        newRound("New game! Tap the coins to make the amount!");
+      });
+      document.getElementById("hearBtn").addEventListener("click", speakTarget);
+      el.soundBtn.addEventListener("click", function () {
+        soundOn = !soundOn;
+        el.soundLabel.textContent = soundOn ? "Sound: On" : "Sound: Off";
+        el.soundBtn.classList.toggle("off", !soundOn);
+        el.soundBtn.setAttribute("aria-pressed", soundOn ? "true" : "false");
+        el.soundWaves.style.display = soundOn ? "" : "none";
+        if (soundOn) playClick();
+      });
+
+      /* ============ Start ============ */
+      buildBank();
+      newRound();
+    </script>
+  </body>
+</html>
