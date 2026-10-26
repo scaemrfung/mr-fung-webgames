@@ -28,6 +28,8 @@
         --c-letters-soft: #e6f5f8;
         --c-numbers: #e8912d;
         --c-numbers-soft: #fdf2e2;
+        --c-builder: #c2447f;
+        --c-builder-soft: #fae9f2;
       }
       @media (prefers-color-scheme: dark) {
         :root {
@@ -48,6 +50,8 @@
           --c-letters-soft: #22383f;
           --c-numbers: #ffb35c;
           --c-numbers-soft: #3d3323;
+          --c-builder: #f08bbd;
+          --c-builder-soft: #3a2833;
         }
       }
 
@@ -92,6 +96,7 @@
       .dots .d2 { background: var(--c-word); }
       .dots .d3 { background: var(--c-letters); }
       .dots .d4 { background: var(--c-numbers); }
+      .dots .d5 { background: var(--c-builder); }
 
       .grid {
         display: grid;
@@ -128,6 +133,7 @@
       .art-word { background: var(--c-word-soft); }
       .art-letters { background: var(--c-letters-soft); }
       .art-numbers { background: var(--c-numbers-soft); }
+      .art-builder { background: var(--c-builder-soft); }
 
       h2 {
         font-family: "Fredoka", "Nunito", system-ui, sans-serif;
@@ -171,6 +177,7 @@
       .play-word { background: var(--c-word); }
       .play-letters { background: var(--c-letters); }
       .play-numbers { background: var(--c-numbers); }
+      .play-builder { background: var(--c-builder); }
       @media (prefers-color-scheme: dark) {
         .play { color: #14202e; }
       }
@@ -194,7 +201,7 @@
       <header>
         <h1>My Apps</h1>
         <p class="sub">Games for Kindergarten and Grade One — pick one and play!</p>
-        <div class="dots" aria-hidden="true"><span class="d1"></span><span class="d2"></span><span class="d3"></span><span class="d4"></span></div>
+        <div class="dots" aria-hidden="true"><span class="d1"></span><span class="d2"></span><span class="d3"></span><span class="d4"></span><span class="d5"></span></div>
       </header>
 
       <main class="grid">
@@ -275,6 +282,28 @@
           <h2>Hooked on Numbers!</h2>
           <p class="desc">Fishing for math! Counting, adding, subtracting, and making 10.</p>
           <a class="play play-numbers" href="https://scaemrfung.github.io/mr-fung-webgames/hooked-on-numbers/" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15c0 .8.9 1.3 1.6.9l12-7.5c.7-.4.7-1.4 0-1.8l-12-7.5C7.9 3.2 7 3.7 7 4.5z"/></svg>
+            Play
+          </a>
+        </section>
+
+        <section class="card">
+          <div class="art art-builder" aria-hidden="true">
+            <svg viewBox="0 0 160 120" role="img">
+              <g font-family="Fredoka, sans-serif" font-weight="700" font-size="30">
+                <rect x="14" y="34" width="40" height="40" rx="9" fill="#c2447f"/>
+                <text x="34" y="65" text-anchor="middle" fill="#ffffff">T</text>
+                <rect x="60" y="46" width="40" height="40" rx="9" fill="#ffffff" stroke="#c2447f" stroke-width="4"/>
+                <text x="80" y="77" text-anchor="middle" fill="#c2447f">C</text>
+                <rect x="106" y="34" width="40" height="40" rx="9" fill="#c2447f"/>
+                <text x="126" y="65" text-anchor="middle" fill="#ffffff">A</text>
+              </g>
+              <path d="M34 96 q10 -8 20 0 M80 104 q10 -8 20 0 M126 96 q10 -8 20 0" fill="none" stroke="#c2447f" stroke-width="4" stroke-linecap="round" opacity="0.55" transform="translate(-14 0)"/>
+            </svg>
+          </div>
+          <h2>Word Builder</h2>
+          <p class="desc">Build Grade One words from scrambled letters, or match the starting letter to the picture!</p>
+          <a class="play play-builder" href="https://scaemrfung.github.io/mr-fung-webgames/word-builder/" target="_blank" rel="noopener">
             <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15c0 .8.9 1.3 1.6.9l12-7.5c.7-.4.7-1.4 0-1.8l-12-7.5C7.9 3.2 7 3.7 7 4.5z"/></svg>
             Play
           </a>
