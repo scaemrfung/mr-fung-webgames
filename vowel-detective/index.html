@@ -412,11 +412,11 @@
   ];
 
   var VOWELS = [
-    {letter:"A", shortSound:"ă · cat", longSound:"ā · cake"},
-    {letter:"E", shortSound:"ĕ · pen", longSound:"ē · tree"},
-    {letter:"I", shortSound:"ĭ · pig", longSound:"ī · kite"},
-    {letter:"O", shortSound:"ŏ · dog", longSound:"ō · boat"},
-    {letter:"U", shortSound:"ŭ · sun", longSound:"ū · cube"}
+    {letter:"A", shortSound:"ă · cat", longSound:"ā · cake", shortSay:"A. Ah. Cat.", longSay:"A. Ay. Cake."},
+    {letter:"E", shortSound:"ĕ · pen", longSound:"ē · tree", shortSay:"E. Eh. Pen.", longSay:"E. Ee. Tree."},
+    {letter:"I", shortSound:"ĭ · pig", longSound:"ī · kite", shortSay:"I. Ih. Pig.", longSay:"I. Eye. Kite."},
+    {letter:"O", shortSound:"ŏ · dog", longSound:"ō · boat", shortSay:"O. Ah. Dog.", longSay:"O. Oh. Boat."},
+    {letter:"U", shortSound:"ŭ · sun", longSound:"ū · cube", shortSay:"U. Uh. Sun.", longSay:"U. Yoo. Cube."}
   ];
 
   var ROUND_SIZE = 12;
@@ -527,6 +527,11 @@
     var w = current(); if (!w) return;
     speak(w.word.toLowerCase());
   }
+  function speakVowel(v){
+    // Speak the sound shown on the button (short in short/mixed, long in long mode).
+    // speak() already respects the Sound toggle.
+    speak(mode === "long" ? v.longSay : v.shortSay);
+  }
 
   /* ---------- Rendering ---------- */
   function renderSoundBtn(){
@@ -561,7 +566,7 @@
       sound.textContent = isLongContext ? v.longSound : v.shortSound;
       b.appendChild(letter);
       b.appendChild(sound);
-      b.addEventListener("click", function(){ onVowel(v.letter, b); });
+      b.addEventListener("click", function(){ speakVowel(v); onVowel(v.letter, b); });
       vowelsEl.appendChild(b);
     });
   }
@@ -670,7 +675,8 @@
       setFeedback(praise + " " + w.word + "!", "good");
       playHappy();
       burst();
-      speak(w.word.toLowerCase() + "!");
+      // Let the tapped vowel's sound finish before speaking the word.
+      setTimeout(function(){ if (current() === w) speak(w.word.toLowerCase() + "!"); }, 1100);
 
       advanceTimer = setTimeout(nextWord, 1650);
     } else {
@@ -684,8 +690,9 @@
       playTryAgain();
       var w2 = current();
       setFeedback("Good try! Listen again and pick another vowel.", "try");
-      // Re-speak the word gently after a short pause so they can listen for the vowel
-      setTimeout(function(){ if (!locked) speakWord(); }, 450);
+      // Re-speak the word gently after the tapped vowel's sound finishes,
+      // so they can listen for the vowel
+      setTimeout(function(){ if (!locked) speakWord(); }, 1400);
       void w2;
     }
   }

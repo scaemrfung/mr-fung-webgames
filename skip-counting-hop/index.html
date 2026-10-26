@@ -339,7 +339,7 @@
       @media (max-width:560px){
         .controls{ gap:8px; }
         .seg{ flex:1 1 100%; }
-        .seg button{ flex:1 1 0; min-width:0; }
+        .seg button{ flex:1 1 0; min-width:0; padding:10px 6px; font-size:16px; }
         .btn{ flex:1 1 auto; justify-content:center; }
         .choice{ flex:1 1 28%; min-width:96px; }
         .board{ padding-top:58px; }
@@ -361,6 +361,8 @@
         <a class="btn home-btn" href="https://scaemrfung.github.io/mr-fung-webgames/" aria-label="Home — back to all games">🏠 Home</a>
         <div class="seg" role="group" aria-label="Choose how to count">
           <button type="button" id="step2" aria-pressed="true">By 2s</button>
+          <button type="button" id="step3" aria-pressed="false">By 3s</button>
+          <button type="button" id="step4" aria-pressed="false">By 4s</button>
           <button type="button" id="step5" aria-pressed="false">By 5s</button>
           <button type="button" id="step10" aria-pressed="false">By 10s</button>
         </div>
@@ -428,7 +430,7 @@
         var finishText = document.getElementById('finishText');
         var soundBtn = document.getElementById('soundBtn');
 
-        var stepWords = { 2: 'twos', 5: 'fives', 10: 'tens' };
+        var stepWords = { 2: 'twos', 3: 'threes', 4: 'fours', 5: 'fives', 10: 'tens' };
 
         function ensureAudio(){
           if(!audioCtx){
@@ -667,13 +669,15 @@
 
         function setStep(newStep){
           step = newStep;
-          [2, 5, 10].forEach(function(s){
+          [2, 3, 4, 5, 10].forEach(function(s){
             document.getElementById('step' + s).setAttribute('aria-pressed', s === step ? 'true' : 'false');
           });
           newGame();
         }
 
         document.getElementById('step2').addEventListener('click', function(){ setStep(2); });
+        document.getElementById('step3').addEventListener('click', function(){ setStep(3); });
+        document.getElementById('step4').addEventListener('click', function(){ setStep(4); });
         document.getElementById('step5').addEventListener('click', function(){ setStep(5); });
         document.getElementById('step10').addEventListener('click', function(){ setStep(10); });
         document.getElementById('newGameBtn').addEventListener('click', function(){ ensureAudio(); newGame(); });

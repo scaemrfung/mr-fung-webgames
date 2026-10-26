@@ -29,6 +29,9 @@
         --rainy-bg:#dceeff;
         --snowy-bg:#e8f6ff;
         --windy-bg:#e2f5ec;
+        --special-bg:#ffe9ec;
+        --special-ring:#ffb3c1;
+        --special-ink:#a4133c;
         --pill:#f1f6fb;
         --pill-border:#dbe9f6;
         --shadow:0 18px 50px rgba(22,50,90,.16), 0 4px 14px rgba(22,50,90,.08);
@@ -54,6 +57,9 @@
           --rainy-bg:#1d3350;
           --snowy-bg:#1e3448;
           --windy-bg:#1c3a33;
+          --special-bg:#3d2130;
+          --special-ring:#7a3a52;
+          --special-ink:#ffb3c1;
           --pill:#1f3050;
           --pill-border:#2a3c5e;
           --shadow:0 18px 50px rgba(0,0,0,.45), 0 4px 14px rgba(0,0,0,.3);
@@ -181,6 +187,29 @@
       }
       .message-text.is-long{font-size:clamp(1.6rem,4.6vw,3.2rem)}
       .message-text.is-xlong{font-size:clamp(1.3rem,3.6vw,2.4rem)}
+
+      /* ---------- Special today ---------- */
+      .special-zone[hidden]{display:none !important}
+      .special-zone{
+        flex:0 0 auto;
+        margin:2px clamp(18px,3vw,36px) 0;
+        display:flex;align-items:center;justify-content:center;gap:12px;
+        background:var(--special-bg);
+        border:2px solid var(--special-ring);
+        border-radius:18px;
+        padding:clamp(10px,1.8vw,16px) clamp(16px,3vw,28px);
+        text-align:center;
+      }
+      .special-star{flex:0 0 auto;width:clamp(26px,3.4vw,36px);height:clamp(26px,3.4vw,36px);color:#f5a623}
+      .special-zone-text{min-width:0}
+      .special-zone-label{
+        font-weight:900;font-size:clamp(.78rem,1.5vw,.92rem);letter-spacing:.14em;text-transform:uppercase;color:var(--special-ink);opacity:.85;
+      }
+      .special-text{
+        font-family:"Fredoka",sans-serif;font-weight:600;
+        font-size:clamp(1.25rem,3vw,2rem);line-height:1.2;color:var(--special-ink);
+        text-wrap:balance;
+      }
 
       /* ---------- Controls ---------- */
       .controls{
@@ -319,6 +348,14 @@
         padding:16px 18px;resize:vertical;min-height:110px;
       }
       textarea:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 4px color-mix(in srgb, var(--accent) 30%, transparent)}
+      .field-opt{font-weight:700;color:var(--ink-3);font-size:.92rem}
+      .special-input{
+        width:100%;border:3px solid var(--pill-border);border-radius:18px;background:var(--pill);
+        color:var(--ink);font-family:"Nunito",sans-serif;font-weight:800;
+        font-size:clamp(1.15rem,2.6vw,1.4rem);line-height:1.4;
+        padding:14px 18px;
+      }
+      .special-input:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 4px color-mix(in srgb, var(--accent) 30%, transparent)}
       .char-row{display:flex;justify-content:space-between;gap:10px;margin-top:8px;color:var(--ink-3);font-weight:800;font-size:.92rem}
       .quick-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
       .quick-chip{
@@ -392,6 +429,14 @@
           <div class="message-text" id="messageText" tabindex="0">learn, play, and be kind to each other!</div>
         </section>
 
+        <section class="special-zone" id="specialZone" aria-label="Special today" hidden>
+          <svg class="special-star" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.6l2.9 5.9 6.5.95-4.7 4.58 1.1 6.47L12 17.45l-5.8 3.05 1.1-6.47L2.6 9.45l6.5-.95L12 2.6Z"/></svg>
+          <div class="special-zone-text">
+            <div class="special-zone-label">Special today</div>
+            <div class="special-text" id="specialText"></div>
+          </div>
+        </section>
+
         <div class="controls">
           <button class="btn btn-hear" id="hearBtn" type="button">
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 9.5v5h3.2L12 18.6c.6.5 1.5.1 1.5-.7V6.1c0-.8-.9-1.2-1.5-.7L7.2 9.5H4Z" fill="currentColor"/><path d="M16.2 9.2a4 4 0 0 1 0 5.6M18.6 6.8a7.4 7.4 0 0 1 0 10.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
@@ -411,7 +456,7 @@
     <div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="editTitle">
       <div class="sheet">
         <h2 id="editTitle">Set up today's board</h2>
-        <p class="sub">Pick the weather and type today's message. It takes just a few seconds.</p>
+        <p class="sub">Pick the weather, type today's message, and add a special line if there is one. It takes just a few seconds.</p>
 
         <span class="field-label" id="weatherLabel">1 · What's the weather today?</span>
         <div class="weather-grid" role="group" aria-labelledby="weatherLabel" id="weatherGrid"></div>
@@ -420,6 +465,10 @@
         <textarea id="messageInput" maxlength="140" rows="3" placeholder="e.g. read a story, count to 100, and paint pictures!"></textarea>
         <div class="char-row"><span>Keep it short so everyone can read it from the back.</span><span id="charCount">0 / 140</span></div>
         <div class="quick-row" id="quickRow" aria-label="Quick message ideas"></div>
+
+        <label class="field-label" for="specialInput">3 · Special today <span class="field-opt">— birthdays, assemblies, special days (leave blank to hide it)</span></label>
+        <input class="special-input" id="specialInput" type="text" maxlength="80" placeholder="e.g. Happy birthday, Emma! Assembly at 10:30 in the gym." />
+        <div class="char-row"><span>Shown in a banner under today's message.</span><span id="specialCount">0 / 80</span></div>
 
         <div class="sheet-actions">
           <button class="btn btn-cancel" id="cancelBtn" type="button">Cancel</button>
@@ -488,7 +537,7 @@
         ];
 
         /* ============ State (in memory only — nothing is saved) ============ */
-        var state = { weather:"sunny", message:"learn, play, and be kind to each other!", sound:true };
+        var state = { weather:"sunny", message:"learn, play, and be kind to each other!", special:"", sound:true };
         var draftWeather = state.weather;
 
         var $ = function(id){ return document.getElementById(id); };
@@ -497,7 +546,9 @@
             soundBtn = $("soundBtn"), soundIcon = $("soundIcon"), soundState = $("soundState"),
             hearBtn = $("hearBtn"), hearLabel = $("hearLabel"), hint = $("hint"),
             overlay = $("overlay"), grid = $("weatherGrid"), input = $("messageInput"),
-            charCount = $("charCount"), quickRow = $("quickRow");
+            charCount = $("charCount"), quickRow = $("quickRow"),
+            specialZone = $("specialZone"), specialText = $("specialText"),
+            specialInput = $("specialInput"), specialCount = $("specialCount");
 
         /* ============ Date (auto-filled from today) ============ */
         var now = new Date();
@@ -537,6 +588,8 @@
           wName.textContent = WEATHERS[state.weather].name;
           wPhrase.textContent = WEATHERS[state.weather].phrase;
           msgEl.textContent = state.message;
+          specialText.textContent = state.special;
+          specialZone.hidden = !state.special;
           msgEl.classList.toggle("is-long", state.message.length > 60);
           msgEl.classList.toggle("is-xlong", state.message.length > 100);
           soundIcon.innerHTML = state.sound ? ICON_SOUND_ON : ICON_SOUND_OFF;
@@ -604,6 +657,8 @@
         });
         function updateCount(){ charCount.textContent = input.value.length + " / 140"; }
         input.addEventListener("input", updateCount);
+        function updateSpecialCount(){ specialCount.textContent = specialInput.value.length + " / 80"; }
+        specialInput.addEventListener("input", updateSpecialCount);
 
         var lastFocus = null;
         function openEdit(){
@@ -611,6 +666,7 @@
           draftWeather = state.weather;
           Array.prototype.forEach.call(grid.children, function(c){ c.setAttribute("aria-pressed", String(c.dataset.w === draftWeather)); });
           input.value = state.message; updateCount();
+          specialInput.value = state.special; updateSpecialCount();
           overlay.classList.add("open");
           document.body.style.overflow = "hidden";
           setTimeout(function(){ input.focus(); input.select(); }, 60);
@@ -628,6 +684,7 @@
           var v = input.value.replace(/\s+/g," ").trim();
           state.weather = draftWeather;
           if (v) state.message = v;
+          state.special = specialInput.value.replace(/\s+/g," ").trim();
           closeEdit(); render(); playChime();
           showHint("Board updated — ready for the class!");
           $("editBtn").focus();

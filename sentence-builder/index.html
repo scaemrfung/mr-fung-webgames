@@ -342,6 +342,16 @@
         display: none;
       }
       .controls .btn-read.show { display: inline-flex; }
+      .controls .btn-replay {
+        background: var(--accent);
+        border-color: var(--accent-dark);
+        color: #ffffff;
+        display: none;
+      }
+      .controls .btn-replay.show { display: inline-flex; }
+      @media (prefers-color-scheme: dark) {
+        .controls .btn-replay { color: #0c231d; }
+      }
 
       #confetti-canvas {
         position: fixed;
@@ -355,6 +365,7 @@
       @media (max-width: 560px) {
         .controls button { flex: 1 1 44%; justify-content: center; padding: 14px 10px; }
         .btn-read.show { flex: 1 1 100%; }
+        .btn-replay.show { flex: 1 1 100%; }
         .btn-next { flex: 1 1 100%; order: 5; }
         .topbar { justify-content: space-between; }
       }
@@ -442,6 +453,13 @@
           </svg>
           Read It
         </button>
+        <button class="btn-replay" id="btn-replay" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 12a9 9 0 1 0 3-6.7"></path>
+            <path d="M3 4v5h5"></path>
+          </svg>
+          Replay
+        </button>
         <button class="btn-next" id="btn-next" type="button">Next Sentence →</button>
       </div>
     </main>
@@ -486,6 +504,7 @@
         var starCountEl = document.getElementById("star-count");
         var starsBox = document.getElementById("stars-box");
         var btnRead = document.getElementById("btn-read");
+        var btnReplay = document.getElementById("btn-replay");
         var btnSound = document.getElementById("btn-sound");
         var soundStateEl = document.getElementById("sound-state");
 
@@ -695,6 +714,7 @@
             }
           }
           btnRead.classList.toggle("show", solved);
+          btnReplay.classList.toggle("show", solved);
         }
 
         /* ---------------- Game actions ---------------- */
@@ -873,6 +893,12 @@
         });
 
         btnRead.addEventListener("click", function () {
+          speak(sentenceText);
+        });
+
+        /* Replay: hear the finished sentence again — the build stays
+           exactly as it is; nothing is reset or re-rendered. */
+        btnReplay.addEventListener("click", function () {
           speak(sentenceText);
         });
 

@@ -84,6 +84,42 @@
   }
   .subtitle{text-align:center;color:var(--muted);font-weight:800;font-size:clamp(1rem,2vw,1.2rem);margin:0 0 14px}
 
+  .mode-bar{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:0 0 14px}
+  .mode-btn{
+    border:3px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;
+    padding:11px 20px;font-weight:900;font-size:1.05rem;box-shadow:var(--shadow);min-height:52px;
+    font-family:"Fredoka",sans-serif;
+  }
+  .mode-btn:active{transform:translateY(2px);box-shadow:none}
+  .mode-btn.active{background:var(--teal);border-color:var(--teal-dark);color:#fff}
+  .list-panel{
+    display:none;background:var(--card);border:3px solid var(--line);border-radius:24px;box-shadow:var(--shadow);
+    padding:16px 18px;margin-bottom:18px;
+  }
+  .list-panel.show{display:block}
+  .list-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+  .list-title{font-family:"Fredoka",sans-serif;font-weight:700;font-size:1.35rem}
+  .list-progress{font-weight:900;color:var(--teal);font-size:1.05rem}
+  .list-items{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  @media (max-width:640px){ .list-items{grid-template-columns:1fr} }
+  .list-item{
+    display:flex;align-items:center;gap:10px;border:3px solid var(--line);border-radius:16px;
+    padding:10px 12px;background:var(--card2);font-weight:900;
+  }
+  .list-item .li-emoji{font-size:2rem;line-height:1;flex:0 0 auto}
+  .list-item .li-main{flex:1;min-width:0}
+  .list-item .li-name{font-family:"Fredoka",sans-serif;font-weight:600;font-size:1.1rem;line-height:1.15}
+  .list-item .li-price{color:var(--muted);font-size:.98rem}
+  .list-item .li-status{font-size:.88rem;font-weight:900;white-space:nowrap}
+  .list-item.current{border-color:var(--teal);background:var(--teal-soft)}
+  .list-item.current .li-status{color:var(--teal)}
+  .list-item.done{border-color:var(--good);background:var(--good-bg)}
+  .list-item.done .li-status{color:var(--good)}
+  .list-item.waiting{opacity:.75}
+  .list-total{margin-top:10px;text-align:center;font-weight:900;font-size:1.08rem;color:var(--muted)}
+  .list-total b{color:var(--teal)}
+  @media (prefers-color-scheme: dark){ .list-item.done .li-status{color:#7ED99A} .list-item.current .li-status{color:var(--teal)} }
+
   .layout{display:grid;grid-template-columns: 380px 1fr;gap:18px;align-items:start}
   @media (max-width:820px){ .layout{grid-template-columns:1fr} }
 
@@ -233,6 +269,20 @@
     <h1>🛒 Money Shop</h1>
     <p class="subtitle">Pay for the item with Canadian coins — then make your change!</p>
 
+    <div class="mode-bar" role="group" aria-label="Choose how to shop">
+      <button class="mode-btn active" id="modeSingleBtn" type="button" aria-pressed="true">🛒 1 Item at a Time</button>
+      <button class="mode-btn" id="modeListBtn" type="button" aria-pressed="false">📋 Shopping List — 3 Items</button>
+    </div>
+
+    <section class="list-panel" id="listPanel" aria-label="Shopping list">
+      <div class="list-head">
+        <div class="list-title">📋 Your Shopping List</div>
+        <div class="list-progress" id="listProgress" aria-live="polite">0 of 3 bought</div>
+      </div>
+      <div class="list-items" id="listItems"></div>
+      <div class="list-total" id="listTotal"></div>
+    </section>
+
     <div class="layout">
       <section class="item-card" aria-label="Shop item">
         <span class="shop-sign">For Sale</span>
@@ -313,6 +363,10 @@
   var changeCoins = [];
   var paidCents = 0;
   var busy = false;
+  var mode = "single"; // "single" | "list"
+  var listItems = [];
+  var listIndex = 0;
+  var bought = []; // completed items in list mode: {name, emoji, price}
 
   var el = {
     starCount: document.getElementById("starCount"),
@@ -334,7 +388,13 @@
     coins: document.getElementById("coins"),
     clearBtn: document.getElementById("clearBtn"),
     checkBtn: document.getElementById("checkBtn"),
-    confetti: document.getElementById("confetti")
+    confetti: document.getElementById("confetti"),
+    modeSingleBtn: document.getElementById("modeSingleBtn"),
+    modeListBtn: document.getElementById("modeListBtn"),
+    listPanel: document.getElementById("listPanel"),
+    listItems: document.getElementById("listItems"),
+    listProgress: document.getElementById("listProgress"),
+    listTotal: document.getElementById("listTotal")
   };
 
   /* ---------- money helpers ---------- */
@@ -436,12 +496,15 @@
     var steps = 3 + Math.floor(Math.random()*74); // 3..76 steps of 5¢
     return steps * 5;
   }
+  function makeItem(idx){
+    var base = ITEMS[idx];
+    return { name: base.name, emoji: base.emoji, price: randomPrice() };
+  }
   function newItem(){
     var idx;
     do { idx = Math.floor(Math.random()*ITEMS.length); } while (idx === lastItemIdx);
     lastItemIdx = idx;
-    var base = ITEMS[idx];
-    item = { name: base.name, emoji: base.emoji, price: randomPrice() };
+    item = makeItem(idx);
     phase = "pay";
     payCoins = []; changeCoins = []; paidCents = 0; busy = false;
     render();
@@ -449,10 +512,87 @@
     speak(""); // stop any prior speech
     if ("speechSynthesis" in window) try{ window.speechSynthesis.cancel(); }catch(e){}
   }
+  function generateList(){
+    var used = {}, items = [], guard = 0;
+    while (items.length < 3 && guard < 100){
+      guard++;
+      var idx = Math.floor(Math.random()*ITEMS.length);
+      if (used[idx]) continue;
+      used[idx] = true;
+      lastItemIdx = idx;
+      items.push(makeItem(idx));
+    }
+    return items;
+  }
+  function loadListItem(){
+    item = listItems[listIndex];
+    phase = "pay";
+    payCoins = []; changeCoins = []; paidCents = 0; busy = false;
+    render();
+    renderList();
+    setMessage("Item " + (listIndex + 1) + " of 3: Tap coins to pay for the " + item.name + "!", "");
+    if ("speechSynthesis" in window) try{ window.speechSynthesis.cancel(); }catch(e){}
+  }
+  function startListRound(){
+    listItems = generateList();
+    bought = [];
+    listIndex = 0;
+    loadListItem();
+  }
+  function renderList(){
+    if (mode !== "list"){
+      el.listPanel.className = "list-panel";
+      return;
+    }
+    el.listPanel.className = "list-panel show";
+    el.listProgress.textContent = bought.length + " of 3 bought";
+    el.listItems.innerHTML = "";
+    listItems.forEach(function(li, i){
+      var state, status;
+      if (i < bought.length){ state = "done"; status = "✓ Bought"; }
+      else if (i === bought.length && bought.length < 3){ state = "current"; status = "▶ Buying now"; }
+      else { state = "waiting"; status = "To buy"; }
+      if (bought.length === 3){ state = "done"; status = "✓ Bought"; }
+      var row = document.createElement("div");
+      row.className = "list-item " + state;
+      row.innerHTML = '<span class="li-emoji" aria-hidden="true">' + li.emoji + '</span>' +
+        '<span class="li-main"><span class="li-name">' + li.name + '</span><br><span class="li-price">' + fmt(li.price) + '</span></span>' +
+        '<span class="li-status">' + status + '</span>';
+      el.listItems.appendChild(row);
+    });
+    if (bought.length === 0){
+      el.listTotal.innerHTML = "Buy all <b>3 items</b> on your list to earn a <b>⭐ star</b>!";
+    } else if (bought.length < 3){
+      var spent = 0; bought.forEach(function(b){ spent += b.price; });
+      el.listTotal.innerHTML = "Bought so far: <b>" + bought.map(function(b){ return b.emoji + " " + b.name; }).join(", ") + "</b> · Spent: <b>" + fmt(spent) + "</b>";
+    } else {
+      var total = 0; bought.forEach(function(b){ total += b.price; });
+      el.listTotal.innerHTML = "🎉 List complete! You bought <b>" + bought.map(function(b){ return b.emoji + " " + b.name; }).join(", ") + "</b> · Total spent: <b>" + fmt(total) + "</b>";
+    }
+  }
+  function setMode(next){
+    if (mode === next) return;
+    mode = next;
+    el.modeSingleBtn.className = "mode-btn" + (mode === "single" ? " active" : "");
+    el.modeSingleBtn.setAttribute("aria-pressed", mode === "single" ? "true" : "false");
+    el.modeListBtn.className = "mode-btn" + (mode === "list" ? " active" : "");
+    el.modeListBtn.setAttribute("aria-pressed", mode === "list" ? "true" : "false");
+    if (mode === "list"){ startListRound(); }
+    else { el.listPanel.className = "list-panel"; newItem(); }
+  }
+  function advanceAfterDone(){
+    if (mode === "list"){
+      if (bought.length < 3){ listIndex = bought.length; loadListItem(); }
+      else { startListRound(); }
+    } else {
+      newItem();
+    }
+  }
   function newGame(){
     stars = 0;
     el.starCount.textContent = "0";
-    newItem();
+    if (mode === "list"){ startListRound(); }
+    else { newItem(); }
   }
 
   function currentTray(){ return (phase === "change" || phase === "done") ? changeCoins : payCoins; }
@@ -564,6 +704,7 @@
       });
     }
     renderHint();
+    renderList();
   }
 
   function shakeTray(){
@@ -612,22 +753,46 @@
         // Correct!
         busy = true;
         phase = "done";
-        stars++;
-        el.starCount.textContent = "" + stars;
-        render();
-        happySound();
-        confettiBurst();
-        if (due === 0){
-          setMessage("⭐ Great job! Exact money — no change! You earned a star!", "good");
-          speak("Great job! Exact money, no change!");
+        if (mode === "list"){
+          bought.push({ name: item.name, emoji: item.emoji, price: item.price });
+          var isComplete = bought.length === 3;
+          if (isComplete){
+            stars++;
+            el.starCount.textContent = "" + stars;
+          }
+          render();
+          happySound();
+          if (isComplete) confettiBurst();
+          if (isComplete){
+            setMessage("⭐ Great job! You bought all 3 items on your list — you earned a star!", "good");
+            speak("Great job! You finished your shopping list and earned a star!");
+            el.checkBtn.textContent = "New Shopping List →";
+          } else {
+            var nextItem = listItems[bought.length];
+            setMessage("✅ You bought the " + item.name + "! " + bought.length + " of 3 done. Next: " + nextItem.emoji + " " + nextItem.name + "!", "good");
+            speak("You bought the " + item.name + "! Next is the " + nextItem.name + ".");
+            el.checkBtn.textContent = "Next Item →";
+          }
+          busy = false;
+          setTimeout(function(){ if (phase === "done") advanceAfterDone(); }, isComplete ? 3200 : 2600);
         } else {
-          setMessage("⭐ Great job! Your change is " + fmt(due) + " — that's right! You earned a star!", "good");
-          speak("Great job! Your change is " + speakMoney(due) + "!");
+          stars++;
+          el.starCount.textContent = "" + stars;
+          render();
+          happySound();
+          confettiBurst();
+          if (due === 0){
+            setMessage("⭐ Great job! Exact money — no change! You earned a star!", "good");
+            speak("Great job! Exact money, no change!");
+          } else {
+            setMessage("⭐ Great job! Your change is " + fmt(due) + " — that's right! You earned a star!", "good");
+            speak("Great job! Your change is " + speakMoney(due) + "!");
+          }
+          el.checkBtn.textContent = "Next Item →";
+          busy = false;
+          // Auto-advance after a celebration pause; button also works
+          setTimeout(function(){ if (phase === "done") newItem(); }, 2600);
         }
-        el.checkBtn.textContent = "Next Item →";
-        busy = false;
-        // Auto-advance after a celebration pause; button also works
-        setTimeout(function(){ if (phase === "done") newItem(); }, 2600);
       } else if (got < due){
         gentleSound(); shakeTray();
         setMessage("Good try! You need " + fmt(due - got) + " more change. Keep tapping coins!", "warn");
@@ -636,7 +801,7 @@
         setMessage("Good try! That's too much change. Tap a coin in the tray to take one back, or press Clear.", "warn");
       }
     } else if (phase === "done"){
-      newItem();
+      advanceAfterDone();
     }
   });
 
@@ -660,6 +825,17 @@
   el.newGameBtn.addEventListener("click", function(){
     coinSound();
     newGame();
+  });
+
+  el.modeSingleBtn.addEventListener("click", function(){
+    if (mode === "single") return;
+    coinSound();
+    setMode("single");
+  });
+  el.modeListBtn.addEventListener("click", function(){
+    if (mode === "list") return;
+    coinSound();
+    setMode("list");
   });
 
   newGame();

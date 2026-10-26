@@ -312,7 +312,7 @@
       <div class="topbar">
         <a class="tool-btn" href="https://scaemrfung.github.io/mr-fung-webgames/">🏠 Home</a>
         <span class="stars" aria-label="Stars earned"><span class="star-ico" aria-hidden="true">⭐</span> Stars: <span id="starCount">0</span></span>
-        <span class="progress" id="progress">Picture 1 of 24</span>
+        <span class="progress" id="progress">Picture 1 of 32</span>
         <button class="tool-btn" id="soundBtn" type="button" aria-pressed="true">🔊 Sound: On</button>
         <button class="tool-btn new-game" id="newGameBtn" type="button">🔁 New Game</button>
       </div>
@@ -348,7 +348,7 @@
       <section class="finish" id="finish" hidden>
         <div class="big-star" aria-hidden="true">🌟</div>
         <h2>Great Job!</h2>
-        <p id="finishText">You sorted all 24 pictures!</p>
+        <p id="finishText">You sorted all 32 pictures!</p>
         <button class="play-again" id="playAgainBtn" type="button">▶️ Play Again</button>
       </section>
     </main>
@@ -359,33 +359,41 @@
 
         var ITEMS = [
           // Spring
-          { emoji: "🌷", name: "Tulips", season: "spring" },
+          { emoji: "🌷", name: "Tulips", season: "spring", plural: true },
           { emoji: "☂️", name: "Umbrella", season: "spring" },
           { emoji: "🐣", name: "Baby Chick", season: "spring" },
           { emoji: "🌱", name: "Little Sprout", season: "spring" },
           { emoji: "🦋", name: "Butterfly", season: "spring" },
           { emoji: "🌈", name: "Rainbow", season: "spring" },
+          { emoji: "👢", name: "Rain Boots", season: "spring", plural: true },
+          { emoji: "👗", name: "Flower Dress", season: "spring" },
           // Summer
-          { emoji: "😎", name: "Sunglasses", season: "summer" },
+          { emoji: "😎", name: "Sunglasses", season: "summer", plural: true },
           { emoji: "🍦", name: "Ice Cream", season: "summer" },
           { emoji: "🏖️", name: "Beach Day", season: "summer" },
           { emoji: "🏊", name: "Swimming", season: "summer" },
-          { emoji: "🩳", name: "Shorts", season: "summer" },
+          { emoji: "🩳", name: "Shorts", season: "summer", plural: true },
           { emoji: "☀️", name: "Hot Sunny Day", season: "summer" },
+          { emoji: "🎽", name: "Tank Top", season: "summer" },
+          { emoji: "🧢", name: "Ball Cap", season: "summer" },
           // Fall
           { emoji: "🎃", name: "Pumpkin", season: "fall" },
-          { emoji: "🍂", name: "Fall Leaves", season: "fall" },
-          { emoji: "🍎", name: "Apples", season: "fall" },
+          { emoji: "🍂", name: "Fall Leaves", season: "fall", plural: true },
+          { emoji: "🍎", name: "Apples", season: "fall", plural: true },
           { emoji: "🧥", name: "Jacket", season: "fall" },
           { emoji: "🌽", name: "Corn", season: "fall" },
           { emoji: "🌰", name: "Acorn", season: "fall" },
+          { emoji: "🥾", name: "Hiking Boots", season: "fall", plural: true },
+          { emoji: "🦺", name: "Warm Vest", season: "fall" },
           // Winter
           { emoji: "⛄", name: "Snowman", season: "winter" },
-          { emoji: "🧤", name: "Mittens", season: "winter" },
-          { emoji: "🎿", name: "Skis", season: "winter" },
+          { emoji: "🧤", name: "Mittens", season: "winter", plural: true },
+          { emoji: "🎿", name: "Skis", season: "winter", plural: true },
           { emoji: "❄️", name: "Snowflake", season: "winter" },
           { emoji: "☕", name: "Hot Chocolate", season: "winter" },
-          { emoji: "🛷", name: "Sled", season: "winter" }
+          { emoji: "🛷", name: "Sled", season: "winter" },
+          { emoji: "🧥", name: "Winter Coat", season: "winter" },
+          { emoji: "🧣", name: "Scarf", season: "winter" }
         ];
 
         var SEASON_NAMES = { spring: "Spring", summer: "Summer", fall: "Fall", winter: "Winter" };
@@ -421,6 +429,12 @@
         }
 
         function current() { return order[index]; }
+
+        /* Plural names ("Apples", "Mittens") take "belong"; singular names take "belongs". */
+        function belongVerb(item) { return item.plural ? "belong" : "belongs"; }
+        function belongSentence(item) {
+          return item.name + " " + belongVerb(item) + " in " + SEASON_NAMES[item.season];
+        }
 
         /* ---------- Sound (Web Audio, in-browser only) ---------- */
         function ensureAudio() {
@@ -552,8 +566,8 @@
             happySound();
             var r = btn.getBoundingClientRect();
             burst(r.left + r.width / 2, r.top + r.height / 2);
-            setFeedback("⭐ Yes! " + item.name + " belongs in " + SEASON_NAMES[item.season] + "!", "good");
-            speak("Yes! " + item.name + " belongs in " + SEASON_NAMES[item.season] + "!");
+            setFeedback("⭐ Yes! " + belongSentence(item) + "!", "good");
+            speak("Yes! " + belongSentence(item) + "!");
             setTimeout(function () {
               index++;
               if (index >= order.length) finishGame();
@@ -594,7 +608,7 @@
         document.getElementById("hearBtn").addEventListener("click", function () {
           ensureAudio();
           var item = current();
-          speak(item.name + "! " + item.name + " belongs in " + SEASON_NAMES[item.season] + ".");
+          speak(item.name + "! " + belongSentence(item) + ".");
         });
         soundBtn.addEventListener("click", function () {
           soundOn = !soundOn;

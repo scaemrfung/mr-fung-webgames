@@ -273,6 +273,8 @@
         .stars-pill .label{display:none}
         .dot{width:17px;height:17px}
         .dot-group{max-width:160px}
+        .mode-switch{flex-wrap:wrap;justify-content:center}
+        .mode-btn{padding:8px 12px;font-size:.95rem}
       }
       @media (min-width:621px){
         body{overflow:hidden}
@@ -309,6 +311,10 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg>
               Fast Mode
             </button>
+            <button type="button" class="mode-btn" id="modeNear" aria-pressed="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="6.5" cy="12" r="3.4"/><circle cx="16.8" cy="12" r="5"/></svg>
+              Near Doubles
+            </button>
           </div>
           <button type="button" class="ctl-btn" id="soundBtn" aria-pressed="true" aria-label="Toggle sound">
             <svg class="on-state" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H3v6h3l5 4V5z" fill="currentColor" stroke="none"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.2 6a9 9 0 0 1 0 12"/></svg>
@@ -335,7 +341,7 @@
       <!-- Stage -->
       <div class="stage" id="playStage">
         <section class="fact-card" id="factCard" aria-label="Doubles question">
-          <p class="prompt">What is the double?</p>
+          <p class="prompt" id="factPrompt">What is the double?</p>
           <div class="fact" id="factDisplay" aria-live="polite">
             <span class="n1" id="factN1">5</span> + <span class="n2" id="factN2">5</span> = <span class="q" id="factQ">?</span>
           </div>
@@ -386,6 +392,8 @@
         var playAgainBtn = document.getElementById('playAgainBtn');
         var modePracticeBtn = document.getElementById('modePractice');
         var modeFastBtn = document.getElementById('modeFast');
+        var modeNearBtn = document.getElementById('modeNear');
+        var factPrompt = document.getElementById('factPrompt');
         var modeHint = document.getElementById('modeHint');
         var timerWrap = document.getElementById('timerWrap');
         var timerText = document.getElementById('timerText');
@@ -396,12 +404,13 @@
         var endStars = document.getElementById('endStars');
 
         var state = {
-          mode: 'practice',       // 'practice' | 'fast'
+          mode: 'practice',       // 'practice' | 'fast' | 'near'
           soundOn: true,
           stars: 0,
           streak: 0,
           solved: 0,
-          currentN: 5,
+          n1: 5,
+          n2: 5,
           correct: 10,
           lastN: -1,
           locked: false,
@@ -423,6 +432,19 @@
           'Almost! Look at the double once more.',
           'Nice trying! Tap another answer.',
           'Keep going! You can find the double.'
+        ];
+        var NEAR_PRAISE = [
+          'Yes! That is the near double!',
+          'Great job! Double plus 1 more!',
+          'Super work! That is right!',
+          'You did it! Near double solved!',
+          'Wonderful! That is the near double!'
+        ];
+        var NEAR_TRY_AGAIN = [
+          'Good try! Find the double first, then add 1 more.',
+          'Almost! Count the dots and try again.',
+          'Nice trying! Tap another answer.',
+          'Keep going! Think double, then 1 more.'
         ];
 
         /* ---------- Sound (Web Audio, in-browser only) ---------- */
@@ -474,13 +496,13 @@
         function speakFact(){
           try{
             if (!('speechSynthesis' in window)) {
-              setFeedback('Sound is not available here — read it together: ' + state.currentN + ' plus ' + state.currentN + '.', '');
+              setFeedback('Sound is not available here — read it together: ' + state.n1 + ' plus ' + state.n2 + '.', '');
               return;
             }
             window.speechSynthesis.cancel();
             var text = state.locked && !state.gameOver
-              ? state.currentN + ' plus ' + state.currentN + ' equals ' + state.correct + '.'
-              : state.currentN + ' plus ' + state.currentN + ' equals what?';
+              ? state.n1 + ' plus ' + state.n2 + ' equals ' + state.correct + '.'
+              : state.n1 + ' plus ' + state.n2 + ' equals what?';
             var u = new SpeechSynthesisUtterance(text);
             u.rate = 0.92; u.pitch = 1.05;
             window.speechSynthesis.speak(u);
@@ -504,23 +526,23 @@
           streakEl.textContent = state.streak >= 2 ? '· ' + state.streak + ' in a row!' : '';
         }
 
-        function renderDots(n){
+        function renderDots(n1, n2){
           dotsEl.innerHTML = '';
-          function group(cls){
+          function group(cls, count){
             var g = document.createElement('div');
             g.className = 'dot-group ' + cls;
-            for (var i = 0; i < n; i++){
+            for (var i = 0; i < count; i++){
               var d = document.createElement('span');
               d.className = 'dot';
               g.appendChild(d);
             }
             return g;
           }
-          dotsEl.appendChild(group('g1'));
+          dotsEl.appendChild(group('g1', n1));
           var plus = document.createElement('span');
           plus.className = 'dots-plus'; plus.textContent = '+';
           dotsEl.appendChild(plus);
-          dotsEl.appendChild(group('g2'));
+          dotsEl.appendChild(group('g2', n2));
         }
 
         function makeDistractors(correct){
@@ -542,18 +564,22 @@
         function newFact(){
           if (state.advanceId){ clearTimeout(state.advanceId); state.advanceId = null; }
           state.locked = false;
+          var isNear = state.mode === 'near';
           var n;
-          do { n = 1 + Math.floor(Math.random() * 10); } while (n === state.lastN);
+          do { n = 1 + Math.floor(Math.random() * (isNear ? 9 : 10)); } while (n === state.lastN);
           state.lastN = n;
-          state.currentN = n;
-          state.correct = n * 2;
+          state.n1 = n;
+          state.n2 = isNear ? n + 1 : n;
+          state.correct = state.n1 + state.n2;
 
-          factN1.textContent = n;
-          factN2.textContent = n;
+          factPrompt.textContent = isNear ? 'What is the near double?' : 'What is the double?';
+          factCard.setAttribute('aria-label', isNear ? 'Near doubles question' : 'Doubles question');
+          factN1.textContent = state.n1;
+          factN2.textContent = state.n2;
           factQ.textContent = '?';
           factQ.classList.remove('solved');
           factCard.classList.remove('celebrate');
-          renderDots(n);
+          renderDots(state.n1, state.n2);
 
           var answers = shuffle([state.correct].concat(makeDistractors(state.correct)));
           choicesEl.innerHTML = '';
@@ -566,7 +592,7 @@
             b.addEventListener('click', function(){ onChoice(val, b); });
             choicesEl.appendChild(b);
           });
-          setFeedback('Tap the answer that matches the double!', '');
+          setFeedback(isNear ? 'Tap the answer — think of the double, then add 1 more!' : 'Tap the answer that matches the double!', '');
         }
 
         function starBurst(){
@@ -606,7 +632,8 @@
             factQ.textContent = state.correct;
             factQ.classList.add('solved');
             factCard.classList.add('celebrate');
-            setFeedback(PRAISE[Math.floor(Math.random() * PRAISE.length)] + ' ' + state.currentN + ' + ' + state.currentN + ' = ' + state.correct, 'good');
+            var praisePool = state.mode === 'near' ? NEAR_PRAISE : PRAISE;
+            setFeedback(praisePool[Math.floor(Math.random() * praisePool.length)] + ' ' + state.n1 + ' + ' + state.n2 + ' = ' + state.correct, 'good');
             playHappy();
             starBurst();
             state.advanceId = setTimeout(function(){
@@ -621,7 +648,8 @@
             btn.classList.remove('shake');
             void btn.offsetWidth;
             btn.classList.add('shake');
-            setFeedback(TRY_AGAIN[Math.floor(Math.random() * TRY_AGAIN.length)], 'try');
+            var tryPool = state.mode === 'near' ? NEAR_TRY_AGAIN : TRY_AGAIN;
+            setFeedback(tryPool[Math.floor(Math.random() * tryPool.length)], 'try');
             playGentle();
           }
         }
@@ -681,9 +709,12 @@
           state.mode = mode;
           modePracticeBtn.setAttribute('aria-pressed', mode === 'practice' ? 'true' : 'false');
           modeFastBtn.setAttribute('aria-pressed', mode === 'fast' ? 'true' : 'false');
+          modeNearBtn.setAttribute('aria-pressed', mode === 'near' ? 'true' : 'false');
           modeHint.textContent = mode === 'fast'
             ? 'Fast Mode — answer as many doubles as you can in 60 seconds!'
-            : 'Practice mode — take your time, no timer.';
+            : mode === 'near'
+              ? 'Near Doubles — the numbers are neighbours! Use the double, then add 1 more. No timer.'
+              : 'Practice mode — take your time, no timer.';
           if (startFresh) newGame();
         }
         function newGame(){
@@ -710,6 +741,7 @@
         /* ---------- Wiring ---------- */
         modePracticeBtn.addEventListener('click', function(){ ensureAudio(); if (state.mode !== 'practice') setMode('practice', true); });
         modeFastBtn.addEventListener('click', function(){ ensureAudio(); if (state.mode !== 'fast') setMode('fast', true); });
+        modeNearBtn.addEventListener('click', function(){ ensureAudio(); if (state.mode !== 'near') setMode('near', true); });
         newGameBtn.addEventListener('click', function(){ ensureAudio(); newGame(); });
         playAgainBtn.addEventListener('click', function(){ ensureAudio(); newGame(); });
         hearBtn.addEventListener('click', function(){ ensureAudio(); speakFact(); });

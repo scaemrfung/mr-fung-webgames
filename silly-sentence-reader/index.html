@@ -204,6 +204,18 @@
         max-width:34em;
       }
       .act.show{display:block;animation:wordpop .4s ease}
+      .idea{
+        display:none;
+        background:var(--surface);
+        border:2px solid var(--line);
+        border-radius:14px;
+        padding:10px 16px;
+        font-weight:800;
+        font-size:clamp(1.05rem,2.8vw,1.35rem);
+        color:var(--ink);
+        max-width:34em;
+      }
+      .idea.show{display:block;animation:wordpop .4s ease}
 
       /* Controls */
       .controls{display:flex;flex-direction:column;gap:12px}
@@ -313,6 +325,7 @@
         <div class="status" id="status">Read each word together, out loud!</div>
         <div class="dots" id="dots" aria-hidden="true"></div>
         <div class="act" id="actBox"></div>
+        <div class="idea" id="ideaBox"></div>
       </section>
 
       <div class="controls">
@@ -334,26 +347,26 @@
 
     <script>
       var SENTENCES = [
-        { text: "THE CAT WEARS A HAT", pic: "🐱🎩", act: "Act it out: tip your hat like a cat!" },
-        { text: "THE DOG EATS A CAKE", pic: "🐶🎂", act: "Act it out: pretend to eat a great big cake!" },
-        { text: "THE PIG DANCES IN MUD", pic: "🐷💃", act: "Act it out: dance and wiggle like a happy pig!" },
-        { text: "THE FROG HOPS AND SINGS", pic: "🐸🎵", act: "Act it out: hop, hop, hop — and sing like a frog!" },
-        { text: "THE COW JUMPS SO HIGH", pic: "🐮☁️", act: "Act it out: jump as high as you can!" },
-        { text: "THE DUCK SWIMS IN SOUP", pic: "🦆🍲", act: "Act it out: pretend to swim — splash, splash!" },
-        { text: "THE BEAR HUGS A TREE", pic: "🐻🌲", act: "Act it out: give a tree a great big bear hug!" },
-        { text: "THE BEE BUZZES BY ME", pic: "🐝💨", act: "Act it out: buzz and fly around like a bee — bzzzzz!" },
-        { text: "THE ANT LIFTS A CAKE", pic: "🐜🎂", act: "Act it out: lift something very, very heavy!" },
-        { text: "THE GOAT EATS MY SOCK", pic: "🐐🧦", act: "Act it out: oh no — pretend to nibble a sock. Yuck!" },
-        { text: "THE FISH BLOWS BIG BUBBLES", pic: "🐟🫧", act: "Act it out: blow great big bubbles — blub, blub!" },
-        { text: "THE HEN RUNS TO BED", pic: "🐔🛏️", act: "Act it out: run in place, then pretend to fall asleep!" },
-        { text: "THE LION ROARS AT LUNCH", pic: "🦁🍽️", act: "Act it out: roar like a lion — ROAR!" },
-        { text: "THE MOUSE SNEAKS BY QUIETLY", pic: "🐭🤫", act: "Act it out: tiptoe past very, very quietly!" },
-        { text: "THE OWL STAYS UP LATE", pic: "🦉🌙", act: "Act it out: hoot like an owl — hoo, hoo!" },
-        { text: "THE SNAKE SLIDES SO SLOW", pic: "🐍🐌", act: "Act it out: slither slowly like a snake — sssss!" },
-        { text: "THE HORSE RUNS SO FAST", pic: "🐴💨", act: "Act it out: gallop fast like a horse!" },
-        { text: "THE BUG HUGS A RUG", pic: "🐛❤️", act: "Act it out: give your rug a big, cozy hug!" },
-        { text: "THE BAT FLIES AT NIGHT", pic: "🦇🌙", act: "Act it out: flap your wings and fly through the night!" },
-        { text: "THE FOX HIDES AND PEEKS", pic: "🦊👀", act: "Act it out: hide your eyes, then peek — peekaboo!" }
+        { text: "THE CAT WEARS A HAT", pic: "🐱🎩", act: "Act it out: tip your hat like a cat!", idea: "Pretend to put a hat on your head and say meow!" },
+        { text: "THE DOG EATS A CAKE", pic: "🐶🎂", act: "Act it out: pretend to eat a great big cake!", idea: "Pretend to take a big bite of cake!" },
+        { text: "THE PIG DANCES IN MUD", pic: "🐷💃", act: "Act it out: dance and wiggle like a happy pig!", idea: "Wiggle and dance in pretend mud!" },
+        { text: "THE FROG HOPS AND SINGS", pic: "🐸🎵", act: "Act it out: hop, hop, hop — and sing like a frog!", idea: "Hop like a frog and sing ribbit!" },
+        { text: "THE COW JUMPS SO HIGH", pic: "🐮☁️", act: "Act it out: jump as high as you can!", idea: "Jump up high like a cow!" },
+        { text: "THE DUCK SWIMS IN SOUP", pic: "🦆🍲", act: "Act it out: pretend to swim — splash, splash!", idea: "Move your arms like you are swimming!" },
+        { text: "THE BEAR HUGS A TREE", pic: "🐻🌲", act: "Act it out: give a tree a great big bear hug!", idea: "Wrap your arms wide and hug like a bear!" },
+        { text: "THE BEE BUZZES BY ME", pic: "🐝💨", act: "Act it out: buzz and fly around like a bee — bzzzzz!", idea: "Flap your arms fast and buzz by!" },
+        { text: "THE ANT LIFTS A CAKE", pic: "🐜🎂", act: "Act it out: lift something very, very heavy!", idea: "Pretend to lift a heavy cake over your head!" },
+        { text: "THE GOAT EATS MY SOCK", pic: "🐐🧦", act: "Act it out: oh no — pretend to nibble a sock. Yuck!", idea: "Pretend to nibble a sock — yuck!" },
+        { text: "THE FISH BLOWS BIG BUBBLES", pic: "🐟🫧", act: "Act it out: blow great big bubbles — blub, blub!", idea: "Blow big bubbles in the air!" },
+        { text: "THE HEN RUNS TO BED", pic: "🐔🛏️", act: "Act it out: run in place, then pretend to fall asleep!", idea: "Run on the spot, then pretend to sleep!" },
+        { text: "THE LION ROARS AT LUNCH", pic: "🦁🍽️", act: "Act it out: roar like a lion — ROAR!", idea: "Open your mouth wide and roar like a lion!" },
+        { text: "THE MOUSE SNEAKS BY QUIETLY", pic: "🐭🤫", act: "Act it out: tiptoe past very, very quietly!", idea: "Tiptoe quietly like a tiny mouse!" },
+        { text: "THE OWL STAYS UP LATE", pic: "🦉🌙", act: "Act it out: hoot like an owl — hoo, hoo!", idea: "Hoot hoo, hoo like an owl at night!" },
+        { text: "THE SNAKE SLIDES SO SLOW", pic: "🐍🐌", act: "Act it out: slither slowly like a snake — sssss!", idea: "Slide slowly side to side like a snake!" },
+        { text: "THE HORSE RUNS SO FAST", pic: "🐴💨", act: "Act it out: gallop fast like a horse!", idea: "Gallop fast like a running horse!" },
+        { text: "THE BUG HUGS A RUG", pic: "🐛❤️", act: "Act it out: give your rug a big, cozy hug!", idea: "Give the floor a big, cozy hug!" },
+        { text: "THE BAT FLIES AT NIGHT", pic: "🦇🌙", act: "Act it out: flap your wings and fly through the night!", idea: "Flap your arms like bat wings!" },
+        { text: "THE FOX HIDES AND PEEKS", pic: "🦊👀", act: "Act it out: hide your eyes, then peek — peekaboo!", idea: "Cover your eyes, then peek out — peekaboo!" }
       ];
 
       // Shuffle the sentence order so every class visit feels fresh.
@@ -375,6 +388,7 @@
       var statusEl = document.getElementById('status');
       var dotsEl = document.getElementById('dots');
       var actBox = document.getElementById('actBox');
+      var ideaBox = document.getElementById('ideaBox');
       var pill = document.getElementById('progressPill');
       var nextWordBtn = document.getElementById('nextWordBtn');
       var hearBtn = document.getElementById('hearBtn');
@@ -494,6 +508,8 @@
         readBtn.classList.toggle('ready', done);
         actBox.classList.toggle('show', done);
         if (done) actBox.textContent = '🎭 ' + current().act;
+        ideaBox.classList.toggle('show', done);
+        if (done) ideaBox.textContent = '💡 Idea: ' + current().idea;
 
         if (shown === 0) {
           statusEl.textContent = 'Read each word together, out loud!';

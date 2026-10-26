@@ -111,6 +111,15 @@ h1 .leaf{color:var(--green)}
 .question{
   font-size:clamp(21px,3.4vw,28px);font-weight:800;color:var(--ink-soft);margin:0;
 }
+.baby-line{
+  display:inline-flex;align-items:center;gap:9px;margin:8px 0 2px;
+  background:var(--amber-soft);border:3px solid var(--amber);border-radius:999px;
+  padding:6px 20px;
+  font-family:"Fredoka",sans-serif;font-weight:600;
+  font-size:clamp(21px,3.6vw,29px);line-height:1.15;color:var(--ink);
+}
+.baby-line[hidden]{display:none}
+.baby-line .baby-emoji{font-size:30px;line-height:1}
 
 .feedback{
   min-height:44px;display:flex;align-items:center;justify-content:center;
@@ -207,6 +216,7 @@ h1 .leaf{color:var(--green)}
     <section class="animal-card" aria-label="Animal">
       <span class="animal-emoji" id="animalEmoji" role="img" aria-label="Animal picture">🐦</span>
       <div class="animal-name" id="animalName">Bird</div>
+      <div class="baby-line" id="babyLine" hidden><span class="baby-emoji" id="babyEmoji" aria-hidden="true"></span><span id="babyText"></span></div>
       <p class="question" id="question">Where does the bird live?</p>
     </section>
 
@@ -229,16 +239,16 @@ h1 .leaf{color:var(--green)}
   "use strict";
 
   var ROUNDS = [
-    { animal:"Bird",   emoji:"🐦", home:"Nest",     homeEmoji:"🪺" },
-    { animal:"Bear",   emoji:"🐻", home:"Den",      homeEmoji:"🕳️" },
+    { animal:"Bird",   emoji:"🐦", home:"Nest",     homeEmoji:"🪺", baby:"Chick",      babyEmoji:"🐥" },
+    { animal:"Bear",   emoji:"🐻", home:"Den",      homeEmoji:"🕳️", baby:"Cub",        babyEmoji:"🐻" },
     { animal:"Bee",    emoji:"🐝", home:"Hive",     homeEmoji:"🐝" },
-    { animal:"Dog",    emoji:"🐶", home:"Kennel",   homeEmoji:"🏠" },
+    { animal:"Dog",    emoji:"🐶", home:"Kennel",   homeEmoji:"🏠", baby:"Puppy",      babyEmoji:"🐶" },
     { animal:"Fish",   emoji:"🐠", home:"Fish Bowl",homeEmoji:"🐟" },
-    { animal:"Rabbit", emoji:"🐰", home:"Burrow",   homeEmoji:"🕳️" },
-    { animal:"Spider", emoji:"🕷️", home:"Web",      homeEmoji:"🕸️" },
-    { animal:"Frog",   emoji:"🐸", home:"Pond",     homeEmoji:"💧" },
-    { animal:"Horse",  emoji:"🐴", home:"Barn",     homeEmoji:"🏚️" },
-    { animal:"Owl",    emoji:"🦉", home:"Tree",     homeEmoji:"🌳" }
+    { animal:"Rabbit", emoji:"🐰", home:"Burrow",   homeEmoji:"🕳️", baby:"Bunny",      babyEmoji:"🐰" },
+    { animal:"Spider", emoji:"🕷️", home:"Web",      homeEmoji:"🕸️", baby:"Spiderling", babyEmoji:"🕷️" },
+    { animal:"Frog",   emoji:"🐸", home:"Pond",     homeEmoji:"💧", baby:"Tadpole",    babyEmoji:"🐸" },
+    { animal:"Horse",  emoji:"🐴", home:"Barn",     homeEmoji:"🏚️", baby:"Foal",       babyEmoji:"🐴" },
+    { animal:"Owl",    emoji:"🦉", home:"Tree",     homeEmoji:"🌳", baby:"Owlet",      babyEmoji:"🦉" }
   ];
   // Bee's home picture: a drawn beehive (skep), not a honey pot or a second bee:
   ROUNDS[2].homeSvg = '<svg viewBox="0 0 100 100" width="84" height="84" aria-hidden="true"><path d="M50 10 a36 40 0 0 1 36 40 v22 a6 6 0 0 1 -6 6 H20 a6 6 0 0 1 -6 -6 V50 a36 40 0 0 1 36 -40 Z" fill="#f2b93b" stroke="#c07f16" stroke-width="4"/><path d="M17 44 H83 M14.5 58 H85.5 M15 72 H85" stroke="#c07f16" stroke-width="4" fill="none"/><path d="M40 78 a10 9 0 0 1 20 0 Z" fill="#6b4210"/></svg>';
@@ -257,6 +267,9 @@ h1 .leaf{color:var(--green)}
   var dotsEl = document.getElementById('dots');
   var emojiEl = document.getElementById('animalEmoji');
   var nameEl = document.getElementById('animalName');
+  var babyLineEl = document.getElementById('babyLine');
+  var babyEmojiEl = document.getElementById('babyEmoji');
+  var babyTextEl = document.getElementById('babyText');
   var questionEl = document.getElementById('question');
   var feedbackEl = document.getElementById('feedback');
   var choicesEl = document.getElementById('choices');
@@ -331,6 +344,9 @@ h1 .leaf{color:var(--green)}
   function sentence(r){
     return 'The ' + r.animal.toLowerCase() + ' lives in ' + articleFor(r.home) + ' ' + r.home.toLowerCase() + '.';
   }
+  function babySentence(r){
+    return 'A baby ' + r.animal.toLowerCase() + ' is called ' + articleFor(r.baby) + ' ' + r.baby.toLowerCase() + '.';
+  }
 
   function renderDots(){
     dotsEl.innerHTML = '';
@@ -349,6 +365,13 @@ h1 .leaf{color:var(--green)}
     emojiEl.textContent = r.emoji;
     emojiEl.setAttribute('aria-label', r.animal + ' picture');
     nameEl.textContent = r.animal;
+    if (r.baby){
+      babyLineEl.hidden = false;
+      babyEmojiEl.textContent = r.babyEmoji;
+      babyTextEl.textContent = 'Baby: ' + r.baby;
+    } else {
+      babyLineEl.hidden = true;
+    }
     questionEl.textContent = 'Where does the ' + r.animal.toLowerCase() + ' live?';
     feedbackEl.className = 'feedback';
     feedbackEl.textContent = 'Tap the ' + r.animal.toLowerCase() + "'s home!";
@@ -437,7 +460,7 @@ h1 .leaf{color:var(--green)}
       return;
     }
     var r = order[idx];
-    speak(sentence(r) + ' Where does the ' + r.animal.toLowerCase() + ' live?');
+    speak(sentence(r) + (r.baby ? ' ' + babySentence(r) : '') + ' Where does the ' + r.animal.toLowerCase() + ' live?');
   });
 
   newGame();

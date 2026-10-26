@@ -205,6 +205,29 @@
   .feedback .hint{color:var(--muted);font-weight:800;font-size:1.05rem;margin:0}
   .feedback-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
 
+  /* Write-your-why box (shown after a correct answer) */
+  .why-box{width:100%;max-width:640px}
+  .why-label{
+    font-family:"Fredoka",sans-serif;font-weight:600;
+    font-size:clamp(1rem,2.6vw,1.2rem);display:block;margin-bottom:8px;
+  }
+  .why-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+  .why-input{
+    flex:1 1 220px;min-width:0;
+    font:inherit;font-weight:800;font-size:1.05rem;
+    padding:10px 14px;min-height:52px;
+    border-radius:14px;border:2px solid var(--panel-border);
+    background:var(--panel);color:var(--text);
+  }
+  .why-input:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+  .btn-why{background:var(--teal);color:#fff;border-color:var(--teal)}
+  @media (prefers-color-scheme: dark){ .btn-why{color:#0b1f18} }
+  .your-why{
+    font-size:clamp(1.05rem,2.8vw,1.3rem);font-weight:800;
+    margin:10px 0 0;line-height:1.4;
+  }
+  .your-why .yw-label{color:var(--teal-dark)}
+
   /* Burst stars */
   .burst{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:50}
   .burst span{
@@ -452,6 +475,14 @@
     setFeedback("win",
       '<p class="msg">⭐ You found it! Great job!</p>' +
       '<p class="reason">' + escapeHtml(reason) + '</p>' +
+      '<div class="why-box">' +
+        '<label class="why-label" for="whyInput">✏️ Your turn! Why is the ' + escapeHtml(set.odd) + ' the odd one out? Say it in one sentence.</label>' +
+        '<div class="why-row">' +
+          '<input class="why-input" id="whyInput" type="text" maxlength="140" placeholder="Type your reason here…" autocomplete="off">' +
+          '<button class="btn btn-why" id="whyBtn" type="button">Add My Why</button>' +
+        '</div>' +
+        '<p class="your-why" id="yourWhy" hidden></p>' +
+      '</div>' +
       '<div class="feedback-actions">' +
         '<button class="btn btn-hear" id="hearBtn" type="button">🔊 Hear It</button>' +
         '<button class="btn btn-next" id="nextBtn" type="button">Next ▶</button>' +
@@ -460,6 +491,29 @@
     var next = document.getElementById("nextBtn");
     if (hear) hear.addEventListener("click", function(){ speak(reason); });
     if (next) next.addEventListener("click", function(){ clearAdvance(); nextRound(); });
+
+    var whyInput = document.getElementById("whyInput");
+    var whyBtn = document.getElementById("whyBtn");
+    var yourWhy = document.getElementById("yourWhy");
+    function addWhy(){
+      var text = whyInput.value.trim();
+      if (!text) return;
+      if (!/[.!?]$/.test(text)) text += ".";
+      yourWhy.innerHTML = '<span class="yw-label">Your why:</span> ' + escapeHtml(text);
+      yourWhy.hidden = false;
+      whyInput.value = "";
+      whyInput.placeholder = "Want to say it another way? Type again…";
+      whyBtn.textContent = "Update My Why";
+    }
+    if (whyBtn) whyBtn.addEventListener("click", addWhy);
+    if (whyInput){
+      whyInput.addEventListener("keydown", function(e){
+        if (e.key === "Enter"){ e.preventDefault(); addWhy(); }
+      });
+      // Don't auto-advance to the next puzzle while a student is writing.
+      whyInput.addEventListener("focus", clearAdvance);
+      whyInput.addEventListener("input", clearAdvance);
+    }
   }
   function escapeHtml(s){
     return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
@@ -580,6 +634,7 @@
 
   // Keyboard: numbers 1–4 pick a card (handy for teachers on a projector)
   document.addEventListener("keydown", function(e){
+    if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")) return;
     var n = parseInt(e.key, 10);
     if (n >= 1 && n <= 4){
       var cards = grid.querySelectorAll(".card");

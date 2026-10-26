@@ -140,7 +140,7 @@
     </div>
     <div class="controls">
       <a class="home-btn" href="https://scaemrfung.github.io/mr-fung-webgames/" aria-label="Home — back to all games"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 3l9 8.5"/><path d="M5.5 10v10h13V10"/><path d="M9.5 20v-6h5v6"/></svg>Home</a>
-      <div class="stars-pill" aria-label="Stars earned"><span>⭐ Stars</span><span id="starCount">0</span><span class="star-icons" id="starRow">☆☆☆☆☆☆☆☆</span></div>
+      <div class="stars-pill" aria-label="Stars earned"><span>⭐ Stars</span><span id="starCount">0</span><span class="star-icons" id="starRow">☆☆☆☆☆☆☆☆☆☆</span></div>
       <button class="btn" id="soundBtn">🔊 Sound On</button>
       <button class="btn primary" id="newBtn">↻ New Game</button>
     </div>
@@ -148,7 +148,7 @@
 
   <div class="mode-label">How do you want to sort?</div>
   <div class="modes" role="tablist" aria-label="Sort by">
-    <button class="mode-btn active" data-mode="name"><span class="emoji">🔤</span><span class="label">By Name</span><span class="sub">Circle, Square…</span></button>
+    <button class="mode-btn active" data-mode="name"><span class="emoji">🔤</span><span class="label">By Name</span><span class="sub">Circle, Cube, Sphere…</span></button>
     <button class="mode-btn" data-mode="sides"><span class="emoji">🔢</span><span class="label">By Sides</span><span class="sub">0, 3, 4, 10 sides</span></button>
     <button class="mode-btn" data-mode="colour"><span class="emoji">🎨</span><span class="label">By Colour</span><span class="sub">Red, Blue, Green…</span></button>
   </div>
@@ -167,15 +167,15 @@
       <div class="feedback idle" id="feedback">Look at the shape. Tap the correct bin!</div>
       <div class="bottom">
         <div class="dots" id="dots"></div>
-        <div class="progress-text" id="progressText">Shape 1 of 8</div>
+        <div class="progress-text" id="progressText">Shape 1 of 10</div>
       </div>
     </div>
   </section>
 
   <div class="finish" id="finish">
-    <div class="big-stars">⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐</div>
+    <div class="big-stars" id="bigStars">⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐ ⭐</div>
     <h2>Great Job! You sorted all the shapes!</h2>
-    <p id="finishText">You earned 8 stars!</p>
+    <p id="finishText">You earned 10 stars!</p>
     <button class="btn primary" id="againBtn" style="font-size:18px;padding:14px 22px">▶ Play Again — New Game</button>
   </div>
   <p style="text-align:center;color:var(--muted);font-weight:800;font-size:13px;margin:14px 0 0">Tap a bin to sort • Wrong taps never take stars away — just try again!</p>
@@ -202,6 +202,8 @@ const SHAPES=[
   {id:'heart',name:'Heart',sides:0},
   {id:'oval',name:'Oval',sides:0},
   {id:'diamond',name:'Diamond',sides:4},
+  {id:'cube',name:'Cube',dim:'3d'},
+  {id:'sphere',name:'Sphere',dim:'3d'},
 ];
 function shapeSVG(shape, colour, size){
   const f=colour.hex, s=colour.dark;
@@ -215,6 +217,20 @@ function shapeSVG(shape, colour, size){
   else if(shape.id==='heart') inner=`<path d="M100 176 C 20 118 22 52 58 36 C 78 27 96 40 100 56 C 104 40 122 27 142 36 C 178 52 180 118 100 176 Z" ${common}/>`;
   else if(shape.id==='oval') inner=`<ellipse cx="100" cy="100" rx="88" ry="58" ${common}/>`;
   else if(shape.id==='diamond') inner=`<polygon points="100,14 176,100 100,186 24,100" ${common}/>`;
+  else if(shape.id==='cube') inner=`
+    <polygon points="45,92 78,52 168,52 135,92" fill="${f}" stroke="${s}" stroke-width="6" stroke-linejoin="round"/>
+    <polygon points="45,92 78,52 168,52 135,92" fill="#FFFFFF" opacity=".38"/>
+    <polygon points="135,92 168,52 168,142 135,182" fill="${f}" stroke="${s}" stroke-width="6" stroke-linejoin="round"/>
+    <polygon points="135,92 168,52 168,142 135,182" fill="#000000" opacity=".22"/>
+    <polygon points="45,92 135,92 135,182 45,182" fill="${f}" stroke="${s}" stroke-width="6" stroke-linejoin="round"/>`;
+  else if(shape.id==='sphere') inner=`
+    <defs><radialGradient id="sph-${colour.hex.replace('#','')}" cx="35%" cy="28%" r="85%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity=".9"/>
+      <stop offset="38%" stop-color="${f}"/>
+      <stop offset="100%" stop-color="${s}"/>
+    </radialGradient></defs>
+    <circle cx="100" cy="100" r="78" fill="url(#sph-${colour.hex.replace('#','')})" stroke="${s}" stroke-width="6"/>
+    <ellipse cx="72" cy="66" rx="26" ry="16" fill="#FFFFFF" opacity=".55" transform="rotate(-24 72 66)"/>`;
   return `<svg viewBox="0 0 200 200" width="${size||200}" height="${size||200}" aria-label="${shape.name}">${inner}</svg>`;
 }
 function smallShapeSVG(shape, colourHex){
@@ -245,8 +261,12 @@ function happySound(){ ensureAudio(); tone(523,0,0.18,'sine',0.2); tone(659,0.09
 function trySound(){ ensureAudio(); tone(330,0,0.18,'sine',0.12); tone(262,0.12,0.22,'sine',0.12); }
 function clickSound(){ ensureAudio(); tone(660,0,0.08,'triangle',0.08); }
 
+function shapesForMode(){
+  // 3D shapes have faces and edges, not sides — the By Sides game uses flat shapes only.
+  return mode==='sides' ? SHAPES.filter(s=>s.dim!=='3d') : SHAPES;
+}
 function newGame(){
-  const shuffledShapes=shuffle(SHAPES);
+  const shuffledShapes=shuffle(shapesForMode());
   const shuffledColours=shuffle(COLOURS);
   queue=shuffledShapes.map((s,i)=>({shape:s, colour:shuffledColours[i % shuffledColours.length]}));
   // re-randomize colours a bit for variety on replays
@@ -256,9 +276,21 @@ function newGame(){
   document.getElementById('finish').classList.remove('show');
   updateStars(); render();
 }
+function switchMode(){
+  // Changing how you sort keeps your stars and progress — only the shapes still to come are rebuilt for the new mode.
+  if(idx>=queue.length){ newGame(); return; }
+  const doneIds=new Set(queue.slice(0,idx).map(q=>q.shape.id));
+  const prefix=queue.slice(0,idx);
+  const rest=shuffle(shapesForMode().filter(s=>!doneIds.has(s.id)))
+    .map(s=>({shape:s, colour:COLOURS[Math.floor(Math.random()*COLOURS.length)]}));
+  queue=prefix.concat(rest);
+  locked=false;
+  document.getElementById('finish').classList.remove('show');
+  render();
+}
 function updateStars(){
   document.getElementById('starCount').textContent=stars;
-  document.getElementById('starRow').textContent='★'.repeat(stars)+'☆'.repeat(Math.max(0,8-stars));
+  document.getElementById('starRow').textContent='★'.repeat(stars)+'☆'.repeat(Math.max(0,queue.length-stars));
   const dots=document.getElementById('dots'); dots.innerHTML='';
   queue.forEach((q,i)=>{
     const d=document.createElement('div'); d.className='pdot'+(i<idx?' done':'')+(i===idx?' now':'');
@@ -269,6 +301,13 @@ function updateStars(){
 function current(){ return queue[idx]; }
 
 function sidesLabel(n, shape){ if(shape && shape.id==='star') return '5 points • 10 sides'; return n===0 ? '0 sides • round' : n===1 ? '1 side' : `${n} sides`; }
+function is3D(shape){ return shape.dim==='3d'; }
+function dimLabel(shape){ return is3D(shape) ? '3D shape — solid' : 'Flat shape'; }
+function shapeDetail(shape){
+  if(shape.id==='cube') return '6 faces • 12 edges';
+  if(shape.id==='sphere') return 'Round all over • it rolls';
+  return sidesLabel(shape.sides, shape);
+}
 
 function render(){
   if(idx>=queue.length){ showFinish(); return; }
@@ -277,11 +316,11 @@ function render(){
   document.getElementById('shapeName').textContent=cur.shape.name;
   const prompt=document.getElementById('promptText');
   const fact=document.getElementById('shapeFact');
-  if(mode==='name'){ prompt.innerHTML='Tap the bin with the right <strong>name</strong>!'; fact.innerHTML=`<span class="fact-chip"><span class="dot" style="background:${cur.colour.hex}"></span> ${cur.colour.name}</span><span class="fact-chip">${sidesLabel(cur.shape.sides, cur.shape)}</span>`; }
+  if(mode==='name'){ prompt.innerHTML='Tap the bin with the right <strong>name</strong>!'; fact.innerHTML=`<span class="fact-chip"><span class="dot" style="background:${cur.colour.hex}"></span> ${cur.colour.name}</span><span class="fact-chip">${shapeDetail(cur.shape)}</span><span class="fact-chip">${dimLabel(cur.shape)}</span>`; }
   else if(mode==='sides'){ prompt.innerHTML='How many <strong>sides</strong> does it have? Tap that bin!'; fact.innerHTML=`<span class="fact-chip"><span class="dot" style="background:${cur.colour.hex}"></span> ${cur.colour.name} ${cur.shape.name}</span>`; }
-  else { prompt.innerHTML='What <strong>colour</strong> is it? Tap that bin!'; fact.innerHTML=`<span class="fact-chip">${sidesLabel(cur.shape.sides, cur.shape)}</span><span class="fact-chip">${cur.shape.name}</span>`; }
+  else { prompt.innerHTML='What <strong>colour</strong> is it? Tap that bin!'; fact.innerHTML=`<span class="fact-chip">${shapeDetail(cur.shape)}</span><span class="fact-chip">${dimLabel(cur.shape)}</span><span class="fact-chip">${cur.shape.name}</span>`; }
   document.getElementById('binsTitle').textContent = mode==='name' ? 'Which bin says its name?' : mode==='sides' ? 'Which bin shows its sides?' : 'Which bin shows its colour?';
-  setFeedback('idle', mode==='name' ? `Look at the shape. Tap the bin that says “${cur.shape.name}”.` : mode==='sides' ? `Count the sides. Tap the correct number!` : `Look at the colour. Tap the ${cur.colour.name} bin!`);
+  setFeedback('idle', mode==='name' ? (is3D(cur.shape) ? `This is a 3D shape — it is solid, not flat! Tap the bin that says “${cur.shape.name}”.` : `Look at the shape. Tap the bin that says “${cur.shape.name}”.`) : mode==='sides' ? `Count the sides. Tap the correct number!` : `Look at the colour. Tap the ${cur.colour.name} bin!`);
   renderBins();
   updateStars();
 }
@@ -291,10 +330,14 @@ function renderBins(){
   const cur=current(); const binsEl=document.getElementById('bins'); binsEl.innerHTML='';
   let options=[];
   if(mode==='name'){
-    const others=shuffle(SHAPES.filter(s=>s.id!==cur.shape.id)).slice(0,2);
+    // Always mix one flat and one 3D choice in with the answer, so kids learn to tell them apart.
+    const pool=SHAPES.filter(s=>s.id!==cur.shape.id);
+    const cross=shuffle(pool.filter(s=>is3D(s)!==is3D(cur.shape)))[0];
+    const rest=shuffle(pool.filter(s=>s.id!==cross.id));
+    const others=[cross, rest[0]];
     options=shuffle([{label:cur.shape.name, sub:cur.shape.name+' bin', correct:true, shape:cur.shape}, ...others.map(s=>({label:s.name, sub:s.name+' bin', correct:false, shape:s}))]);
     options.forEach(opt=>{
-      const b=document.createElement('button'); b.className='bin'; b.innerHTML=`<span class="bin-icon">${smallShapeSVG(opt.shape)}</span><span class="bin-main"><span class="bin-word">${opt.label}</span><span class="bin-sub" style="display:block">Sort by name</span></span><span class="bin-arrow">→</span>`;
+      const b=document.createElement('button'); b.className='bin'; b.innerHTML=`<span class="bin-icon">${smallShapeSVG(opt.shape)}</span><span class="bin-main"><span class="bin-word">${opt.label}</span><span class="bin-sub" style="display:block">${is3D(opt.shape)?'3D shape':'Flat shape'} • Sort by name</span></span><span class="bin-arrow">→</span>`;
       b.onclick=()=>handlePick(b, opt.correct, opt.label); binsEl.appendChild(b);
     });
   } else if(mode==='sides'){
@@ -336,6 +379,7 @@ function handlePick(btn, correct, label){
   }
 }
 function showFinish(){
+  document.getElementById('bigStars').textContent='⭐ '.repeat(queue.length).trim();
   document.getElementById('finish').classList.add('show');
   document.getElementById('finishText').textContent=`You earned ${stars} star${stars===1?'':'s'} sorting by ${mode==='name'?'name':mode==='sides'?'sides':'colour'}!`;
   setFeedback('good','🎉 All shapes sorted! Press Play Again for a new game.');
@@ -351,7 +395,9 @@ function speakCurrent(){
   ensureAudio(); clickSound();
   const cur=current(); if(!cur) return;
   let text='';
-  if(mode==='name') text=`${cur.shape.name}. This is a ${cur.colour.name} ${cur.shape.name}.`;
+  if(cur.shape.id==='cube') text=`Cube. This is a 3D shape. It is solid, not flat. A cube has 6 faces and 12 edges. This cube is ${cur.colour.name}.`;
+  else if(cur.shape.id==='sphere') text=`Sphere. This is a 3D shape. It is solid, not flat. A sphere is round all over, and it can roll. This sphere is ${cur.colour.name}.`;
+  else if(mode==='name') text=`${cur.shape.name}. This is a ${cur.colour.name} ${cur.shape.name}. It is a flat shape.`;
   else if(mode==='sides') text= cur.shape.id==='star' ? `Star. It has 5 points and 10 sides.` : `${cur.shape.name}. It has ${cur.shape.sides} sides.`;
   else text=`This ${cur.shape.name} is ${cur.colour.name}.`;
   try{
@@ -363,7 +409,7 @@ function speakCurrent(){
 document.querySelectorAll('.mode-btn').forEach(b=>{
   b.addEventListener('click',()=>{
     document.querySelectorAll('.mode-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active');
-    mode=b.dataset.mode; ensureAudio(); clickSound(); render();
+    mode=b.dataset.mode; ensureAudio(); clickSound(); switchMode();
   });
 });
 document.getElementById('soundBtn').addEventListener('click',function(){

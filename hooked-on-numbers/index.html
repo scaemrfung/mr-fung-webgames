@@ -447,6 +447,7 @@
         <button class="mode-btn" data-mode="adding" aria-pressed="false">Adding</button>
         <button class="mode-btn" data-mode="subtracting" aria-pressed="false">Subtracting</button>
         <button class="mode-btn" data-mode="make10" aria-pressed="false">Make 10</button>
+        <button class="mode-btn" data-mode="make20" aria-pressed="false">Make 20</button>
       </div>
       <div class="tools">
         <button class="tool-btn" id="soundBtn" aria-pressed="true">
@@ -500,7 +501,7 @@
       var ROUND_GOAL = 8;
       var FISH_COUNT = 5;
       var FISH_COLORS = ["#ef476f", "#f78c2b", "#ffd166", "#2fbf71", "#118ab2", "#9b5de5", "#00b8a9", "#e86aa8"];
-      var MODES = ["counting", "adding", "subtracting", "make10"];
+      var MODES = ["counting", "adding", "subtracting", "make10", "make20"];
 
       var pond = document.getElementById("pond");
       var questionEl = document.getElementById("question");
@@ -594,11 +595,13 @@
       }
       function distractors(answer, count) {
         var pool = [];
+        var maxVal = state.mode === "make20" ? 20 : 99;
         var cands = [answer - 2, answer - 1, answer + 1, answer + 2, answer - 3, answer + 3, answer + 4, answer - 4, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+        if (state.mode === "make20") cands = cands.concat([11, 12, 13, 14, 15, 16, 17, 18, 19, 20]);
         shuffle(cands);
         for (var i = 0; i < cands.length && pool.length < count; i++) {
           var c = cands[i];
-          if (c !== answer && c >= 0 && pool.indexOf(c) === -1) pool.push(c);
+          if (c !== answer && c >= 0 && c <= maxVal && pool.indexOf(c) === -1) pool.push(c);
         }
         return pool;
       }
@@ -619,10 +622,14 @@
           var d = randInt(0, c);
           state.answer = c - d;
           q = c + " − " + d + " = ?";
-        } else { // make10
+        } else if (state.mode === "make10") {
           var n = randInt(0, 10);
           state.answer = 10 - n;
           q = n + " + ? = 10";
+        } else { // make20
+          var m = randInt(1, 19);
+          state.answer = 20 - m;
+          q = m + " + ? = 20";
         }
         questionEl.textContent = q;
         renderTrail();

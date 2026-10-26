@@ -262,10 +262,87 @@
       .feedback.good { color: var(--good); }
       .feedback.try { color: var(--try); }
 
+      /* ---------- mode switch ---------- */
+      .mode-switch {
+        display: inline-flex;
+        background: var(--card);
+        border: 3px solid var(--btn-edge);
+        border-radius: 999px;
+        padding: 4px;
+        gap: 4px;
+        box-shadow: var(--shadow);
+      }
+      .mode-btn {
+        font: inherit;
+        font-weight: 600;
+        font-size: clamp(17px, 2.4vw, 22px);
+        border: none;
+        background: transparent;
+        color: var(--muted);
+        border-radius: 999px;
+        padding: 8px 20px;
+        min-height: 48px;
+        cursor: pointer;
+      }
+      .mode-btn.active { background: var(--accent); color: var(--accent-ink); }
+      .mode-btn:focus-visible { outline: 4px solid var(--amber); outline-offset: 2px; }
+      .mode-btn:active { transform: translateY(1px); }
+
+      /* ---------- ruler scenes ---------- */
+      .stage.has-ruler::after { display: none; }
+      .scene-wrap { width: 100%; height: 100%; }
+      .rscene { position: relative; width: 100%; height: 100%; }
+      .rscene-long { display: flex; flex-direction: column; }
+      .robj-row {
+        flex: 1;
+        display: flex;
+        align-items: flex-end;
+        position: relative;
+        width: 100%;
+        min-height: 40px;
+      }
+      .robj-long { flex: none; }
+      .robj-long svg { width: 100%; height: auto; display: block; }
+      .ruler-h { width: 100%; height: auto; display: block; flex: none; }
+      .end-guide {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        border-left: 3px dashed var(--try);
+        opacity: 0.6;
+        pointer-events: none;
+      }
+      .rscene-tall { display: flex; align-items: flex-end; gap: 8px; }
+      .ruler-v { height: 100%; width: auto; display: block; flex: none; }
+      .robj-col { position: relative; flex: 1; height: 100%; min-width: 0; }
+      .robj-tall { position: absolute; left: 50%; transform: translateX(-50%); }
+      .robj-tall svg { height: 100%; width: auto; display: block; }
+      .top-guide {
+        position: absolute;
+        left: 10%;
+        right: 0;
+        border-top: 3px dashed var(--try);
+        opacity: 0.6;
+        pointer-events: none;
+      }
+      .ruler-bar { fill: var(--amber-soft); stroke: var(--amber); stroke-width: 2; }
+      .ruler-tick { stroke: var(--ink); stroke-width: 2.4; }
+      .ruler-half { stroke: var(--muted); stroke-width: 1.6; }
+      .ruler-num {
+        fill: var(--ink);
+        font-size: 16px;
+        font-weight: 600;
+        font-family: "Fredoka", "Trebuchet MS", sans-serif;
+      }
+
       /* ---------- phones: stack and scroll ---------- */
       @media (max-width: 640px) {
-        .cards { flex-direction: column; }
+        /* stack and scroll: cards take their natural height so nothing clips */
+        .cards { flex-direction: column; flex: none; }
+        .card { flex: none; }
         .stage { min-height: 170px; }
+        /* ruler stages get a definite, readable height */
+        body.ruler-on .stage.has-ruler { flex: none; height: 300px; min-height: 300px; }
         .topbar { justify-content: space-between; }
       }
       @media (prefers-reduced-motion: reduce) {
@@ -287,6 +364,11 @@
     </header>
 
     <main>
+      <div class="mode-switch" role="group" aria-label="Choose a game mode">
+        <button class="mode-btn active" id="modeSizeBtn" type="button" aria-pressed="true">Size Game</button>
+        <button class="mode-btn" id="modeRulerBtn" type="button" aria-pressed="false">Ruler Game · cm</button>
+      </div>
+
       <h1 class="question" id="question">Which one is <span class="word">longer</span>?</h1>
 
       <div class="controls">
@@ -342,36 +424,41 @@
       };
 
       /* ---------- object data: size is relative, bigger number = bigger picture ---------- */
+      /* art: for long objects, the [left, right] fractions of the viewBox the drawing
+         actually spans; for tall objects, the [top, bottom] fractions. The ruler
+         renderer scales by these so the drawing's edges land exactly on the
+         ruler's 0 and cm marks, past any whitespace inside the artwork. */
       var LONG_OBJECTS = [
-        { id: "worm",   name: "Worm",   size: 2 },
-        { id: "fish",   name: "Fish",   size: 3 },
-        { id: "crayon", name: "Crayon", size: 3 },
-        { id: "spoon",  name: "Spoon",  size: 4 },
-        { id: "carrot", name: "Carrot", size: 4 },
-        { id: "pencil", name: "Pencil", size: 5 },
-        { id: "banana", name: "Banana", size: 5 },
-        { id: "ribbon", name: "Ribbon", size: 7 },
-        { id: "bus",    name: "Bus",    size: 8 },
-        { id: "snake",  name: "Snake",  size: 9 },
-        { id: "train",  name: "Train",  size: 10 }
+        { id: "worm",   name: "Worm",   size: 2,  cm: 4,  art: [0.065, 0.96] },
+        { id: "fish",   name: "Fish",   size: 3,  cm: 6,  art: [0.15, 0.92] },
+        { id: "crayon", name: "Crayon", size: 3,  cm: 5,  art: [0.09, 0.88] },
+        { id: "spoon",  name: "Spoon",  size: 4,  cm: 8,  art: [0.055, 0.95] },
+        { id: "carrot", name: "Carrot", size: 4,  cm: 7,  art: [0.06, 0.95] },
+        { id: "pencil", name: "Pencil", size: 5,  cm: 10, art: [0.07, 0.91] },
+        { id: "banana", name: "Banana", size: 5,  cm: 9,  art: [0.07, 0.95] },
+        { id: "ribbon", name: "Ribbon", size: 7,  cm: 12, art: [0.01, 0.99] },
+        { id: "bus",    name: "Bus",    size: 8,  cm: 12, art: [0.06, 0.94] },
+        { id: "snake",  name: "Snake",  size: 9,  cm: 13, art: [0.01, 0.99] },
+        { id: "train",  name: "Train",  size: 10, cm: 14, art: [0.02, 0.81] }
       ];
       var TALL_OBJECTS = [
-        { id: "mushroom",  name: "Mushroom",  size: 2 },
-        { id: "candle",    name: "Candle",    size: 3 },
-        { id: "flower",    name: "Flower",    size: 3 },
-        { id: "dog",       name: "Dog",       size: 4 },
-        { id: "sunflower", name: "Sunflower", size: 5 },
-        { id: "house",     name: "House",     size: 6 },
-        { id: "tree",      name: "Tree",      size: 7 },
-        { id: "castle",    name: "Castle",    size: 8 },
-        { id: "giraffe",   name: "Giraffe",   size: 9 },
-        { id: "lighthouse",name: "Lighthouse",size: 9 },
-        { id: "building",  name: "Building",  size: 10 }
+        { id: "mushroom",  name: "Mushroom",  size: 2,  cm: 4,  art: [0.435, 0.95] },
+        { id: "candle",    name: "Candle",    size: 3,  cm: 6,  art: [0.165, 0.94] },
+        { id: "flower",    name: "Flower",    size: 3,  cm: 5,  art: [0.10, 0.96] },
+        { id: "dog",       name: "Dog",       size: 4,  cm: 7,  art: [0.45, 0.94] },
+        { id: "sunflower", name: "Sunflower", size: 5,  cm: 9,  art: [0.03, 0.96] },
+        { id: "house",     name: "House",     size: 6,  cm: 10, art: [0.28, 0.94] },
+        { id: "tree",      name: "Tree",      size: 7,  cm: 11, art: [0.13, 0.96] },
+        { id: "castle",    name: "Castle",    size: 8,  cm: 12, art: [0.04, 0.95] },
+        { id: "giraffe",   name: "Giraffe",   size: 9,  cm: 13, art: [0.03, 0.94] },
+        { id: "lighthouse",name: "Lighthouse",size: 9,  cm: 12, art: [0.02, 0.95] },
+        { id: "building",  name: "Building",  size: 10, cm: 14, art: [0.07, 0.95] }
       ];
 
       /* ---------- game state ---------- */
       var stars = 0;
       var soundOn = true;
+      var mode = "size"; /* "size" = classic game, "ruler" = centimetre ruler game */
       var locked = false;
       var round = null; /* { a, b, answer, word, orient } */
       var lastPairKey = "";
@@ -384,48 +471,123 @@
         { card: document.getElementById("cardA"), obj: document.getElementById("objA"), name: document.getElementById("nameA") },
         { card: document.getElementById("cardB"), obj: document.getElementById("objB"), name: document.getElementById("nameB") }
       ];
+      cards[0].stage = cards[0].card.querySelector(".stage");
+      cards[1].stage = cards[1].card.querySelector(".stage");
 
-      function pickPair(list) {
+      function pickPair(list, metric) {
         var a, b, tries = 0;
         do {
           a = list[Math.floor(Math.random() * list.length)];
           b = list[Math.floor(Math.random() * list.length)];
           tries++;
-        } while ((a === b || Math.abs(a.size - b.size) < 2 || [a.id, b.id].sort().join("-") === lastPairKey) && tries < 60);
+        } while ((a === b || Math.abs(a[metric] - b[metric]) < 2 || [a.id, b.id].sort().join("-") === lastPairKey) && tries < 60);
         lastPairKey = [a.id, b.id].sort().join("-");
         return [a, b];
       }
 
       function newRound() {
         locked = false;
+        document.body.classList.toggle("ruler-on", mode === "ruler");
         var orient = Math.random() < 0.5 ? "long" : "tall";
-        var pair = pickPair(orient === "long" ? LONG_OBJECTS : TALL_OBJECTS);
+        var metric = mode === "ruler" ? "cm" : "size";
+        var pair = pickPair(orient === "long" ? LONG_OBJECTS : TALL_OBJECTS, metric);
         if (Math.random() < 0.5) pair.reverse();
         var bigWord = orient === "long" ? "longer" : "taller";
         var word = Math.random() < 0.38 ? "shorter" : bigWord;
         var answer = word === "shorter"
-          ? (pair[0].size < pair[1].size ? pair[0] : pair[1])
-          : (pair[0].size > pair[1].size ? pair[0] : pair[1]);
+          ? (pair[0][metric] < pair[1][metric] ? pair[0] : pair[1])
+          : (pair[0][metric] > pair[1][metric] ? pair[0] : pair[1]);
         round = { a: pair[0], b: pair[1], answer: answer, word: word, orient: orient };
 
         questionEl.innerHTML = 'Which one is <span class="word">' + word + "</span>?";
-        setFeedback("Tap the picture that is " + word + "!", "");
+        setFeedback(mode === "ruler"
+          ? "Use the ruler! Tap the one that is " + word + "!"
+          : "Tap the picture that is " + word + "!", "");
         for (var i = 0; i < 2; i++) {
           var item = i === 0 ? round.a : round.b;
           var slot = cards[i];
           slot.card.classList.remove("correct", "wrong");
           slot.card.setAttribute("aria-label", item.name);
-          slot.obj.className = "obj " + (orient === "long" ? "obj-long" : "obj-tall");
-          slot.obj.innerHTML = ART[item.id];
-          if (orient === "long") {
-            slot.obj.style.width = (24 + item.size * 7.4) + "%";
-            slot.obj.style.height = "";
-          } else {
-            slot.obj.style.height = (26 + item.size * 7.2) + "%";
-            slot.obj.style.width = "";
-          }
-          slot.name.textContent = item.name;
+          if (mode === "ruler") renderRuler(slot, item, orient);
+          else renderClassic(slot, item, orient);
         }
+      }
+
+      function renderClassic(slot, item, orient) {
+        slot.stage.classList.remove("has-ruler");
+        slot.obj.className = "obj " + (orient === "long" ? "obj-long" : "obj-tall");
+        slot.obj.innerHTML = ART[item.id];
+        if (orient === "long") {
+          slot.obj.style.width = (24 + item.size * 7.4) + "%";
+          slot.obj.style.height = "";
+        } else {
+          slot.obj.style.height = (26 + item.size * 7.2) + "%";
+          slot.obj.style.width = "";
+        }
+        slot.name.textContent = item.name;
+      }
+
+      /* ---------- centimetre rulers (0–14 cm, half-cm ticks) ---------- */
+      var MAXCM = 14, CMUNIT = 28, RPAD = 10, RLEN = MAXCM * CMUNIT + RPAD * 2;
+
+      function rulerH() {
+        var p = ['<svg class="ruler-h" viewBox="0 0 ' + RLEN + ' 46" aria-hidden="true" focusable="false">'];
+        p.push('<rect class="ruler-bar" x="1.5" y="1.5" width="' + (RLEN - 3) + '" height="17" rx="3"/>');
+        for (var i = 0; i <= MAXCM; i++) {
+          var x = RPAD + i * CMUNIT;
+          p.push('<line class="ruler-tick" x1="' + x + '" y1="2" x2="' + x + '" y2="13"/>');
+          if (i < MAXCM) p.push('<line class="ruler-half" x1="' + (x + CMUNIT / 2) + '" y1="2" x2="' + (x + CMUNIT / 2) + '" y2="8.5"/>');
+          var anchor = i === 0 ? "start" : (i === MAXCM ? "end" : "middle");
+          p.push('<text class="ruler-num" x="' + x + '" y="37" text-anchor="' + anchor + '">' + i + "</text>");
+        }
+        p.push("</svg>");
+        return p.join("");
+      }
+
+      function rulerV() {
+        var p = ['<svg class="ruler-v" viewBox="0 0 48 ' + RLEN + '" aria-hidden="true" focusable="false">'];
+        p.push('<rect class="ruler-bar" x="23.5" y="1.5" width="23" height="' + (RLEN - 3) + '" rx="3"/>');
+        for (var i = 0; i <= MAXCM; i++) {
+          var y = RLEN - RPAD - i * CMUNIT;
+          p.push('<line class="ruler-tick" x1="24.5" y1="' + y + '" x2="37" y2="' + y + '"/>');
+          if (i < MAXCM) {
+            var yh = y - CMUNIT / 2;
+            p.push('<line class="ruler-half" x1="24.5" y1="' + yh + '" x2="31.5" y2="' + yh + '"/>');
+          }
+          p.push('<text class="ruler-num" x="19" y="' + (y + 5) + '" text-anchor="end">' + i + "</text>");
+        }
+        p.push("</svg>");
+        return p.join("");
+      }
+
+      function renderRuler(slot, item, orient) {
+        slot.stage.classList.add("has-ruler");
+        slot.obj.className = "obj scene-wrap";
+        slot.obj.style.width = "100%";
+        slot.obj.style.height = "100%";
+        var endPct = ((RPAD + item.cm * CMUNIT) / RLEN) * 100;
+        var span = item.art[1] - item.art[0];
+        var boxUnits = (item.cm * CMUNIT) / span; /* artwork box size that makes the drawing span exactly cm */
+        if (orient === "long") {
+          var leftPct = ((RPAD - item.art[0] * boxUnits) / RLEN) * 100;
+          slot.obj.innerHTML =
+            '<div class="rscene rscene-long">' +
+              '<div class="robj-row">' +
+                '<div class="end-guide" style="left:' + endPct + '%"></div>' +
+                '<div class="robj-long obj-long" style="margin-left:' + leftPct + '%;width:' + ((boxUnits / RLEN) * 100) + '%">' + ART[item.id] + "</div>" +
+              "</div>" +
+              rulerH() +
+            "</div>";
+        } else {
+          var bottomPct = ((RPAD - (1 - item.art[1]) * boxUnits) / RLEN) * 100;
+          slot.obj.innerHTML =
+            '<div class="rscene rscene-tall">' +
+              rulerV() +
+              '<div class="robj-col"><div class="robj-tall obj-tall" style="bottom:' + bottomPct + '%;height:' + ((boxUnits / RLEN) * 100) + '%">' + ART[item.id] + "</div></div>" +
+              '<div class="top-guide" style="bottom:' + endPct + '%"></div>' +
+            "</div>";
+        }
+        slot.name.textContent = item.name;
       }
 
       function setFeedback(text, kind) {
@@ -464,14 +626,21 @@
           cardEl.classList.add("correct");
           starBurst(cardEl);
           playHappy();
-          setFeedback("Yes! The " + item.name.toLowerCase() + " is " + round.word + "! You earned a star!", "good");
+          if (mode === "ruler") {
+            var other = item === round.a ? round.b : round.a;
+            setFeedback("Yes! The " + item.name.toLowerCase() + " is " + item.cm + " cm — " + round.word + " than the " + other.name.toLowerCase() + " at " + other.cm + " cm! You earned a star!", "good");
+          } else {
+            setFeedback("Yes! The " + item.name.toLowerCase() + " is " + round.word + "! You earned a star!", "good");
+          }
           setTimeout(newRound, 1700);
         } else {
           playTryAgain();
           cardEl.classList.remove("wrong");
           void cardEl.offsetWidth;
           cardEl.classList.add("wrong");
-          setFeedback("Good try! Look again — which one is " + round.word + "?", "try");
+          setFeedback(mode === "ruler"
+            ? "Good try! Check the ruler — which one is " + round.word + "?"
+            : "Good try! Look again — which one is " + round.word + "?", "try");
           setTimeout(function () { cardEl.classList.remove("wrong"); }, 500);
         }
       }
@@ -519,7 +688,9 @@
         if (!round || !("speechSynthesis" in window)) return;
         try {
           window.speechSynthesis.cancel();
-          var text = "Which one is " + round.word + "? The " + round.a.name.toLowerCase() + ", or the " + round.b.name.toLowerCase() + "?";
+          var text = mode === "ruler"
+            ? "Which one is " + round.word + "? Use the centimetre ruler. The " + round.a.name.toLowerCase() + ", or the " + round.b.name.toLowerCase() + "?"
+            : "Which one is " + round.word + "? The " + round.a.name.toLowerCase() + ", or the " + round.b.name.toLowerCase() + "?";
           var u = new SpeechSynthesisUtterance(text);
           u.rate = 0.92;
           u.pitch = 1.1;
@@ -528,6 +699,21 @@
       }
 
       /* ---------- controls ---------- */
+      var modeSizeBtn = document.getElementById("modeSizeBtn");
+      var modeRulerBtn = document.getElementById("modeRulerBtn");
+      function setMode(m) {
+        if (mode === m) return;
+        mode = m;
+        modeSizeBtn.classList.toggle("active", m === "size");
+        modeRulerBtn.classList.toggle("active", m === "ruler");
+        modeSizeBtn.setAttribute("aria-pressed", m === "size" ? "true" : "false");
+        modeRulerBtn.setAttribute("aria-pressed", m === "ruler" ? "true" : "false");
+        ensureAudio();
+        newRound();
+      }
+      modeSizeBtn.addEventListener("click", function () { setMode("size"); });
+      modeRulerBtn.addEventListener("click", function () { setMode("ruler"); });
+
       document.getElementById("hearBtn").addEventListener("click", function () {
         ensureAudio();
         speakQuestion();

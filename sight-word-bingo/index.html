@@ -307,6 +307,50 @@
       }
       .called-empty { color: var(--ink-soft); font-weight: 700; font-size: .95rem; margin: 0; }
 
+      /* Teacher call list (full calling order for this board) */
+      .call-list-wrap { border-top: 2px solid var(--line); padding-top: 12px; }
+      .call-list-title span { font-weight: 700; font-size: .85rem; }
+      .call-list {
+        position: relative;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        max-height: 118px;
+        overflow-y: auto;
+      }
+      .call-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--bg-soft);
+        border: 2px solid var(--line);
+        border-radius: 999px;
+        padding: 3px 10px 3px 4px;
+        font-weight: 800;
+        font-size: .9rem;
+      }
+      .call-chip .num {
+        background: var(--line);
+        color: var(--ink-soft);
+        border-radius: 999px;
+        min-width: 20px;
+        height: 20px;
+        display: inline-grid;
+        place-items: center;
+        font-size: .72rem;
+        padding: 0 4px;
+      }
+      .call-chip.called { opacity: .5; }
+      .call-chip.now { background: var(--teal); border-color: var(--teal); color: var(--teal-ink); }
+      .call-chip.now .num { background: rgba(255, 255, 255, .35); color: inherit; }
+      .call-chip.next { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+      .call-chip.next .num { background: var(--accent-ink); color: var(--accent); }
+      .call-chip .next-tag {
+        font-size: .65rem;
+        font-weight: 800;
+        letter-spacing: .08em;
+      }
+
       /* ---------- Board ---------- */
       .board-wrap {
         background: var(--panel);
@@ -558,6 +602,10 @@
               <p class="called-empty">No words called yet.</p>
             </div>
           </div>
+          <div class="call-list-wrap">
+            <p class="call-list-title">Teacher call list <span>in calling order</span></p>
+            <div class="call-list" id="callList" aria-label="Teacher call list, words in calling order"></div>
+          </div>
         </section>
 
         <!-- Bingo board -->
@@ -597,6 +645,7 @@
         var foundCountEl = document.getElementById("foundCount");
         var starsEl = document.getElementById("stars");
         var calledListEl = document.getElementById("calledList");
+        var callListEl = document.getElementById("callList");
         var callBtn = document.getElementById("callBtn");
         var hearBtn = document.getElementById("hearBtn");
         var newGameBtn = document.getElementById("newGameBtn");
@@ -694,6 +743,7 @@
           stopConfetti();
           renderBoard();
           renderCalledList();
+          renderCallList();
           updateProgress();
           calledWordEl.textContent = "Ready?";
           calledWordEl.classList.remove("pop");
@@ -750,6 +800,47 @@
           });
         }
 
+        /* Teacher call list: every word for this board, in calling order.
+           Called words dim, the word being hunted now is teal, and the
+           next word to come up is highlighted amber with a NEXT tag. */
+        function renderCallList() {
+          callListEl.innerHTML = "";
+          var order = calledWords.concat(callQueue);
+          var nextIdx = calledWords.length; // first word not yet called
+          var nextEl = null;
+          order.forEach(function (w, i) {
+            var chip = document.createElement("span");
+            chip.className = "call-chip";
+            var isCalled = i < nextIdx;
+            var isNow = isCalled && currentWord === w && i === nextIdx - 1;
+            if (isNow) chip.classList.add("now");
+            else if (isCalled) chip.classList.add("called");
+            if (i === nextIdx && callQueue.length) {
+              chip.classList.add("next");
+              nextEl = chip;
+            }
+            var num = document.createElement("span");
+            num.className = "num";
+            num.textContent = i + 1;
+            chip.appendChild(num);
+            var label = w;
+            var bi = boardWords.indexOf(w);
+            if (bi !== -1 && marked[bi]) label = w + " ✓";
+            chip.appendChild(document.createTextNode(label));
+            if (chip.classList.contains("next")) {
+              var tag = document.createElement("span");
+              tag.className = "next-tag";
+              tag.textContent = "NEXT";
+              chip.appendChild(tag);
+              chip.setAttribute("aria-label", "Next word to call: " + w);
+            }
+            callListEl.appendChild(chip);
+          });
+          if (nextEl) {
+            callListEl.scrollTop = Math.max(0, nextEl.offsetTop - 10);
+          }
+        }
+
         function updateProgress() {
           foundCountEl.textContent = "Found: " + foundCount + " of 24";
           starsEl.innerHTML = "";
@@ -777,6 +868,7 @@
             hearBtn.disabled = true;
             callBtn.disabled = true;
             renderCalledList();
+            renderCallList();
             return;
           }
           currentWord = callQueue.shift();
@@ -791,6 +883,7 @@
           playPop();
           speak(currentWord);
           renderCalledList();
+          renderCallList();
         }
 
         /* ---------- Tapping the board ---------- */
@@ -816,6 +909,7 @@
             setFeedback("Yes! You found " + word + "!", "good");
             updateProgress();
             renderCalledList();
+            renderCallList();
             checkBingo();
           } else {
             var c = cells[idx];

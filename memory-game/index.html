@@ -102,6 +102,19 @@
   .mode-btn .ico{font-size:1.35em}
   .mode-btn[aria-pressed="true"]{background:var(--teal);color:#fff;border-color:var(--teal-dark);box-shadow:0 4px 0 var(--teal-dark)}
   .mode-btn:focus-visible, button:focus-visible{outline:4px solid var(--sun);outline-offset:2px}
+  /* Board size switcher */
+  .sizes{
+    display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 12px;
+    background:var(--panel);border:2px solid var(--panel-border);border-radius:999px;padding:6px;box-shadow:var(--shadow-sm);
+  }
+  .size-btn{
+    border:3px solid transparent;background:transparent;color:var(--text);cursor:pointer;
+    border-radius:999px;padding:10px 8px;
+    font-family:"Baloo 2",sans-serif;font-weight:800;font-size:clamp(1rem,3vw,1.3rem);
+    display:flex;align-items:center;justify-content:center;gap:8px;line-height:1;min-width:0;
+  }
+  .size-btn .ico{font-size:1.25em}
+  .size-btn[aria-pressed="true"]{background:var(--sun);color:#3a2800;border-color:#e6a200;box-shadow:0 4px 0 #e6a200}
   /* Stats + controls */
   .bar{
     display:flex;flex-wrap:wrap;gap:10px;align-items:stretch;justify-content:space-between;
@@ -136,9 +149,12 @@
   .board{
     display:grid;grid-template-columns:repeat(4,1fr);gap:12px;
   }
+  .board.pairs-6{grid-template-columns:repeat(4,1fr)}
   @media (max-width:560px){
     .board{gap:9px} .wrap{padding:12px 10px 22px}
     .modes{gap:5px;padding:5px}
+    .sizes{gap:5px;padding:5px;margin-bottom:10px}
+    .size-btn{font-size:.95rem;padding:9px 2px;gap:4px;white-space:nowrap}
     .mode-btn{font-size:.98rem;padding:10px 2px;gap:4px;min-width:0;white-space:nowrap}
     .mode-btn .ico{font-size:1.05em}
     .stats{gap:8px}
@@ -156,7 +172,9 @@
     .subtitle{font-size:1rem}
     .new-top{padding:9px 18px;font-size:1.05rem}
     .home-btn{padding:9px 18px;font-size:1.05rem}
-    .modes{margin:10px 0 8px;padding:5px;flex:none}
+    .modes{margin:10px 0 6px;padding:5px;flex:none}
+    .sizes{margin:0 0 8px;padding:5px;flex:none}
+    .size-btn{padding:7px 6px;font-size:1.15rem}
     .mode-btn{padding:9px 6px;font-size:1.3rem}
     .bar{flex:none}
     .stat{padding:5px 14px;min-width:108px}
@@ -165,6 +183,8 @@
     .feedback{margin:8px 0;min-height:42px;padding:6px 12px;font-size:1.3rem;flex:none}
     main{flex:1;min-height:0;display:flex;flex-direction:column}
     .board{flex:1;min-height:0;gap:10px;grid-template-rows:repeat(4,1fr)}
+    .board.pairs-6{grid-template-rows:repeat(3,1fr)}
+    .board.pairs-8{grid-template-rows:repeat(4,1fr)}
     .card{aspect-ratio:auto;height:100%;min-height:0}
     .hint{margin:8px 0 0;font-size:.9rem;flex:none}
     .emoji{font-size:clamp(2rem,6vh,3.4rem)}
@@ -265,6 +285,11 @@
     <button class="mode-btn" type="button" data-mode="letters" aria-pressed="true"><span class="ico" aria-hidden="true">🔤</span> Letters</button>
     <button class="mode-btn" type="button" data-mode="numbers" aria-pressed="false"><span class="ico" aria-hidden="true">🔢</span> Numbers</button>
     <button class="mode-btn" type="button" data-mode="words" aria-pressed="false"><span class="ico" aria-hidden="true">🖼️</span> Words</button>
+  </div>
+
+  <div class="sizes" role="group" aria-label="Choose board size">
+    <button class="size-btn" type="button" data-pairs="6" aria-pressed="false"><span class="ico" aria-hidden="true">🌟</span> 6 Pairs — Easy</button>
+    <button class="size-btn" type="button" data-pairs="8" aria-pressed="true"><span class="ico" aria-hidden="true">⭐</span> 8 Pairs — Standard</button>
   </div>
 
   <div class="bar">
@@ -499,6 +524,7 @@
     lastSpeak=''; lastLabel='';
     overlayEl.classList.remove('show');
     confettiEl.innerHTML='';
+    boardEl.className = 'board pairs-' + PAIRS;
     var deck;
     if(mode==='letters') deck = buildLettersDeck();
     else if(mode==='numbers') deck = buildNumbersDeck();
@@ -582,7 +608,7 @@
     winTextEl.textContent = 'You found all ' + PAIRS + ' pairs in ' + moves + ' moves!';
     overlayEl.classList.add('show');
     launchConfetti();
-    speak('Great job! You found all the pairs!');
+    speak('Great job! You found all ' + PAIRS + ' pairs!');
     var btn = document.getElementById('playAgainBtn');
     if(btn) btn.focus();
   }
@@ -605,6 +631,17 @@
   }
 
   // ---------- Controls ----------
+  document.querySelectorAll('.size-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var n = parseInt(btn.dataset.pairs, 10);
+      if(PAIRS===n) { newGame(); return; }
+      PAIRS = n;
+      document.querySelectorAll('.size-btn').forEach(function(b){ b.setAttribute('aria-pressed', parseInt(b.dataset.pairs,10)===PAIRS ? 'true':'false'); });
+      ensureAudio(); playFlip();
+      newGame();
+    });
+  });
+
   document.querySelectorAll('.mode-btn').forEach(function(btn){
     btn.addEventListener('click', function(){
       if(mode===btn.dataset.mode) { newGame(); return; }

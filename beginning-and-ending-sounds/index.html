@@ -20,6 +20,8 @@
         --teal-soft: #dff3ec;
         --orange: #e85d26;
         --orange-soft: #ffe7d9;
+        --pink: #c2255c;
+        --pink-soft: #fde3ee;
         --gold: #f2b705;
         --gold-soft: #fff3cf;
         --good: #1e9e57;
@@ -39,6 +41,8 @@
           --teal-soft: #173f35;
           --orange: #ff8a50;
           --orange-soft: #4a2c1a;
+          --pink: #ff7eb6;
+          --pink-soft: #47202f;
           --gold: #ffc61a;
           --gold-soft: #4a3a08;
           --good: #4ade80;
@@ -169,6 +173,7 @@
         background: var(--orange-soft);
       }
       .wl.missing.at-start { color: var(--teal); background: var(--teal-soft); border-color: var(--teal); }
+      .wl.missing.at-middle { color: var(--pink); background: var(--pink-soft); border-color: var(--pink); }
       .wl.missing.at-end { color: var(--orange); background: var(--orange-soft); border-color: var(--orange); }
       .wl.filled { border-style: solid; }
 
@@ -186,9 +191,11 @@
         white-space: nowrap;
       }
       .prompt .kind.start { background: var(--teal); }
+      .prompt .kind.mid { background: var(--pink); }
       .prompt .kind.end { background: var(--orange); }
       @media (prefers-color-scheme: dark) {
         .prompt .kind.start { color: #10201b; }
+        .prompt .kind.mid { color: #2a0a18; }
         .prompt .kind.end { color: #2a1503; }
       }
 
@@ -391,17 +398,20 @@
       (function () {
         "use strict";
 
+        // mid = index of the clear single middle letter, or -1 when the word
+        // has no clear middle sound (BOOK's middle is the two-letter "OO"),
+        // so BOOK is never asked as a Middle Sound question.
         var WORDS = [
-          { word: "CAT",  pic: "🐱", name: "cat" },
-          { word: "DOG",  pic: "🐶", name: "dog" },
-          { word: "SUN",  pic: "☀️", name: "sun" },
-          { word: "FISH", pic: "🐟", name: "fish" },
-          { word: "BALL", pic: "⚽", name: "ball" },
-          { word: "DUCK", pic: "🦆", name: "duck" },
-          { word: "PIG",  pic: "🐷", name: "pig" },
-          { word: "HEN",  pic: "🐔", name: "hen" },
-          { word: "BOOK", pic: "📖", name: "book" },
-          { word: "CAR",  pic: "🚗", name: "car" }
+          { word: "CAT",  pic: "🐱", name: "cat",  mid: 1 },
+          { word: "DOG",  pic: "🐶", name: "dog",  mid: 1 },
+          { word: "SUN",  pic: "☀️", name: "sun",  mid: 1 },
+          { word: "FISH", pic: "🐟", name: "fish", mid: 1 },
+          { word: "BALL", pic: "⚽", name: "ball", mid: 1 },
+          { word: "DUCK", pic: "🦆", name: "duck", mid: 1 },
+          { word: "PIG",  pic: "🐷", name: "pig",  mid: 1 },
+          { word: "HEN",  pic: "🐔", name: "hen",  mid: 1 },
+          { word: "BOOK", pic: "📖", name: "book", mid: -1 },
+          { word: "CAR",  pic: "🚗", name: "car",  mid: 1 }
         ];
         var ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
@@ -410,7 +420,7 @@
         var stars = 0;
         var soundOn = true;
         var locked = false;
-        var current = null;   // { item, kind: 'start'|'end', answer }
+        var current = null;   // { item, kind: 'start'|'middle'|'end', answer }
         var interacted = false;
         var audioCtx = null;
 
@@ -509,8 +519,11 @@
           locked = false;
           if (index >= deck.length) { showFinish(); return; }
           var item = deck[index];
-          var kind = Math.random() < 0.5 ? "start" : "end";
-          var answer = kind === "start" ? item.word.charAt(0) : item.word.charAt(item.word.length - 1);
+          var kinds = item.mid >= 0 ? ["start", "middle", "end"] : ["start", "end"];
+          var kind = kinds[Math.floor(Math.random() * kinds.length)];
+          var answer = kind === "start" ? item.word.charAt(0)
+            : kind === "middle" ? item.word.charAt(item.mid)
+            : item.word.charAt(item.word.length - 1);
           current = { item: item, kind: kind, answer: answer };
 
           progressEl.textContent = "Word " + (index + 1) + " of " + deck.length;
@@ -519,13 +532,15 @@
 
           // Word row with the target letter as a "?"
           wordRow.innerHTML = "";
-          var targetIdx = kind === "start" ? 0 : item.word.length - 1;
+          var targetIdx = kind === "start" ? 0
+            : kind === "middle" ? item.mid
+            : item.word.length - 1;
           for (var i = 0; i < item.word.length; i++) {
             var span = document.createElement("span");
             span.className = "wl";
             if (i === targetIdx) {
               span.classList.add("missing");
-              span.classList.add(kind === "start" ? "at-start" : "at-end");
+              span.classList.add(kind === "start" ? "at-start" : kind === "middle" ? "at-middle" : "at-end");
               span.textContent = "?";
               span.id = "missingSlot";
             } else {
@@ -536,6 +551,8 @@
 
           promptEl.innerHTML = kind === "start"
             ? 'What is the <span class="kind start">FIRST</span> sound in ' + item.word + "?"
+            : kind === "middle"
+            ? 'What is the <span class="kind mid">MIDDLE</span> sound in ' + item.word + "?"
             : 'What is the <span class="kind end">LAST</span> sound in ' + item.word + "?";
 
           feedbackEl.textContent = "";
@@ -583,6 +600,8 @@
             feedbackEl.className = "feedback good";
             feedbackEl.textContent = current.kind === "start"
               ? "⭐ Yes! " + current.item.word + " starts with " + current.answer + "!"
+              : current.kind === "middle"
+              ? "⭐ Yes! " + current.item.word + " has " + current.answer + " in the middle!"
               : "⭐ Yes! " + current.item.word + " ends with " + current.answer + "!";
 
             index++;

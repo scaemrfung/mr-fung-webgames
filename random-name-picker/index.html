@@ -178,6 +178,7 @@
         font-weight:600; color:var(--stage-sub); line-height:1.25; max-width:22ch;
       }
       #displayName.is-spinning{color:var(--gold)}
+      #displayName.is-pair{font-size:clamp(2rem, 6vw, 4.4rem); line-height:1.08}
       #displayName.pop{animation:pop .45s ease}
       @keyframes pop{0%{transform:scale(.82)}55%{transform:scale(1.06)}100%{transform:scale(1)}}
       @media (prefers-reduced-motion: reduce){ #displayName.pop{animation:none} }
@@ -428,6 +429,14 @@
 
           <div class="toggle-row">
             <div>
+              <div class="toggle-text">Pairs mode</div>
+              <div class="toggle-sub">Pick two names at a time for partner work.</div>
+            </div>
+            <button type="button" class="switch" id="pairsBtn" aria-pressed="false" aria-label="Pairs mode — pick two names at a time for partner work"></button>
+          </div>
+
+          <div class="toggle-row">
+            <div>
               <div class="toggle-text">Remove picked names</div>
               <div class="toggle-sub">A picked name won&rsquo;t be picked again.</div>
             </div>
@@ -501,8 +510,10 @@
         var pickedHistory = [];
         var soundOn = true;
         var autoRemove = false;
+        var pairsMode = false;
         var spinning = false;
         var lastWinner = null;
+        var lastPair = null;
         var audioCtx = null;
 
         var els = {
@@ -521,6 +532,7 @@
           soundBtn: document.getElementById('soundBtn'),
           soundLabel: document.getElementById('soundLabel'),
           autoBtn: document.getElementById('autoRemoveBtn'),
+          pairsBtn: document.getElementById('pairsBtn'),
           winnerActions: document.getElementById('winnerActions'),
           keepBtn: document.getElementById('keepBtn'),
           removePickedBtn: document.getElementById('removePickedBtn'),
@@ -576,7 +588,7 @@
             btn.setAttribute('aria-label', 'Remove ' + name);
             btn.addEventListener('click', function(){
               names.splice(idx, 1);
-              if(lastWinner === name) hideWinnerActions();
+              if(lastWinner === name || (lastPair && lastPair.indexOf(name) >= 0)) hideWinnerActions();
               renderAll();
               popSound();
             });
@@ -588,7 +600,7 @@
           els.listCount.textContent = label;
           els.stageCount.textContent = label + ' ready';
           els.spinBtn.disabled = spinning || names.length === 0;
-          els.spinBtn.textContent = names.length === 0 ? 'Add Names to Spin' : (spinning ? 'Spinning\u2026' : 'SPIN \u2014 Pick a Name');
+          els.spinBtn.textContent = names.length === 0 ? 'Add Names to Spin' : (spinning ? 'Spinning\u2026' : (pairsMode ? 'SPIN \u2014 Pick a Pair' : 'SPIN \u2014 Pick a Name'));
         }
         function renderHistory(){
           els.historyList.innerHTML = '';
@@ -609,14 +621,26 @@
           els.display.textContent = text;
           els.display.classList.toggle('is-placeholder', mode === 'placeholder');
           els.display.classList.toggle('is-spinning', mode === 'spinning');
+          els.display.classList.toggle('is-pair', mode === 'pair' || mode === 'pair-spinning');
+          if(mode === 'pair-spinning') els.display.classList.add('is-spinning');
         }
         function hideWinnerActions(){
           els.winnerActions.classList.remove('show');
           lastWinner = null;
+          lastPair = null;
         }
         function showWinnerActions(name){
           lastWinner = name;
+          lastPair = null;
           els.removePickedBtn.textContent = 'Remove \u201C' + name + '\u201D from List';
+          els.keepBtn.textContent = 'Keep Name & Spin Again';
+          els.winnerActions.classList.add('show');
+        }
+        function showPairActions(pair){
+          lastPair = pair.slice();
+          lastWinner = null;
+          els.removePickedBtn.textContent = 'Remove \u201C' + pair.join('\u201D & \u201C') + '\u201D from List';
+          els.keepBtn.textContent = 'Keep Pair & Spin Again';
           els.winnerActions.classList.add('show');
         }
 
@@ -699,7 +723,7 @@
 
         function clearList(){
           if(spinning) return;
-          names = []; pickedHistory = []; lastWinner = null;
+          names = []; pickedHistory = []; lastWinner = null; lastPair = null;
           els.input.value = '';
           if(els.classSelect) els.classSelect.value = '';
           setDisplay('Add names, then press Spin!', 'placeholder');
@@ -720,6 +744,8 @@
           ensureAudio();
           hideWinnerActions();
           els.status.classList.remove('win');
+
+          if(pairsMode){ spinPair(); return; }
 
           if(names.length === 1){ finishPick(names[0]); return; }
 
@@ -779,7 +805,81 @@
 
           renderAll();
         }
-        function hideWinnerActionsSilent(){ lastWinner = null; els.winnerActions.classList.remove('show'); }
+        function hideWinnerActionsSilent(){ lastWinner = null; lastPair = null; els.winnerActions.classList.remove('show'); }
+
+        function spinPair(){
+          if(names.length === 1){ finishPair([names[0]]); return; }
+          spinning = true;
+          renderList();
+          els.spinBtn.disabled = true;
+          els.spinBtn.textContent = 'Spinning\u2026';
+          els.status.textContent = 'Spinning\u2026';
+
+          var firstIdx = Math.floor(Math.random() * names.length);
+          var secondIdx;
+          do { secondIdx = Math.floor(Math.random() * names.length); } while(secondIdx === firstIdx);
+          var pair = [names[firstIdx], names[secondIdx]];
+          var totalSteps = 26;
+          var stepCount = 0;
+          var lastKey = '';
+
+          function pickRandomPair(){
+            var a = Math.floor(Math.random() * names.length);
+            var b;
+            do { b = Math.floor(Math.random() * names.length); } while(b === a);
+            return [names[a], names[b]];
+          }
+          function stepPair(){
+            stepCount++;
+            var progress = stepCount / totalSteps;
+            var delay = 45 + Math.pow(progress, 2.2) * 240;
+            if(stepCount >= totalSteps){
+              spinning = false;
+              finishPair(pair);
+              return;
+            }
+            var shown = pickRandomPair();
+            var key = shown.join('|');
+            if(key === lastKey) shown.reverse();
+            lastKey = shown.join('|');
+            setDisplay(shown.join(' & '), 'pair-spinning');
+            tickSound();
+            setTimeout(stepPair, delay);
+          }
+          stepPair();
+        }
+
+        function finishPair(pair){
+          spinning = false;
+          var label = pair.join(' & ');
+          setDisplay(label, 'pair');
+          els.display.classList.remove('pop'); void els.display.offsetWidth; els.display.classList.add('pop');
+          pickedHistory.push(label);
+          winSound();
+          confetti();
+
+          var removed = false;
+          if(autoRemove){
+            pair.forEach(function(n){ removeName(n); });
+            removed = true;
+          }
+          if(pair.length === 1){
+            els.status.textContent = removed
+              ? pair[0] + ' was picked and removed from the list. Only one name was left for this pair.'
+              : 'Only one name left \u2014 ' + pair[0] + ' is up next.';
+          } else {
+            els.status.textContent = removed
+              ? label + ' were picked and removed from the list. ' + names.length + (names.length===1?' name':' names') + ' left.'
+              : 'Great pair! ' + label + ' are partners.';
+          }
+          els.status.classList.add('win');
+
+          var allStillThere = pair.every(function(n){ return names.indexOf(n) >= 0; });
+          if(!removed && allStillThere) showPairActions(pair);
+          else hideWinnerActionsSilent();
+
+          renderAll();
+        }
 
         /* ---------- Events ---------- */
         els.addBtn.addEventListener('click', addNames);
@@ -791,7 +891,9 @@
         });
         els.keepBtn.addEventListener('click', function(){ spin(); });
         els.removePickedBtn.addEventListener('click', function(){
-          if(lastWinner){ removeName(lastWinner); }
+          if(lastPair && lastPair.length){
+            lastPair.slice().forEach(function(n){ removeName(n); });
+          } else if(lastWinner){ removeName(lastWinner); }
           hideWinnerActions();
           els.status.textContent = 'Removed. ' + names.length + (names.length===1?' name':' names') + ' left in the hat.';
           renderAll(); popSound();
@@ -805,6 +907,20 @@
         els.autoBtn.addEventListener('click', function(){
           autoRemove = !autoRemove;
           els.autoBtn.setAttribute('aria-pressed', String(autoRemove));
+          popSound();
+        });
+        if(els.pairsBtn) els.pairsBtn.addEventListener('click', function(){
+          if(spinning) return;
+          pairsMode = !pairsMode;
+          els.pairsBtn.setAttribute('aria-pressed', String(pairsMode));
+          hideWinnerActions();
+          if(names.length){
+            els.status.textContent = pairsMode
+              ? 'Pairs mode on \u2014 Spin picks two names at a time for partner work.'
+              : 'Pairs mode off \u2014 Spin picks one name at a time.';
+            els.status.classList.remove('win');
+          }
+          renderList();
           popSound();
         });
 

@@ -229,6 +229,19 @@
         animation: chip-in 0.25s ease both;
       }
       @keyframes chip-in { from { transform: scale(0.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+      .team-names { display: grid; grid-template-columns: 1fr 1fr; gap: 0.55rem; margin-top: 0.9rem; }
+      .team-name-row {
+        display: flex; align-items: center; gap: 0.55rem;
+        background: var(--paper); border: 2px solid var(--line); border-radius: 14px;
+        padding: 0.35rem 0.65rem 0.35rem 0.5rem;
+      }
+      .team-dot { width: 22px; height: 22px; border-radius: 50%; flex: none; box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.18); }
+      .team-name-row input {
+        flex: 1; min-width: 0; border: none; background: transparent; color: var(--ink);
+        font-family: var(--display); font-weight: 700; font-size: 1.05rem; padding: 0.3rem 0.1rem;
+      }
+      .team-name-row input::placeholder { color: var(--muted); opacity: 0.8; }
+      .team-names-hint { margin: 0.55rem 0 0; font-size: 0.9rem; font-weight: 700; color: var(--muted); }
       .seg-row { display: flex; gap: 0.6rem; flex-wrap: wrap; }
       .seg {
         flex: 1 1 0; min-width: 92px; border: 2.5px solid var(--line); background: var(--paper);
@@ -278,7 +291,7 @@
         box-shadow: var(--shadow-sm); position: relative; overflow: hidden;
         border: 3px solid transparent;
       }
-      .score-name { font-family: var(--display); font-weight: 700; font-size: clamp(1.05rem, 2.2vw, 1.5rem); }
+      .score-name { font-family: var(--display); font-weight: 700; font-size: clamp(1.05rem, 2.2vw, 1.5rem); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
       .score-num { font-family: var(--display); font-weight: 800; font-size: clamp(1.9rem, 4vw, 3rem); line-height: 1; margin-left: auto; }
       .score-num.pop { animation: score-pop 0.45s cubic-bezier(0.2, 2.2, 0.4, 1); }
       @keyframes score-pop { 0% { transform: scale(1); } 40% { transform: scale(1.45); } 100% { transform: scale(1); } }
@@ -491,7 +504,7 @@
       }
       .award:hover { filter: brightness(1.07); transform: translateY(-2px); }
       .award:active { transform: translateY(1px) scale(0.98); }
-      .award-name { font-family: var(--display); font-weight: 800; font-size: clamp(1.3rem, 2.8vw, 2rem); line-height: 1.1; }
+      .award-name { font-family: var(--display); font-weight: 800; font-size: clamp(1.3rem, 2.8vw, 2rem); line-height: 1.1; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
       .award-hint { font-weight: 800; font-size: 0.85rem; opacity: 0.85; }
       .team-actions.is-ready .award { box-shadow: 0 0 0 3px var(--gold), 0 0 22px rgba(240, 180, 28, 0.55), var(--shadow-sm); animation: ready-pop 0.5s cubic-bezier(0.2, 1.6, 0.4, 1) 1; }
       @keyframes ready-pop { 0% { transform: scale(0.96); } 55% { transform: scale(1.03); } 100% { transform: scale(1); } }
@@ -600,6 +613,7 @@
         .status { min-width: 0; font-size: 1rem; padding: 0.5rem 0.7rem; }
         .btn-warn, .btn-quiet { padding: 0.45rem 0.8rem; font-size: 0.9rem; }
         .team-actions { grid-template-columns: repeat(2, 1fr); gap: 0.45rem; }
+        .team-names { grid-template-columns: 1fr; }
         .award { padding: 0.4rem 0.4rem 0.5rem; border-radius: 14px; }
         .award-name { font-size: 1.15rem; }
         .award-hint { font-size: 0.72rem; }
@@ -710,8 +724,22 @@
     return Math.round(n * 100) / 100;
   }
 
+  function cleanTeamNames(raw) {
+    var out = {};
+    if (raw && typeof raw === "object") {
+      for (var i = 0; i < TEAMS.length; i++) {
+        var v = raw[TEAMS[i].id];
+        if (typeof v === "string") {
+          var c = v.trim().slice(0, 24);
+          if (c) out[TEAMS[i].id] = c;
+        }
+      }
+    }
+    return out;
+  }
+
   function loadSettings() {
-    var fallback = { teamCount: 4, minLength: 3, flipMode: "auto", flipSeconds: 5, musicOn: true, musicVolume: 0.55, spellCheck: true };
+    var fallback = { teamCount: 4, minLength: 3, flipMode: "auto", flipSeconds: 5, musicOn: true, musicVolume: 0.55, spellCheck: true, teamNames: {} };
     try {
       var raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
       return {
@@ -721,7 +749,8 @@
         flipSeconds: clampInt(raw.flipSeconds, 2, 10, fallback.flipSeconds),
         musicOn: raw.musicOn === false ? false : true,
         musicVolume: clampVolume(raw.musicVolume == null ? fallback.musicVolume : raw.musicVolume),
-        spellCheck: raw.spellCheck === false ? false : true
+        spellCheck: raw.spellCheck === false ? false : true,
+        teamNames: cleanTeamNames(raw.teamNames)
       };
     } catch (err) {
       return fallback;
@@ -738,7 +767,8 @@
         flipSeconds: s.flipSeconds,
         musicOn: s.musicOn !== false,
         musicVolume: clampVolume(s.musicVolume),
-        spellCheck: s.spellCheck !== false
+        spellCheck: s.spellCheck !== false,
+        teamNames: cleanTeamNames(s.teamNames)
       }));
     } catch (err) {
       /* Private mode and blocked storage still let the round run. */
@@ -1155,6 +1185,13 @@
     return TEAMS.slice(0, state.settings.teamCount);
   }
 
+  /* A team's display name: what the teacher typed, or its colour if blank. */
+  function teamNameFor(def) {
+    var custom = state.settings.teamNames ? state.settings.teamNames[def.id] : "";
+    if (typeof custom === "string" && custom.trim()) return custom.trim().slice(0, 24);
+    return def.name;
+  }
+
   function findTeam(id) {
     for (var i = 0; i < state.teams.length; i++) {
       if (state.teams[i].id === id) return state.teams[i];
@@ -1261,7 +1298,7 @@
       var def = teamDef(t.id);
       return {
         id: def.id,
-        name: def.name,
+        name: teamNameFor(def),
         bg: def.bg,
         fg: def.fg,
         splash: def.splash,
@@ -1405,7 +1442,7 @@
     state.teams = activeTeams().map(function (t) {
       return {
         id: t.id,
-        name: t.name,
+        name: teamNameFor(t),
         bg: t.bg,
         fg: t.fg,
         splash: t.splash,
@@ -1947,8 +1984,17 @@
 
   function renderSetup() {
     var s = state.settings;
-    var preview = activeTeams().map(function (t) {
-      return '<li style="background:' + t.bg + ';color:' + t.fg + '">' + esc(t.name) + "</li>";
+    var nameFields = activeTeams().map(function (t, i) {
+      var custom = s.teamNames && s.teamNames[t.id] ? s.teamNames[t.id] : "";
+      return (
+        '<label class="team-name-row">' +
+          '<span class="team-dot" style="background:' + t.bg + '" aria-hidden="true"></span>' +
+          '<span class="sr-only">Name for team ' + (i + 1) + " (" + esc(t.name) + ')</span>' +
+          '<input type="text" data-role="team-name" data-team="' + t.id +
+            '" data-testid="team-name-' + t.id + '" value="' + esc(custom) +
+            '" placeholder="' + esc(t.name) + '" maxlength="24" autocomplete="off" spellcheck="false">' +
+        "</label>"
+      );
     }).join("");
     var mins = [2, 3, 4].map(function (n) {
       var pressed = s.minLength === n ? "true" : "false";
@@ -1987,7 +2033,8 @@
               '<div class="count"><strong>' + s.teamCount + '</strong><span>teams</span></div>' +
               '<button type="button" class="icon-btn" data-action="teams-inc" aria-label="More teams">+</button>' +
             "</div>" +
-            '<ul class="team-preview">' + preview + "</ul>" +
+            '<div class="team-names">' + nameFields + "</div>" +
+            '<p class="team-names-hint">Type a name for each team, or leave it blank to use its colour.</p>' +
           "</div>" +
           "<div>" +
             '<p class="field-label">Shortest word</p>' +
@@ -2385,6 +2432,16 @@
 
   function onInput(event) {
     var target = event.target;
+    if (target.getAttribute("data-role") === "team-name") {
+      // Update the setting without re-rendering, so typing keeps focus.
+      var teamId = target.getAttribute("data-team");
+      var typed = target.value.trim().slice(0, 24);
+      if (!state.settings.teamNames) state.settings.teamNames = {};
+      if (typed) state.settings.teamNames[teamId] = typed;
+      else delete state.settings.teamNames[teamId];
+      saveSettings();
+      return;
+    }
     if (target.getAttribute("data-action") === "set-speed") {
       state.settings.flipSeconds = clampInt(target.value, 2, 10, 5);
       saveSettings();

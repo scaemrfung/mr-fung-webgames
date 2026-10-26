@@ -472,7 +472,7 @@
       <div class="tabs" role="tablist" aria-label="Choose a game">
         <button class="tab active" data-mode="order" role="tab" aria-selected="true" type="button">
           🔢 Number Order
-          <span class="tab-sub">Tap the numbers smallest → biggest</span>
+          <span class="tab-sub">Forwards &amp; backwards — smallest ↔ biggest</span>
         </button>
         <button class="tab" data-mode="place" role="tab" aria-selected="false" type="button">
           🧱 Place Value
@@ -485,7 +485,7 @@
         <!-- NUMBER ORDER -->
         <div id="orderPanel">
           <div class="prompt-row">
-            <p class="prompt">Tap the numbers from <u>smallest</u> to <u>biggest</u>!</p>
+            <p class="prompt" id="orderPrompt">Tap the numbers from <u>smallest</u> to <u>biggest</u>!</p>
             <button class="btn hear-btn" id="hearOrderBtn" type="button">🔊 Hear It</button>
           </div>
           <div class="feedback" id="orderFeedback"></div>
@@ -543,8 +543,9 @@
       var busy = false; // true while celebration is showing
 
       // Number Order state
-      var orderAnswer = [];   // sorted numbers
+      var orderAnswer = [];   // numbers in the order they should be tapped
       var orderNext = 0;      // index of next number to tap
+      var orderDirection = "forward"; // "forward" = smallest→biggest, "backward" = biggest→smallest
 
       // Place Value state
       var target = 0;
@@ -561,6 +562,7 @@
       var trackEl = el("orderTrack");
       var orderFeedbackEl = el("orderFeedback");
       var placeFeedbackEl = el("placeFeedback");
+      var orderPromptEl = el("orderPrompt");
 
       /* ================= Sound (WebAudio, in-browser only) ================= */
       var audioCtx = null;
@@ -688,6 +690,9 @@
       }
       function newOrderRound() {
         orderRound++;
+        // Alternate direction: odd rounds go forwards (smallest → biggest),
+        // even rounds go backwards (biggest → smallest) so students practise both.
+        orderDirection = (orderRound % 2 === 0) ? "backward" : "forward";
         // Ranges grow gently: up to 20, then 50, then 100, cycling
         var maxes = [20, 50, 100];
         var max = maxes[(orderRound - 1) % maxes.length];
@@ -698,8 +703,16 @@
           var n = 1 + Math.floor(Math.random() * max);
           if (!pool[n]) { pool[n] = true; nums.push(n); }
         }
-        orderAnswer = nums.slice().sort(function (a, b) { return a - b; });
+        var sorted = nums.slice().sort(function (a, b) { return a - b; });
+        orderAnswer = orderDirection === "backward" ? sorted.slice().reverse() : sorted;
         orderNext = 0;
+        if (orderPromptEl) {
+          if (orderDirection === "backward") {
+            orderPromptEl.innerHTML = "Count backwards! Tap from <u>biggest</u> to <u>smallest</u>!";
+          } else {
+            orderPromptEl.innerHTML = "Tap the numbers from <u>smallest</u> to <u>biggest</u>!";
+          }
+        }
         setFeedback(orderFeedbackEl, "", "");
         // track slots
         trackEl.innerHTML = "";
@@ -736,7 +749,9 @@
           if (orderNext >= orderAnswer.length) {
             setFeedback(orderFeedbackEl, "", "");
             celebrate(
-              orderAnswer.join(", ") + " — smallest to biggest!",
+              orderDirection === "backward"
+                ? orderAnswer.join(", ") + " — biggest to smallest!"
+                : orderAnswer.join(", ") + " — smallest to biggest!",
               newOrderRound
             );
           } else {
@@ -747,7 +762,13 @@
           btn.classList.remove("shake");
           void btn.offsetWidth;
           btn.classList.add("shake");
-          setFeedback(orderFeedbackEl, "Try again — find the smallest number left!", "try");
+          setFeedback(
+            orderFeedbackEl,
+            orderDirection === "backward"
+              ? "Try again — find the biggest number left!"
+              : "Try again — find the smallest number left!",
+            "try"
+          );
         }
       }
 
@@ -877,7 +898,11 @@
 
       el("hearOrderBtn").addEventListener("click", function () {
         if (orderNext < orderAnswer.length) {
-          speak("Find the number " + numberWords(orderAnswer[orderNext]) + ".");
+          if (orderDirection === "backward") {
+            speak("Count backwards, from biggest to smallest. Find the number " + numberWords(orderAnswer[orderNext]) + ".");
+          } else {
+            speak("Find the number " + numberWords(orderAnswer[orderNext]) + ".");
+          }
         }
       });
       el("hearPlaceBtn").addEventListener("click", function () {

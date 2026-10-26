@@ -133,6 +133,12 @@
   .reveal-word{text-align:center;font-family:"Fredoka",sans-serif;font-weight:700;font-size:1.9rem;letter-spacing:.12em;min-height:44px;margin-top:6px}
   .reveal-word span{color:var(--primary)}
 
+  /* PRACTICE MODE: the word to copy, shown big above the slots */
+  .practice-word{text-align:center;font-family:"Fredoka",sans-serif;font-weight:700;font-size:2.5rem;letter-spacing:.22em;margin:12px 0 0;color:var(--ink)}
+  .practice-word .pw-label{display:block;font-family:"Nunito",sans-serif;font-weight:900;font-size:.85rem;letter-spacing:.14em;color:var(--muted);margin-bottom:2px}
+  @media(max-width:420px){ .practice-word{font-size:2rem;letter-spacing:.16em} }
+  @media(max-width:560px){ .mode-btn{white-space:normal;line-height:1.15;font-size:.9rem;padding:10px 6px} }
+
   /* CELEBRATION */
   .celebration{position:absolute;inset:0;display:none;place-items:center;pointer-events:none;z-index:5}
   .celebration.show{display:grid}
@@ -153,6 +159,7 @@
     <div class="mode-switch" role="tablist" aria-label="Choose a game">
       <button id="modeBuildBtn" class="mode-btn active" role="tab" aria-selected="true">🔤 Build the Word</button>
       <button id="modeStartBtn" class="mode-btn" role="tab" aria-selected="false">⭐ Starting Letter</button>
+      <button id="modePracticeBtn" class="mode-btn" role="tab" aria-selected="false">👀 Practice</button>
     </div>
     <div class="top-actions">
       <div class="stars" aria-label="Stars earned">⭐ <span id="starCount">0</span></div>
@@ -197,6 +204,29 @@
 
     <div class="controls">
       <button class="btn btn-primary" id="nextStartBtn">Next Picture ➜</button>
+    </div>
+  </section>
+
+  <!-- GAME 3: PRACTICE — word and picture shown first, then build it -->
+  <section id="gamePractice" class="card hidden" aria-label="Practice mode: see the word, then build it">
+    <div class="celebration" id="practiceCeleb"><div class="celebration-inner">🎉 Great Job! 🎉</div></div>
+    <div class="picture-wrap">
+      <div class="emoji-box" id="practiceEmoji" aria-hidden="true">🐱</div>
+      <button class="hear-btn" id="practiceHear">🔊 Hear It</button>
+      <div class="prompt">Practice: look at the word, then build it!</div>
+      <div class="subprompt">The word is right here — copy it with the letters.</div>
+    </div>
+
+    <div class="practice-word"><span class="pw-label">THE WORD IS</span><span id="practiceWordText">CAT</span></div>
+
+    <div class="slots" id="pSlots" aria-label="Word slots"></div>
+    <div class="tiles" id="pTiles" aria-label="Letter tiles"></div>
+    <div class="message" id="practiceMsg" role="status" aria-live="polite"></div>
+
+    <div class="controls">
+      <button class="btn" id="pClearBtn">↩️ Clear</button>
+      <button class="btn" id="pShuffleBtn">🔀 Shuffle</button>
+      <button class="btn btn-primary" id="nextPracticeBtn">Next Word ➜</button>
     </div>
   </section>
 
@@ -406,26 +436,41 @@
     if(deckPos2>=deck2.length){ deck2 = shuffleArr(WORDS.map(function(_,i){return i;})); deckPos2=0; }
     var w = WORDS[deck2[deckPos2]]; deckPos2++; return w;
   }
+  // Third deck for Practice mode — same word set, independent order
+  var deck3 = shuffleArr(WORDS.map(function(_,i){return i;}));
+  var deckPos3 = 0;
+  function nextWordObj3(){
+    if(deckPos3>=deck3.length){ deck3 = shuffleArr(WORDS.map(function(_,i){return i;})); deckPos3=0; }
+    var w = WORDS[deck3[deckPos3]]; deckPos3++; return w;
+  }
 
   // ---------- Mode switcher ----------
   var modeBuildBtn = document.getElementById("modeBuildBtn");
   var modeStartBtn = document.getElementById("modeStartBtn");
+  var modePracticeBtn = document.getElementById("modePracticeBtn");
   var gameBuild = document.getElementById("gameBuild");
   var gameStart = document.getElementById("gameStart");
+  var gamePractice = document.getElementById("gamePractice");
   var currentMode = "build";
   function setMode(m){
     currentMode=m;
     var isBuild = m==="build";
+    var isStart = m==="start";
+    var isPractice = m==="practice";
     gameBuild.classList.toggle("hidden", !isBuild);
-    gameStart.classList.toggle("hidden", isBuild);
+    gameStart.classList.toggle("hidden", !isStart);
+    gamePractice.classList.toggle("hidden", !isPractice);
     modeBuildBtn.classList.toggle("active", isBuild);
-    modeStartBtn.classList.toggle("active", !isBuild);
+    modeStartBtn.classList.toggle("active", isStart);
+    modePracticeBtn.classList.toggle("active", isPractice);
     modeBuildBtn.setAttribute("aria-selected", isBuild?"true":"false");
-    modeStartBtn.setAttribute("aria-selected", !isBuild?"true":"false");
+    modeStartBtn.setAttribute("aria-selected", isStart?"true":"false");
+    modePracticeBtn.setAttribute("aria-selected", isPractice?"true":"false");
     ensureAudio();
   }
   modeBuildBtn.addEventListener("click", function(){ setMode("build"); playPop(); });
   modeStartBtn.addEventListener("click", function(){ setMode("start"); playPop(); });
+  modePracticeBtn.addEventListener("click", function(){ setMode("practice"); playPop(); });
 
   // Sound toggle
   var soundBtn = document.getElementById("soundBtn");
@@ -639,6 +684,129 @@
   nextStartBtn.addEventListener("click", function(){ playPop(); newStartWord(); });
   document.getElementById("startHear").addEventListener("click", function(){ if(sWord) speak(sWord.word); });
 
+  // ================= GAME 3: PRACTICE =================
+  // The word and picture are shown first; the student copies the word with the tiles.
+  var practiceEmoji = document.getElementById("practiceEmoji");
+  var practiceWordText = document.getElementById("practiceWordText");
+  var pSlotsEl = document.getElementById("pSlots");
+  var pTilesEl = document.getElementById("pTiles");
+  var practiceMsg = document.getElementById("practiceMsg");
+  var practiceCeleb = document.getElementById("practiceCeleb");
+  var nextPracticeBtn = document.getElementById("nextPracticeBtn");
+
+  var pWord = null;       // {word, emoji}
+  var pTiles = [];        // [{id, letter, used}]
+  var pSlots = [];        // [tileId|null]
+  var pDone = false;
+
+  function newPracticeWord(){
+    pWord = nextWordObj3();
+    pDone = false;
+    practiceCeleb.classList.remove("show");
+    nextPracticeBtn.classList.remove("pulse");
+    practiceMsg.textContent = "";
+    practiceMsg.className = "message";
+    practiceEmoji.textContent = pWord.emoji;
+    practiceWordText.textContent = pWord.word;
+    var letters = scrambled(pWord.word);
+    pTiles = letters.map(function(ch, idx){ return {id: idx, letter: ch, used:false}; });
+    pSlots = pWord.word.split("").map(function(){ return null; });
+    renderPractice();
+  }
+
+  function renderPractice(){
+    // Slots
+    pSlotsEl.innerHTML = "";
+    pSlots.forEach(function(tileId, i){
+      var d = document.createElement("button");
+      d.type="button";
+      var tile = tileId!==null ? pTiles[tileId] : null;
+      d.className = "slot" + (tile ? " filled" : "") + (pDone ? " correct" : "");
+      d.textContent = tile ? tile.letter : "";
+      d.setAttribute("aria-label", tile ? ("Slot "+(i+1)+", letter "+tile.letter+". Tap to put it back.") : ("Empty slot "+(i+1)));
+      if(tile && !pDone){
+        d.addEventListener("click", function(){ returnPracticeTile(tileId); });
+      }
+      pSlotsEl.appendChild(d);
+    });
+    // Tiles
+    pTilesEl.innerHTML = "";
+    pTiles.forEach(function(t){
+      var b = document.createElement("button");
+      b.type="button";
+      b.className = "tile" + (t.used ? " used" : "");
+      b.textContent = t.letter;
+      b.setAttribute("aria-label", "Letter "+t.letter);
+      b.disabled = t.used || pDone;
+      if(!t.used){
+        b.addEventListener("click", function(){ placePracticeTile(t.id); });
+      }
+      pTilesEl.appendChild(b);
+    });
+  }
+
+  function placePracticeTile(id){
+    if(pDone) return;
+    var idx = pSlots.indexOf(null);
+    if(idx===-1) return;
+    pTiles[id].used = true;
+    pSlots[idx] = id;
+    playPop();
+    renderPractice();
+    checkPractice();
+  }
+  function returnPracticeTile(id){
+    if(pDone) return;
+    var idx = pSlots.indexOf(id);
+    if(idx===-1) return;
+    pSlots[idx]=null;
+    pTiles[id].used=false;
+    playReturn();
+    practiceMsg.textContent="";
+    practiceMsg.className="message";
+    renderPractice();
+  }
+  function checkPractice(){
+    if(pSlots.indexOf(null)!==-1) return;
+    var built = pSlots.map(function(id){ return pTiles[id].letter; }).join("");
+    if(built === pWord.word){
+      pDone = true;
+      addStar();
+      practiceMsg.textContent = "⭐ You built " + pWord.word + "! ⭐";
+      practiceMsg.className = "message good";
+      practiceCeleb.classList.add("show");
+      nextPracticeBtn.classList.add("pulse");
+      playHappy();
+      burstConfetti(42);
+      speak(pWord.word);
+      renderPractice();
+      setTimeout(function(){ practiceCeleb.classList.remove("show"); }, 2200);
+    } else {
+      practiceMsg.textContent = "Good trying! Look at the word and check your letters.";
+      practiceMsg.className = "message try";
+      playGentle();
+      pSlotsEl.animate([{transform:"translateX(0)"},{transform:"translateX(-6px)"},{transform:"translateX(6px)"},{transform:"translateX(0)"}],{duration:320});
+    }
+  }
+
+  document.getElementById("pClearBtn").addEventListener("click", function(){
+    if(pDone) return;
+    pSlots = pSlots.map(function(){ return null; });
+    pTiles.forEach(function(t){ t.used=false; });
+    practiceMsg.textContent=""; practiceMsg.className="message";
+    playReturn();
+    renderPractice();
+  });
+  document.getElementById("pShuffleBtn").addEventListener("click", function(){
+    var unused = pTiles.filter(function(t){ return !t.used; });
+    var shuffledLetters = shuffleArr(unused.map(function(t){ return t.letter; }));
+    unused.forEach(function(t, i){ t.letter = shuffledLetters[i]; });
+    playPop();
+    renderPractice();
+  });
+  nextPracticeBtn.addEventListener("click", function(){ playPop(); newPracticeWord(); });
+  document.getElementById("practiceHear").addEventListener("click", function(){ if(pWord) speak(pWord.word); });
+
   // ================= Keyboard =================
   document.addEventListener("keydown", function(e){
     if(e.metaKey||e.ctrlKey||e.altKey) return;
@@ -657,6 +825,19 @@
           if(!bTiles[k].used && bTiles[k].letter===up){ placeTile(bTiles[k].id); break; }
         }
       }
+    } else if(currentMode==="practice"){
+      if(key==="Backspace"){
+        e.preventDefault();
+        for(var j=pSlots.length-1;j>=0;j--){ if(pSlots[j]!==null){ returnPracticeTile(pSlots[j]); break; } }
+        return;
+      }
+      if(key==="Enter" && pDone){ newPracticeWord(); return; }
+      if(/^[a-zA-Z]$/.test(key) && !pDone){
+        var upP = key.toUpperCase();
+        for(var n=0;n<pTiles.length;n++){
+          if(!pTiles[n].used && pTiles[n].letter===upP){ placePracticeTile(pTiles[n].id); break; }
+        }
+      }
     } else {
       if(/^[a-zA-Z]$/.test(key) && !sDone){
         var up2 = key.toUpperCase();
@@ -673,6 +854,7 @@
   // Init
   newBuildWord();
   newStartWord();
+  newPracticeWord();
 })();
 </script>
 </body>

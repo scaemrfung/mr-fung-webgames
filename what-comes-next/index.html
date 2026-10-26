@@ -244,6 +244,22 @@
         .shake,.pop{animation:none;}
         .choice,.btn{transition:none;}
       }
+      /* ---------- retell ---------- */
+      .retell{
+        background:var(--panel-2);
+        border:3px solid var(--amber);
+        border-radius:22px;
+        padding:18px 16px 20px;
+        text-align:center;
+        box-shadow:var(--shadow);
+      }
+      .retell[hidden]{display:none;}
+      .retell-prompt{
+        font-family:"Fredoka",sans-serif;font-weight:600;
+        font-size:clamp(21px,3.4vw,30px);
+        margin:0 0 14px;
+      }
+      .retell-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
       /* ---------- finish ---------- */
       .finish{
         display:none;
@@ -310,11 +326,19 @@
           </div>
         </section>
 
-        <p class="ask">What comes next? Tap a picture!</p>
+        <p class="ask" id="askLine">What comes next? Tap a picture!</p>
 
         <div class="choices" id="choices" role="group" aria-label="Choose what comes next"></div>
 
         <div class="feedback" id="feedback" aria-live="polite"></div>
+
+        <section class="retell" id="retellBox" hidden aria-label="Retell the story">
+          <p class="retell-prompt">🗣️ Now retell the story! Tell what happened first, next, and last.</p>
+          <div class="retell-btns">
+            <button class="btn btn-hear" id="retellHearBtn" type="button">🔊 Hear It</button>
+            <button class="btn btn-new" id="nextBtn" type="button">Next Story ➜</button>
+          </div>
+        </section>
       </main>
 
       <section class="finish" id="finish" aria-label="All done">
@@ -506,6 +530,7 @@
       var stars = 0;
       var soundOn = true;
       var locked = false;
+      var phase = "play"; // "play" = picking the next picture, "retell" = retelling the finished story
       var audioCtx = null;
 
       var starCountEl = document.getElementById("starCount");
@@ -515,6 +540,9 @@
       var sequenceEl = document.getElementById("sequence");
       var choicesEl = document.getElementById("choices");
       var feedbackEl = document.getElementById("feedback");
+      var askEl = document.getElementById("askLine");
+      var retellBox = document.getElementById("retellBox");
+      var nextBtn = document.getElementById("nextBtn");
       var gameArea = document.getElementById("gameArea");
       var finishEl = document.getElementById("finish");
       var finishText = document.getElementById("finishText");
@@ -610,6 +638,10 @@
 
       function renderStory() {
         locked = false;
+        phase = "play";
+        retellBox.hidden = true;
+        choicesEl.style.display = "";
+        askEl.style.display = "";
         var story = STORIES[order[idx]];
         storyTitleEl.textContent = story.title;
         progressLabel.textContent = "Story " + (idx + 1) + " of " + order.length;
@@ -701,7 +733,22 @@
         happySound();
         burst();
         setFeedback("⭐ Great job! " + story.answer.t + "!", "good");
-        setTimeout(nextStory, 1900);
+        setTimeout(showRetell, 1900);
+      }
+
+      // The full story, start to finish, for the retell step's Hear It.
+      function retellText(story) {
+        var parts = story.steps.map(function (s) { return s.t; });
+        parts.push(story.answer.t);
+        return parts.join(". ") + ".";
+      }
+
+      function showRetell() {
+        phase = "retell";
+        choicesEl.style.display = "none";
+        askEl.style.display = "none";
+        nextBtn.textContent = idx >= order.length - 1 ? "Finish 🏆" : "Next Story ➜";
+        retellBox.hidden = false;
       }
 
       function nextStory() {
@@ -745,8 +792,13 @@
       document.getElementById("againBtn").addEventListener("click", newGame);
       document.getElementById("hearBtn").addEventListener("click", function () {
         var story = STORIES[order[idx]];
-        if (story) speak(story.say);
+        if (story) speak(phase === "retell" ? retellText(story) : story.say);
       });
+      document.getElementById("retellHearBtn").addEventListener("click", function () {
+        var story = STORIES[order[idx]];
+        if (story) speak(retellText(story));
+      });
+      nextBtn.addEventListener("click", nextStory);
       var soundBtn = document.getElementById("soundBtn");
       soundBtn.addEventListener("click", function () {
         soundOn = !soundOn;

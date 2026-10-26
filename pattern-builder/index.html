@@ -276,6 +276,94 @@
         75% { transform: translateX(7px); }
       }
 
+      /* ---------- Mode switch ---------- */
+      .mode-bar {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+      }
+      .mode-btn {
+        font-family: "Fredoka", sans-serif;
+        font-weight: 600;
+        font-size: clamp(1rem, 2.6vw, 1.25rem);
+        border: 3px solid var(--line);
+        background: var(--panel);
+        color: var(--ink-soft);
+        border-radius: 999px;
+        padding: 10px 24px;
+        cursor: pointer;
+        box-shadow: var(--btn-shadow);
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .mode-btn:active { transform: translateY(3px); box-shadow: none; }
+      .mode-btn.active {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: var(--accent-ink);
+      }
+
+      /* ---------- Builder (Make My Own) ---------- */
+      [hidden] { display: none !important; }
+      .builder-title {
+        text-align: center;
+        font-family: "Fredoka", sans-serif;
+        font-weight: 600;
+        font-size: clamp(1.15rem, 3.4vw, 1.5rem);
+        margin: 0 0 14px;
+      }
+      .build-row {
+        min-height: clamp(64px, 13.5vw, 118px);
+        border: 3px dashed var(--tile-line);
+        border-radius: 22px;
+        padding: 10px;
+      }
+      .build-empty {
+        font-family: "Fredoka", sans-serif;
+        font-weight: 500;
+        font-size: clamp(1rem, 3vw, 1.25rem);
+        color: var(--ink-soft);
+        text-align: center;
+      }
+      .builder-hint {
+        text-align: center;
+        font-family: "Fredoka", sans-serif;
+        font-weight: 500;
+        font-size: clamp(1rem, 2.8vw, 1.2rem);
+        color: var(--ink-soft);
+        margin: 12px 0 0;
+      }
+      .palette-group { margin-top: 18px; }
+      .palette-label {
+        font-family: "Fredoka", sans-serif;
+        font-weight: 600;
+        font-size: clamp(1rem, 2.6vw, 1.2rem);
+        color: var(--ink-soft);
+        margin: 0 0 8px;
+        text-align: center;
+      }
+      .palette {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+      }
+      .palette .choice { padding: 8px; border-radius: 20px; }
+      .palette .choice .tile {
+        width: clamp(58px, 14vw, 84px);
+        height: clamp(58px, 14vw, 84px);
+      }
+      .builder-actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .btn:disabled { opacity: 0.45; cursor: default; }
+      .btn:disabled:active { transform: none; box-shadow: var(--btn-shadow); }
+
       .confetti-bit {
         position: fixed;
         width: 12px;
@@ -317,16 +405,44 @@
         </button>
       </div>
 
-      <h1 class="prompt">What comes next?</h1>
+      <div class="mode-bar" role="group" aria-label="Choose how to play">
+        <button class="mode-btn active" id="modePlayBtn" type="button" aria-pressed="true">Pattern Rounds</button>
+        <button class="mode-btn" id="modeMakeBtn" type="button" aria-pressed="false">Make My Own</button>
+      </div>
+
+      <h1 class="prompt" id="promptTitle">What comes next?</h1>
       <div class="kind-chip" id="kindChip">AB Pattern</div>
 
-      <div class="pattern-panel">
+      <div class="pattern-panel" id="roundPanel">
         <div class="pattern-row" id="patternRow" aria-live="polite"></div>
+      </div>
+
+      <div class="pattern-panel" id="builderPanel" hidden>
+        <p class="builder-title">Tap pieces below to build your pattern, in order</p>
+        <div class="pattern-row build-row" id="buildRow" aria-live="polite"></div>
+        <p class="builder-hint" id="buildHint">Pick 2 to 4 pieces, with at least 2 different ones — that becomes your pattern.</p>
+        <div class="palette-group">
+          <p class="palette-label">Colours</p>
+          <div class="palette" id="paletteColors"></div>
+        </div>
+        <div class="palette-group">
+          <p class="palette-label">Shapes</p>
+          <div class="palette" id="paletteShapes"></div>
+        </div>
+        <div class="palette-group">
+          <p class="palette-label">Numbers</p>
+          <div class="palette" id="paletteNumbers"></div>
+        </div>
+        <div class="builder-actions">
+          <button class="btn" id="undoBtn" type="button">Undo</button>
+          <button class="btn" id="clearBtn" type="button">Clear</button>
+          <button class="btn primary" id="startMakeBtn" type="button" disabled>Continue My Pattern!</button>
+        </div>
       </div>
 
       <p class="feedback" id="feedback" aria-live="polite"></p>
 
-      <p class="choices-label">Tap the piece that finishes the pattern</p>
+      <p class="choices-label" id="choicesLabel">Tap the piece that finishes the pattern</p>
       <div class="choices" id="choices"></div>
     </div>
 
@@ -366,6 +482,9 @@
       var state = {
         stars: 0,
         sound: true,
+        mode: "play",    // "play" = pattern rounds, "make" = make your own
+        phase: "round",  // "round" = answering, "build" = building your own pattern
+        build: [],       // pieces the student picked, in order (the pattern core)
         current: null,   // { shown:[item], answer:item, speakText:string, kindLabel }
         locked: false
       };
@@ -380,7 +499,18 @@
         soundBtn: document.getElementById("soundBtn"),
         soundLabel: document.getElementById("soundLabel"),
         hearBtn: document.getElementById("hearBtn"),
-        newBtn: document.getElementById("newBtn")
+        newBtn: document.getElementById("newBtn"),
+        promptTitle: document.getElementById("promptTitle"),
+        roundPanel: document.getElementById("roundPanel"),
+        builderPanel: document.getElementById("builderPanel"),
+        choicesLabel: document.getElementById("choicesLabel"),
+        buildRow: document.getElementById("buildRow"),
+        buildHint: document.getElementById("buildHint"),
+        modePlayBtn: document.getElementById("modePlayBtn"),
+        modeMakeBtn: document.getElementById("modeMakeBtn"),
+        startMakeBtn: document.getElementById("startMakeBtn"),
+        undoBtn: document.getElementById("undoBtn"),
+        clearBtn: document.getElementById("clearBtn")
       };
 
       /* ---------------- Helpers ---------------- */
@@ -454,8 +584,156 @@
         render();
       }
 
+      /* ---------------- Make My Own: builder ---------------- */
+      var MAX_CORE = 4;
+
+      function buildValid() {
+        if (state.build.length < 2) return false;
+        var seen = {};
+        for (var i = 0; i < state.build.length; i++) seen[state.build[i].key] = true;
+        var count = 0;
+        for (var k in seen) count++;
+        return count >= 2;
+      }
+
+      function renderBuild() {
+        els.buildRow.innerHTML = "";
+        if (state.build.length === 0) {
+          var empty = document.createElement("div");
+          empty.className = "build-empty";
+          empty.textContent = "Your pattern goes here…";
+          els.buildRow.appendChild(empty);
+        } else {
+          state.build.forEach(function (item) {
+            var d = document.createElement("div");
+            d.className = "tile";
+            d.innerHTML = tileHTML(item);
+            els.buildRow.appendChild(d);
+          });
+        }
+        if (state.build.length >= MAX_CORE) {
+          els.buildHint.textContent = "That's " + MAX_CORE + " pieces — tap “Continue My Pattern!” or Undo to change one.";
+        } else if (state.build.length >= 2 && !buildValid()) {
+          els.buildHint.textContent = "A pattern needs at least 2 different pieces — add a different one!";
+        } else {
+          els.buildHint.textContent = "Pick 2 to 4 pieces, with at least 2 different ones — that becomes your pattern.";
+        }
+        els.startMakeBtn.disabled = !buildValid();
+        els.undoBtn.disabled = state.build.length === 0;
+        els.clearBtn.disabled = state.build.length === 0;
+      }
+
+      function enterBuild(keepMessage) {
+        state.phase = "build";
+        state.locked = false;
+        state.build = [];
+        els.roundPanel.hidden = true;
+        els.builderPanel.hidden = false;
+        els.choicesLabel.hidden = true;
+        els.choices.hidden = true;
+        els.choices.innerHTML = "";
+        els.promptTitle.textContent = "Make your own pattern!";
+        els.kindChip.textContent = "Make My Own";
+        if (!keepMessage) {
+          els.feedback.textContent = "";
+          els.feedback.className = "feedback";
+        }
+        renderBuild();
+      }
+
+      function addToBuild(item) {
+        ensureAudio();
+        if (state.build.length >= MAX_CORE) {
+          els.buildHint.textContent = "That's " + MAX_CORE + " pieces — tap “Continue My Pattern!” or Undo to change one.";
+          return;
+        }
+        state.build.push(item);
+        if (state.sound && audioCtx) tone(440 + state.build.length * 80, 0, 0.16, "triangle", 0.16);
+        renderBuild();
+      }
+
+      function buildPalette() {
+        var groups = [
+          { el: document.getElementById("paletteColors"), items: makeItems("color") },
+          { el: document.getElementById("paletteShapes"), items: makeItems("shape") },
+          { el: document.getElementById("paletteNumbers"), items: makeItems("number") }
+        ];
+        groups.forEach(function (g) {
+          g.el.innerHTML = "";
+          g.items.forEach(function (item) {
+            var b = document.createElement("button");
+            b.type = "button";
+            b.className = "choice";
+            b.setAttribute("aria-label", "Add " + item.speak + " to my pattern");
+            b.innerHTML = '<div class="tile">' + tileHTML(item) + "</div>";
+            b.addEventListener("click", function () { addToBuild(item); });
+            g.el.appendChild(b);
+          });
+        });
+      }
+
+      function startMakeRound() {
+        if (!buildValid()) return;
+        var core = state.build.slice();
+
+        // Repeat the student's core twice, then ask for the piece that continues it.
+        var seq = [];
+        var totalLen = core.length * 2 + 1;
+        for (var i = 0; i < totalLen; i++) seq.push(core[i % core.length]);
+        var answer = seq[seq.length - 1];
+        var shown = seq.slice(0, seq.length - 1);
+
+        // Choices: the answer, another piece from their core, and one new piece.
+        var all = makeItems("color").concat(makeItems("shape"), makeItems("number"));
+        var picked = [answer];
+        var coreOthers = core.filter(function (it) { return it.key !== answer.key; });
+        if (coreOthers.length) picked.push(pick(coreOthers));
+        var notCore = all.filter(function (it) {
+          return !core.some(function (c) { return c.key === it.key; }) &&
+                 !picked.some(function (p) { return p.key === it.key; });
+        });
+        while (picked.length < 3 && notCore.length) {
+          var extra = pick(notCore);
+          picked.push(extra);
+          notCore = notCore.filter(function (it) { return it.key !== extra.key; });
+        }
+        var options = shuffle(picked);
+
+        state.current = {
+          shown: shown,
+          answer: answer,
+          options: options,
+          kindLabel: "My Pattern — Keep It Going!",
+          speakText: "Your pattern is: " + core.map(function (it) { return it.speak; }).join(", ") +
+                     ". It goes: " + shown.map(function (it) { return it.speak; }).join(", ") + ". What comes next?"
+        };
+        state.locked = false;
+        render();
+      }
+
+      function setMode(mode) {
+        if (state.mode === mode && (mode === "play" || state.phase === "build")) return;
+        state.mode = mode;
+        els.modePlayBtn.classList.toggle("active", mode === "play");
+        els.modePlayBtn.setAttribute("aria-pressed", mode === "play" ? "true" : "false");
+        els.modeMakeBtn.classList.toggle("active", mode === "make");
+        els.modeMakeBtn.setAttribute("aria-pressed", mode === "make" ? "true" : "false");
+        if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+        if (mode === "make") {
+          enterBuild(false);
+        } else {
+          newPattern();
+        }
+      }
+
       function render() {
         var cur = state.current;
+        state.phase = "round";
+        els.builderPanel.hidden = true;
+        els.roundPanel.hidden = false;
+        els.choicesLabel.hidden = false;
+        els.choices.hidden = false;
+        els.promptTitle.textContent = "What comes next?";
         els.kindChip.textContent = cur.kindLabel;
         els.feedback.textContent = "";
         els.feedback.className = "feedback";
@@ -525,9 +803,18 @@
 
       /* ---------------- Speech ---------------- */
       function speakPattern() {
-        if (!("speechSynthesis" in window) || !state.current) return;
+        if (!("speechSynthesis" in window)) return;
+        var text;
+        if (state.phase === "build") {
+          text = state.build.length
+            ? "Your pattern is: " + state.build.map(function (it) { return it.speak; }).join(", ") + "."
+            : "Tap the colours, shapes, and numbers to build your pattern.";
+        } else {
+          if (!state.current) return;
+          text = state.current.speakText;
+        }
         window.speechSynthesis.cancel();
-        var u = new SpeechSynthesisUtterance(state.current.speakText);
+        var u = new SpeechSynthesisUtterance(text);
         u.rate = 0.92;
         u.pitch = 1.05;
         window.speechSynthesis.speak(u);
@@ -587,7 +874,15 @@
           els.feedback.className = "feedback good";
           happySound();
           confetti();
-          setTimeout(newPattern, 1500);
+          setTimeout(function () {
+            if (state.mode === "make") {
+              enterBuild(true);
+              els.feedback.textContent = "You continued your own pattern! Now make a new one.";
+              els.feedback.className = "feedback good";
+            } else {
+              newPattern();
+            }
+          }, 1500);
         } else {
           btn.classList.add("wrong");
           btn.disabled = true;
@@ -603,7 +898,22 @@
         state.stars = 0;
         els.starCount.textContent = "0";
         if ("speechSynthesis" in window) window.speechSynthesis.cancel();
-        newPattern();
+        if (state.mode === "make") {
+          enterBuild(false);
+        } else {
+          newPattern();
+        }
+      });
+      els.modePlayBtn.addEventListener("click", function () { ensureAudio(); setMode("play"); });
+      els.modeMakeBtn.addEventListener("click", function () { ensureAudio(); setMode("make"); });
+      els.startMakeBtn.addEventListener("click", function () { ensureAudio(); startMakeRound(); });
+      els.undoBtn.addEventListener("click", function () {
+        state.build.pop();
+        renderBuild();
+      });
+      els.clearBtn.addEventListener("click", function () {
+        state.build = [];
+        renderBuild();
       });
       els.soundBtn.addEventListener("click", function () {
         state.sound = !state.sound;
@@ -613,6 +923,7 @@
       });
       els.hearBtn.addEventListener("click", speakPattern);
 
+      buildPalette();
       newPattern();
     </script>
   </body>

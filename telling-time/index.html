@@ -297,6 +297,45 @@
         font-size: 0.95rem;
         text-align: center;
       }
+
+      /* ---------- match mode: stage + digital display ---------- */
+      .stage { position: relative; }
+      .clock-card[hidden], .digital-card[hidden] { display: none; }
+      .digital-card {
+        background: var(--panel);
+        border: 3px solid var(--choice-border);
+        border-radius: 28px;
+        box-shadow: var(--shadow);
+        padding: clamp(26px, 5vw, 40px) clamp(28px, 7vw, 52px);
+        text-align: center;
+      }
+      .digital-face {
+        font-family: "Fredoka", sans-serif;
+        font-weight: 700;
+        font-size: clamp(3.8rem, 15vw, 6.2rem);
+        letter-spacing: 0.06em;
+        line-height: 1;
+        color: var(--ink);
+      }
+      .digital-label {
+        margin: 12px 0 0;
+        font-weight: 800;
+        color: var(--ink-soft);
+        font-size: 1rem;
+      }
+      .choice .big-digital {
+        display: block;
+        font-weight: 700;
+        font-size: clamp(2rem, 6vw, 2.6rem);
+        letter-spacing: 0.05em;
+        line-height: 1.1;
+      }
+      .choice svg.mini-clock {
+        display: block;
+        width: 118px;
+        height: 118px;
+        margin: 2px auto;
+      }
       @keyframes wiggle {
         0%, 100% { transform: translateX(0); }
         25% { transform: translateX(-6px); }
@@ -328,16 +367,27 @@
         </div>
       </div>
 
+      <div class="levels" role="group" aria-label="Choose a game">
+        <button class="lvl on" id="modeTell" type="button">Tell the Time<small>read the clock</small></button>
+        <button class="lvl" id="modeMatch" type="button">Match the Clock<small>analogue ↔ digital</small></button>
+      </div>
+
       <div class="levels" role="group" aria-label="Choose a grade level">
         <button class="lvl on" id="lvl1" type="button">Grade 1<small>o'clock &amp; half past</small></button>
         <button class="lvl" id="lvl2" type="button">Grade 2<small>+ quarter past &amp; to</small></button>
       </div>
 
-      <h1>What time is it?</h1>
+      <h1 id="titleEl">What time is it?</h1>
       <p class="round" id="roundLabel">Clock 1</p>
 
-      <div class="clock-card" id="clockCard">
-        <svg id="clockSvg" viewBox="0 0 300 300" role="img" aria-label="Analogue clock"></svg>
+      <div class="stage">
+        <div class="clock-card" id="clockCard">
+          <svg id="clockSvg" viewBox="0 0 300 300" role="img" aria-label="Analogue clock"></svg>
+        </div>
+        <div class="digital-card" id="digitalCard" hidden role="img" aria-label="Digital clock">
+          <div class="digital-face" id="digitalFace">12:00</div>
+          <p class="digital-label">digital clock</p>
+        </div>
         <div class="burst" id="burst" aria-hidden="true">
           <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
         </div>
@@ -348,7 +398,7 @@
       <p class="feedback" id="feedback" aria-live="polite"></p>
 
       <button class="hear" id="hearBtn" type="button">🔊 Hear It</button>
-      <p class="hint">The short hand tells the hour. The long hand tells the minutes.</p>
+      <p class="hint" id="hintEl">The short hand tells the hour. The long hand tells the minutes.</p>
     </div>
 
     <script>
@@ -358,6 +408,8 @@
         var NUM_WORDS = ["twelve", "one", "two", "three", "four", "five", "six",
                          "seven", "eight", "nine", "ten", "eleven", "twelve"];
 
+        var mode = "tell";           // "tell": read the clock · "match": analogue ↔ digital
+        var matchDir = "a2d";        // match round direction: analogue→digital or digital→analogue
         var grade = 1;               // 1: o'clock + half past · 2: + quarters
         var stars = 0;
         var round = 0;
@@ -374,6 +426,10 @@
         var clockSvg = document.getElementById("clockSvg");
         var burstEl = document.getElementById("burst");
         var clockCard = document.getElementById("clockCard");
+        var titleEl = document.getElementById("titleEl");
+        var hintEl = document.getElementById("hintEl");
+        var digitalCard = document.getElementById("digitalCard");
+        var digitalFace = document.getElementById("digitalFace");
 
         /* ---------------- time helpers ---------------- */
 
@@ -450,7 +506,7 @@
           return [cx + r * Math.cos(rad), cy + r * Math.sin(rad)];
         }
 
-        function drawClock(t) {
+        function clockInner(t) {
           var s = "";
           var C = 150, R = 146;
           // face + rim
@@ -481,7 +537,11 @@
           s += '<line x1="' + C + '" y1="' + C + '" x2="' + mp[0].toFixed(1) + '" y2="' + mp[1].toFixed(1) +
                '" stroke="var(--min-hand)" stroke-width="9" stroke-linecap="round"/>';
           s += '<circle cx="' + C + '" cy="' + C + '" r="11" fill="var(--pin)" stroke="var(--clock-face)" stroke-width="3"/>';
-          clockSvg.innerHTML = s;
+          return s;
+        }
+
+        function drawClock(t) {
+          clockSvg.innerHTML = clockInner(t);
           clockSvg.setAttribute("aria-label", "Clock showing " + spoken(t));
         }
 
@@ -545,21 +605,53 @@
           if (advanceTimer) { clearTimeout(advanceTimer); advanceTimer = null; }
           locked = false;
           round++;
-          roundLabelEl.textContent = "Clock " + round;
           feedbackEl.textContent = "";
           feedbackEl.className = "feedback";
           burstEl.classList.remove("go");
 
           current = randomTime();
-          drawClock(current);
+
+          if (mode === "match") {
+            matchDir = round % 2 === 1 ? "a2d" : "d2a";
+            roundLabelEl.textContent = "Match " + round;
+            if (matchDir === "a2d") {
+              titleEl.textContent = "Find the matching digital time!";
+              hintEl.textContent = "Look at the hands on the clock, then tap the digital time that matches.";
+              clockCard.hidden = false;
+              digitalCard.hidden = true;
+              drawClock(current);
+            } else {
+              titleEl.textContent = "Find the clock that matches!";
+              hintEl.textContent = "Read the digital time, then tap the clock that shows the same time.";
+              clockCard.hidden = true;
+              digitalCard.hidden = false;
+              digitalFace.textContent = digital(current);
+              digitalCard.setAttribute("aria-label", "Digital clock showing " + digital(current));
+            }
+          } else {
+            roundLabelEl.textContent = "Clock " + round;
+            titleEl.textContent = "What time is it?";
+            hintEl.textContent = "The short hand tells the hour. The long hand tells the minutes.";
+            clockCard.hidden = false;
+            digitalCard.hidden = true;
+            drawClock(current);
+          }
 
           choicesEl.innerHTML = "";
           makeChoices(current).forEach(function (t) {
             var b = document.createElement("button");
             b.type = "button";
             b.className = "choice";
-            b.innerHTML = '<span class="words">' + phrase(t) + '</span>' +
-                          '<span class="digital">' + digital(t) + '</span>';
+            if (mode === "match" && matchDir === "a2d") {
+              b.innerHTML = '<span class="big-digital">' + digital(t) + '</span>';
+              b.setAttribute("aria-label", "Digital time " + digital(t));
+            } else if (mode === "match") {
+              b.innerHTML = '<svg class="mini-clock" viewBox="0 0 300 300" aria-hidden="true">' + clockInner(t) + '</svg>';
+              b.setAttribute("aria-label", "Clock showing " + spoken(t));
+            } else {
+              b.innerHTML = '<span class="words">' + phrase(t) + '</span>' +
+                            '<span class="digital">' + digital(t) + '</span>';
+            }
             b.addEventListener("click", function () { pick(b, t); });
             choicesEl.appendChild(b);
           });
@@ -588,9 +680,10 @@
             feedbackEl.textContent = "Good try! Look at the hands and try again.";
             feedbackEl.className = "feedback gentle";
             gentleSound();
-            clockCard.classList.remove("wiggle");
-            void clockCard.offsetWidth;
-            clockCard.classList.add("wiggle");
+            var card = digitalCard.hidden ? clockCard : digitalCard;
+            card.classList.remove("wiggle");
+            void card.offsetWidth;
+            card.classList.add("wiggle");
           }
         }
 
@@ -599,6 +692,13 @@
           starCountEl.textContent = "0";
           round = 0;
           newRound();
+        }
+
+        function setMode(m) {
+          mode = m;
+          document.getElementById("modeTell").classList.toggle("on", m === "tell");
+          document.getElementById("modeMatch").classList.toggle("on", m === "match");
+          newGame();
         }
 
         function setGrade(g) {
@@ -611,6 +711,8 @@
         /* ---------------- controls ---------------- */
 
         document.getElementById("newBtn").addEventListener("click", newGame);
+        document.getElementById("modeTell").addEventListener("click", function () { setMode("tell"); });
+        document.getElementById("modeMatch").addEventListener("click", function () { setMode("match"); });
         document.getElementById("lvl1").addEventListener("click", function () { setGrade(1); });
         document.getElementById("lvl2").addEventListener("click", function () { setGrade(2); });
         document.getElementById("hearBtn").addEventListener("click", function () {

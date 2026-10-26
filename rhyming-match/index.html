@@ -225,6 +225,38 @@
       }
       .feedback.good { color: var(--good); }
       .feedback.try { color: var(--try); }
+      /* Rhyming family list shown after a correct match */
+      .family {
+        display: none;
+        background: var(--good-bg);
+        border: 3px solid var(--good);
+        border-radius: 20px;
+        padding: 12px 16px 14px;
+        text-align: center;
+      }
+      .family.show { display: block; }
+      .family-label {
+        font-size: clamp(1rem, 3vw, 1.2rem);
+        font-weight: 700;
+        color: var(--good);
+        margin: 0 0 8px;
+      }
+      .family-words {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+      }
+      .family-words span {
+        background: var(--panel);
+        border: 2px solid var(--good);
+        border-radius: 999px;
+        padding: 4px 14px;
+        font-size: clamp(1.05rem, 3.4vw, 1.35rem);
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        color: var(--ink);
+      }
       /* Celebration */
       .celebration {
         display: none;
@@ -291,6 +323,8 @@
         <div class="feedback" id="feedback" aria-live="polite"></div>
 
         <div class="choices" id="choices" role="group" aria-label="Word choices"></div>
+
+        <div class="family" id="familyBox" aria-live="polite"></div>
       </section>
 
       <section class="celebration" id="celebration">
@@ -322,6 +356,26 @@
         ["FOX",  "🦊", "BOX",  "📦"]
       ];
 
+      // Other words in each rhyming family, shown after a correct match
+      // (in addition to the target and rhyme word just played).
+      var FAMILIES = {
+        "CAT":  { end: "-at",   words: ["BAT", "MAT", "RAT", "FLAT"] },
+        "SUN":  { end: "-un",   words: ["RUN", "BUN", "SPUN"] },
+        "DOG":  { end: "-og",   words: ["LOG", "HOG", "JOG"] },
+        "PIG":  { end: "-ig",   words: ["BIG", "DIG", "TWIG"] },
+        "BED":  { end: "-ed",   words: ["FED", "LED", "SLED"] },
+        "MAP":  { end: "-ap",   words: ["TAP", "NAP", "SNAP"] },
+        "BALL": { end: "-all",  words: ["CALL", "WALL", "TALL", "SMALL"] },
+        "CAKE": { end: "-ake",  words: ["BAKE", "MAKE", "SNAKE", "RAKE"] },
+        "DUCK": { end: "-uck",  words: ["TRUCK", "STUCK", "CLUCK"] },
+        "HEN":  { end: "-en",   words: ["TEN", "DEN", "MEN"] },
+        "BOOK": { end: "-ook",  words: ["COOK", "HOOK", "TOOK"] },
+        "CAR":  { end: "-ar",   words: ["FAR", "JAR", "BAR"] },
+        "ANT":  { end: "-ant",  words: ["PLANT", "CHANT"] },
+        "BEE":  { end: "-ee",   words: ["SEE", "FREE", "THREE"] },
+        "FOX":  { end: "-ox",   words: ["OX", "SOCKS"] }
+      };
+
       var queue = [];
       var current = null;
       var round = 0;
@@ -337,6 +391,7 @@
       var starCountEl = document.getElementById("starCount");
       var progressEl = document.getElementById("progress");
       var gameAreaEl = document.getElementById("gameArea");
+      var familyBoxEl = document.getElementById("familyBox");
       var celebrationEl = document.getElementById("celebration");
       var celebrationSubEl = document.getElementById("celebrationSub");
       var confettiEl = document.getElementById("confetti");
@@ -422,6 +477,8 @@
         locked = false;
         feedbackEl.textContent = "";
         feedbackEl.className = "feedback";
+        familyBoxEl.classList.remove("show");
+        familyBoxEl.innerHTML = "";
         progressEl.textContent = "Word " + (round + 1) + " of " + queue.length;
         targetPicEl.textContent = current[1];
         targetWordEl.textContent = current[0];
@@ -455,6 +512,25 @@
         });
       }
 
+      function showFamily() {
+        var fam = FAMILIES[current[0]];
+        familyBoxEl.innerHTML = "";
+        if (!fam) return;
+        var label = document.createElement("p");
+        label.className = "family-label";
+        label.textContent = "More " + fam.end + " words in the " + current[0] + " family:";
+        var row = document.createElement("div");
+        row.className = "family-words";
+        fam.words.forEach(function (w) {
+          var chip = document.createElement("span");
+          chip.textContent = w;
+          row.appendChild(chip);
+        });
+        familyBoxEl.appendChild(label);
+        familyBoxEl.appendChild(row);
+        familyBoxEl.classList.add("show");
+      }
+
       function pick(btn, opt) {
         if (locked) return;
         ensureAudio();
@@ -467,9 +543,10 @@
           for (var i = 0; i < all.length; i++) all[i].disabled = true;
           feedbackEl.textContent = "⭐ Yes! " + current[0] + " rhymes with " + current[2] + "!";
           feedbackEl.className = "feedback good";
+          showFamily();
           happySound();
           round++;
-          setTimeout(nextRound, 1600);
+          setTimeout(nextRound, 3600);
         } else {
           btn.classList.add("tryagain");
           btn.disabled = true;

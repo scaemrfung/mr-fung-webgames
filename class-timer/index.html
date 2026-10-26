@@ -244,6 +244,10 @@
       .sound-btn.off .icon-on { display: none; }
       .sound-btn.off .icon-off { display: block; }
       .sound-btn.off { color: var(--ink-soft); }
+      .finish-btn .icon-silent { display: none; }
+      .finish-btn.silent .icon-loud { display: none; }
+      .finish-btn.silent .icon-silent { display: block; }
+      .finish-btn.silent { color: var(--ink-soft); }
 
       /* ---------- big clock ---------- */
       .clock-card {
@@ -494,6 +498,11 @@
           <svg class="icon-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6.5 9H3v6h3.5L11 19V5z" fill="currentColor" stroke="none"/><line x1="16" y1="9" x2="22" y2="15"/><line x1="22" y1="9" x2="16" y2="15"/></svg>
           <span id="soundLabel">Sound On</span>
         </button>
+        <button class="sound-btn finish-btn" id="finishBtn" type="button" aria-pressed="false" aria-label="Toggle silent finish: when silent, time's up shows only a visual celebration with no sound">
+          <svg class="icon-loud" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 8-3 8h18s-3-1-3-8"/><path d="M10.3 21a2 2 0 0 0 3.4 0"/></svg>
+          <svg class="icon-silent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.7 3A6 6 0 0 1 18 8c0 7 3 9 3 9H3s3-2 3-9c0-2 .6-3.9 1.7-5"/><path d="M10.3 21a2 2 0 0 0 3.4 0"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
+          <span id="finishLabel">Finish: Sound</span>
+        </button>
       </div>
 
       <section class="clock-card" id="clockCard" aria-label="Timer display">
@@ -593,6 +602,8 @@
         var addBtn = document.getElementById("addBtn");
         var soundBtn = document.getElementById("soundBtn");
         var soundLabel = document.getElementById("soundLabel");
+        var finishBtn = document.getElementById("finishBtn");
+        var finishLabel = document.getElementById("finishLabel");
         var customForm = document.getElementById("customForm");
         var customInput = document.getElementById("customInput");
         var customSet = document.getElementById("customSet");
@@ -606,6 +617,7 @@
         var endAt = 0;
         var rafId = null;
         var soundOn = true;
+        var silentFinish = false;
         var wakeLock = null;
 
         /* ---------------- formatting ---------------- */
@@ -796,9 +808,9 @@
           remainingMs = 0;
           state = "done";
           render();
-          playHappy();
+          if (!silentFinish) playHappy();
           celebrate();
-          if (navigator.vibrate) { try { navigator.vibrate([120, 60, 120]); } catch (e) {} }
+          if (!silentFinish && navigator.vibrate) { try { navigator.vibrate([120, 60, 120]); } catch (e) {} }
         }
         function addMinute() {
           if (state === "running" || state === "paused") {
@@ -862,6 +874,13 @@
           soundBtn.setAttribute("aria-pressed", String(soundOn));
           soundLabel.textContent = soundOn ? "Sound On" : "Sound Off";
           if (soundOn) playClick();
+        });
+        finishBtn.addEventListener("click", function () {
+          silentFinish = !silentFinish;
+          finishBtn.classList.toggle("silent", silentFinish);
+          finishBtn.setAttribute("aria-pressed", String(silentFinish));
+          finishLabel.textContent = silentFinish ? "Finish: Silent" : "Finish: Sound";
+          playClick();
         });
         document.addEventListener("keydown", function (ev) {
           if (toolWrap.hidden) return;
