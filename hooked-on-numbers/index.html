@@ -391,7 +391,7 @@
         max-width: 1200px;
         width: 100%;
         margin: 0 auto;
-        padding: 2px 14px 16px;
+        padding: 2px 14px 6px;
         display: flex;
         align-items: center;
         gap: 12px;
@@ -467,6 +467,16 @@
       <div class="stars" id="stars" aria-label="Stars earned"></div>
     </div>
 
+    <div class="bucket-bar">
+      <div class="bucket-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h16l-1.6 11a2 2 0 0 1-2 1.7H7.6a2 2 0 0 1-2-1.7L4 8z"/><path d="M8 8a4 4 0 0 1 8 0"/></svg>
+        Bucket
+      </div>
+      <div class="bucket-items" id="bucketItems">
+        <span class="bucket-empty" id="bucketEmpty">No fish yet — catch one!</span>
+      </div>
+    </div>
+
     <div class="pond-wrap">
       <div class="pond" id="pond">
         <div class="sand"></div>
@@ -483,16 +493,6 @@
             <button id="newRoundBtn">New Round</button>
           </div>
         </div>
-      </div>
-    </div>
-
-    <div class="bucket-bar">
-      <div class="bucket-label">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h16l-1.6 11a2 2 0 0 1-2 1.7H7.6a2 2 0 0 1-2-1.7L4 8z"/><path d="M8 8a4 4 0 0 1 8 0"/></svg>
-        Bucket
-      </div>
-      <div class="bucket-items" id="bucketItems">
-        <span class="bucket-empty" id="bucketEmpty">No fish yet — catch one!</span>
       </div>
     </div>
 

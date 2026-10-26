@@ -166,8 +166,8 @@
   .mode-btn{min-width:0}
   /* Desktop / projector: whole game fits in one screen, no scrolling */
   @media (min-width:761px){
-    body{height:100dvh;overflow:hidden}
-    .wrap{height:100dvh;display:flex;flex-direction:column;padding:10px 16px 10px;max-width:880px}
+    body{height:100vh;height:100dvh;overflow:hidden}
+    .wrap{height:100vh;height:100dvh;display:flex;flex-direction:column;padding:10px 16px 10px;max-width:880px}
     h1{font-size:2.15rem}
     .subtitle{font-size:1rem}
     .new-top{padding:9px 18px;font-size:1.05rem}
@@ -262,6 +262,72 @@
   #confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden}
   .confetto{position:absolute;top:-18px;width:11px;height:16px;border-radius:3px;animation:fall linear forwards}
   @keyframes fall{to{transform:translateY(560px) rotate(720deg);opacity:.9}}
+  /* Fit-to-viewport for narrow windows (split-screen / scaled Chromebook displays):
+     the board flexes to the available height instead of using tall fixed-aspect cards. */
+  @media (max-width:760px){
+    body{height:100vh;height:100dvh;overflow:hidden}
+    .wrap{height:100vh;height:100dvh;display:flex;flex-direction:column}
+    main{flex:1;min-height:0;display:flex;flex-direction:column}
+    .board{flex:1;min-height:0;gap:8px;grid-template-rows:repeat(4,1fr)}
+    .board.pairs-6{grid-template-rows:repeat(3,1fr)}
+    .board.pairs-8{grid-template-rows:repeat(4,1fr)}
+    .card{aspect-ratio:auto;height:100%;min-height:0}
+    .hint{flex:none}
+  }
+  /* Short screens (Chromebook heights around 768px and below, any width):
+     compact the header, switchers, counters and feedback so the whole board
+     fits on one screen, and size card faces by viewport height so no tile
+     content is clipped. */
+  @media (max-height:860px){
+    .wrap{padding-top:8px;padding-bottom:8px}
+    h1{font-size:clamp(1.45rem,4.6vh,2.05rem)}
+    .subtitle{font-size:.92rem}
+    .new-top{padding:8px 16px;font-size:1rem}
+    .home-btn{padding:8px 16px;font-size:1rem}
+    .modes{margin:8px 0 5px;padding:4px}
+    .mode-btn{padding:7px 6px;font-size:clamp(1rem,3.1vh,1.3rem)}
+    .sizes{margin:0 0 6px;padding:4px}
+    .size-btn{padding:6px 6px;font-size:clamp(.95rem,2.9vh,1.15rem)}
+    .stat{padding:4px 12px;min-width:100px}
+    .stat .label{font-size:.76rem}
+    .stat .value{font-size:1.3rem}
+    .ctrl-btn{padding:7px 12px;font-size:.95rem}
+    .feedback{margin:6px 0;min-height:38px;padding:5px 10px;font-size:clamp(1.05rem,3.3vh,1.4rem)}
+    .board{gap:8px}
+    .hint{margin:6px 0 0;font-size:.85rem}
+    .face{padding:6px}
+    .emoji{font-size:clamp(1.6rem,5.2vh,3.2rem)}
+    .big-letter,.big-num{font-size:clamp(1.8rem,6.2vh,3.4rem)}
+    .big-word{font-size:clamp(1.1rem,3.8vh,2rem)}
+    .face.back .q{font-size:clamp(1.5rem,5.2vh,2.6rem)}
+    .pic-word{font-size:clamp(.95rem,3vh,1.4rem)}
+    .num-word{font-size:clamp(.7rem,2.2vh,.95rem)}
+    .count-grid span{font-size:clamp(1.05rem,3.8vh,1.8rem)}
+    .count-grid.c6 span,.count-grid.c7 span,.count-grid.c8 span,.count-grid.c9 span,.count-grid.c10 span{font-size:clamp(.95rem,3.4vh,1.6rem)}
+  }
+  /* Very short viewports (scaled Chromebook displays, ~600px tall and under):
+     squeeze the chrome a little more so cards stay big enough to tap. */
+  @media (max-height:680px){
+    h1{font-size:1.3rem}
+    .subtitle{font-size:.85rem}
+    .new-top{padding:6px 14px}
+    .home-btn{padding:6px 14px}
+    .modes{margin:6px 0 4px}
+    .mode-btn{padding:5px 4px}
+    .size-btn{padding:4px 4px}
+    .stat .value{font-size:1.15rem}
+    .ctrl-btn{padding:6px 10px}
+    .feedback{margin:5px 0;min-height:32px;font-size:1rem}
+    .board{gap:6px}
+    .hint{margin:4px 0 0;font-size:.8rem}
+  }
+  /* Narrow AND short: keep switcher labels inside their pills (the small-screen
+     sizing wins over the short-screen sizing). */
+  @media (max-width:560px) and (max-height:860px){
+    .mode-btn{font-size:.95rem;padding:7px 2px;gap:4px}
+    .size-btn{font-size:.92rem;padding:6px 2px;gap:4px}
+    .stat{min-width:0}
+  }
   @media (prefers-reduced-motion: reduce){
     .card-inner{transition:none}
     .confetto{animation:none;display:none}
