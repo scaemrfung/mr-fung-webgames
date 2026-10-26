@@ -1,0 +1,734 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>Double Trouble</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet" />
+    <style>
+      :root{
+        --bg:#eef7f2;
+        --bg-accent:#d9efe3;
+        --card:#ffffff;
+        --card-border:#134e3e;
+        --ink:#12211c;
+        --muted:#4a655c;
+        --teal:#0e7a5f;
+        --teal-dark:#0a5c48;
+        --teal-soft:#d7f2e6;
+        --sun:#ffb703;
+        --sun-ink:#5c3d00;
+        --coral:#ff6b4a;
+        --coral-dark:#d94f2e;
+        --choice-bg:#ffffff;
+        --choice-border:#12211c;
+        --good-bg:#16a34a;
+        --good-border:#14532d;
+        --wrong-bg:#fef3c7;
+        --timer-track:#d7e8df;
+        --shadow:0 6px 0 rgba(18,33,28,.14);
+        --radius:22px;
+      }
+      @media (prefers-color-scheme: dark){
+        :root{
+          --bg:#0d1f1a;
+          --bg-accent:#123128;
+          --card:#162e28;
+          --card-border:#7dd3b8;
+          --ink:#f2fbf7;
+          --muted:#a8c8bc;
+          --teal:#2dd4a7;
+          --teal-dark:#5eead4;
+          --teal-soft:#1d4438;
+          --sun:#fbbf24;
+          --sun-ink:#451a03;
+          --coral:#fb7a5c;
+          --coral-dark:#fb7a5c;
+          --choice-bg:#1c3a33;
+          --choice-border:#e6fff5;
+          --good-bg:#22c55e;
+          --good-border:#bbf7d0;
+          --wrong-bg:#451a03;
+          --timer-track:#24473d;
+          --shadow:0 6px 0 rgba(0,0,0,.45);
+        }
+      }
+      *{box-sizing:border-box}
+      html,body{height:100%}
+      body{
+        margin:0;
+        font-family:"Nunito",system-ui,-apple-system,Segoe UI,sans-serif;
+        background:
+          radial-gradient(720px 340px at 12% -60px, var(--bg-accent) 0%, transparent 62%),
+          radial-gradient(640px 300px at 92% -40px, var(--bg-accent) 0%, transparent 60%),
+          var(--bg);
+        color:var(--ink);
+        -webkit-tap-highlight-color:transparent;
+      }
+      button{font:inherit;color:inherit}
+      button:focus-visible, a:focus-visible{outline:4px solid var(--sun);outline-offset:3px}
+      .home-btn{
+        display:inline-flex;align-items:center;gap:8px;
+        background:var(--teal);color:#fff;text-decoration:none;
+        border:3px solid var(--teal-dark);border-radius:999px;
+        padding:9px 18px 9px 14px;font-weight:900;font-size:1.05rem;line-height:1;cursor:pointer;box-shadow:var(--shadow);white-space:nowrap;min-height:48px;
+      }
+      @media (prefers-color-scheme: dark){ .home-btn{color:#06281f} }
+      .home-btn svg{width:22px;height:22px;flex:none}
+      .home-btn:active{transform:translateY(2px)}
+      .top-left{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+
+      .app{
+        max-width:980px;
+        margin:0 auto;
+        min-height:100dvh;
+        display:flex;
+        flex-direction:column;
+        padding:14px 16px 18px;
+        gap:12px;
+      }
+
+      /* ---------- Top bar ---------- */
+      .topbar{
+        display:flex;
+        flex-wrap:wrap;
+        gap:10px;
+        align-items:center;
+        justify-content:space-between;
+      }
+      .stars-pill{
+        display:inline-flex;align-items:center;gap:9px;
+        background:var(--card);
+        border:3px solid var(--card-border);
+        border-radius:999px;
+        padding:7px 16px 7px 10px;
+        box-shadow:var(--shadow);
+        font-family:"Baloo 2",sans-serif;
+        line-height:1;
+      }
+      .stars-pill svg{width:30px;height:30px;flex:none}
+      .stars-pill .num{font-size:1.9rem;font-weight:800;min-width:.7em;text-align:center}
+      .stars-pill .label{font-size:1rem;font-weight:800;letter-spacing:.02em;color:var(--muted);text-transform:uppercase}
+      .streak{font-size:.95rem;font-weight:900;color:var(--teal);white-space:nowrap}
+      .streak:empty{display:none}
+
+      .controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+      .mode-switch{
+        display:flex;background:var(--card);border:3px solid var(--card-border);border-radius:999px;padding:4px;gap:4px;box-shadow:var(--shadow);
+      }
+      .mode-btn{
+        border:0;background:transparent;cursor:pointer;
+        padding:9px 16px;border-radius:999px;
+        font-weight:900;font-size:1rem;line-height:1;white-space:nowrap;
+        display:inline-flex;align-items:center;gap:7px;
+      }
+      .mode-btn svg{width:18px;height:18px}
+      .mode-btn[aria-pressed="true"]{background:var(--teal);color:#fff}
+      @media (prefers-color-scheme: dark){ .mode-btn[aria-pressed="true"]{color:#06281f} }
+
+      .ctl-btn{
+        display:inline-flex;align-items:center;gap:8px;
+        background:var(--card);border:3px solid var(--card-border);border-radius:999px;
+        padding:9px 15px;font-weight:900;font-size:1rem;line-height:1;cursor:pointer;box-shadow:var(--shadow);white-space:nowrap;
+      }
+      .ctl-btn svg{width:20px;height:20px;flex:none}
+      .ctl-btn:active{transform:translateY(2px)}
+      .ctl-btn.new-game{background:var(--sun);border-color:var(--sun-ink);color:#231500}
+      .ctl-btn .off-state{display:none}
+      .ctl-btn.is-off .on-state{display:none}
+      .ctl-btn.is-off .off-state{display:inline}
+
+      /* ---------- Timer ---------- */
+      .timer-wrap{
+        display:none;
+        align-items:center;gap:12px;
+        background:var(--card);border:3px solid var(--card-border);border-radius:16px;
+        padding:9px 14px;box-shadow:var(--shadow);
+      }
+      .timer-wrap.show{display:flex}
+      .timer-clock{font-family:"Baloo 2",sans-serif;font-weight:800;font-size:1.7rem;line-height:1;white-space:nowrap;display:inline-flex;align-items:center;gap:7px}
+      .timer-clock svg{width:24px;height:24px}
+      .timer-track{flex:1;height:18px;border-radius:999px;background:var(--timer-track);overflow:hidden;border:2px solid rgba(0,0,0,.08)}
+      .timer-fill{height:100%;width:100%;background:var(--teal);border-radius:999px;transition:width .25s linear}
+      .timer-wrap.low .timer-clock{color:var(--coral-dark)}
+      .timer-wrap.low .timer-fill{background:var(--coral)}
+      @media (prefers-reduced-motion: no-preference){
+        .timer-wrap.low .timer-clock{animation:pulse 1s ease-in-out infinite}
+        @keyframes pulse{50%{transform:scale(1.08)}}
+      }
+
+      /* ---------- Stage ---------- */
+      .stage{flex:1;display:flex;flex-direction:column;gap:14px;min-height:0}
+      .fact-card{
+        position:relative;
+        background:var(--card);
+        border:3px solid var(--card-border);
+        border-radius:var(--radius);
+        box-shadow:var(--shadow);
+        padding:18px 18px 16px;
+        text-align:center;
+        overflow:hidden;
+      }
+      .prompt{margin:0;font-weight:900;color:var(--muted);font-size:1.05rem;letter-spacing:.04em;text-transform:uppercase}
+      .fact{
+        font-family:"Baloo 2",sans-serif;font-weight:800;
+        font-size:clamp(4.2rem,14vw,7.8rem);
+        line-height:1.05;letter-spacing:.01em;
+        margin:2px 0 4px;white-space:nowrap;
+      }
+      .fact .n1{color:var(--teal)}
+      .fact .n2{color:var(--coral-dark)}
+      .fact .q{
+        display:inline-block;min-width:.72em;
+        background:var(--teal-soft);border:3px dashed var(--teal);border-radius:14px;padding:0 .08em;
+      }
+      .fact .q.solved{background:var(--sun);border-style:solid;border-color:var(--sun-ink);color:#231500}
+
+      /* double visual: two matching dot groups */
+      .dots{display:flex;justify-content:center;align-items:flex-start;gap:18px;margin:6px 0 2px;flex-wrap:wrap}
+      .dot-group{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:190px;padding:10px;border-radius:14px}
+      .dot-group.g1{background:var(--teal-soft)}
+      .dot-group.g2{background:#ffe8dd}
+      @media (prefers-color-scheme: dark){ .dot-group.g2{background:#4a2c22} }
+      .dot{width:20px;height:20px;border-radius:50%;flex:none}
+      .g1 .dot{background:var(--teal)}
+      .g2 .dot{background:var(--coral)}
+      .dots-plus{font-family:"Baloo 2",sans-serif;font-weight:800;font-size:1.6rem;align-self:center;color:var(--muted)}
+
+      .fact-actions{display:flex;justify-content:center;gap:10px;margin-top:12px;flex-wrap:wrap}
+      .hear-btn{
+        display:inline-flex;align-items:center;gap:9px;
+        background:var(--teal);color:#fff;border:3px solid var(--teal-dark);border-radius:999px;
+        padding:12px 24px;font-weight:900;font-size:1.15rem;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.18);min-height:56px;
+      }
+      @media (prefers-color-scheme: dark){ .hear-btn{color:#06281f} }
+      .hear-btn svg{width:24px;height:24px}
+      .hear-btn:active{transform:translateY(2px)}
+
+      .feedback{
+        min-height:2.1rem;margin:10px 0 0;
+        font-family:"Baloo 2",sans-serif;font-weight:700;font-size:clamp(1.25rem,3.4vw,1.7rem);line-height:1.2;
+      }
+      .feedback.good{color:var(--teal)}
+      .feedback.try{color:var(--coral-dark)}
+
+      /* ---------- Choices ---------- */
+      .choices{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+      .choice-btn{
+        font-family:"Baloo 2",sans-serif;font-weight:800;
+        font-size:clamp(2.4rem,7vw,3.6rem);line-height:1;
+        background:var(--choice-bg);color:var(--ink);
+        border:4px solid var(--choice-border);border-radius:20px;
+        min-height:104px;padding:14px 6px;cursor:pointer;
+        box-shadow:0 6px 0 rgba(18,33,28,.18);
+        transition:transform .08s ease, background .15s ease;
+      }
+      .choice-btn:active:not(:disabled){transform:translateY(3px)}
+      .choice-btn:disabled{cursor:default}
+      .choice-btn.wrong-pick{background:var(--wrong-bg);opacity:.45;box-shadow:none}
+      .choice-btn.right-pick{background:var(--good-bg);border-color:var(--good-border);color:#fff;box-shadow:0 6px 0 rgba(0,0,0,.2)}
+      @media (prefers-reduced-motion: no-preference){
+        .choice-btn.shake{animation:shake .35s ease}
+        @keyframes shake{20%{transform:translateX(-7px)}45%{transform:translateX(7px)}70%{transform:translateX(-4px)}90%{transform:translateX(4px)}}
+        .fact-card.celebrate .fact{animation:bounceIn .45s ease}
+        @keyframes bounceIn{30%{transform:scale(1.06)}60%{transform:scale(.98)}}
+      }
+
+      /* star burst */
+      .burst-star{position:absolute;pointer-events:none;z-index:5}
+      .burst-star svg{width:100%;height:100%;display:block}
+
+      /* ---------- End screen (fast mode) ---------- */
+      .end-card{
+        display:none;text-align:center;
+        background:var(--card);border:3px solid var(--card-border);border-radius:var(--radius);box-shadow:var(--shadow);
+        padding:28px 20px 24px;
+      }
+      .end-card.show{display:block}
+      .end-card h2{font-family:"Baloo 2",sans-serif;font-size:clamp(2rem,6vw,3rem);margin:0 0 6px;line-height:1.1}
+      .end-card p{margin:0 0 8px;font-size:1.2rem;font-weight:800;color:var(--muted)}
+      .end-stars{display:flex;justify-content:center;gap:4px;margin:10px 0 16px;flex-wrap:wrap}
+      .end-stars svg{width:38px;height:38px}
+      .big-btn{
+        display:inline-flex;align-items:center;gap:9px;
+        background:var(--sun);color:#231500;border:3px solid var(--sun-ink);border-radius:999px;
+        padding:14px 30px;font-weight:900;font-size:1.25rem;cursor:pointer;box-shadow:0 5px 0 rgba(0,0,0,.18);min-height:60px;
+      }
+      .big-btn:active{transform:translateY(2px)}
+
+      .hint{margin:0;text-align:center;color:var(--muted);font-weight:800;font-size:.98rem}
+
+      /* phones: stack choices, let the page scroll naturally */
+      @media (max-width:620px){
+        .app{padding:10px 12px 16px}
+        .choices{grid-template-columns:1fr}
+        .choice-btn{min-height:84px}
+        .topbar{justify-content:center}
+        .top-left{justify-content:center}
+        .controls{justify-content:center}
+        .stars-pill .label{display:none}
+        .dot{width:17px;height:17px}
+        .dot-group{max-width:160px}
+      }
+      @media (min-width:621px){
+        body{overflow:hidden}
+        .app{height:100dvh}
+      }
+      @media (prefers-reduced-motion: reduce){
+        *{animation:none !important;transition:none !important}
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <!-- Top bar -->
+      <div class="topbar">
+        <div class="top-left">
+          <a class="home-btn" href="https://scaemrfung.github.io/mr-fung-webgames/" aria-label="Home — back to all games">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-6h6v6"/></svg>
+            Home
+          </a>
+        <div class="stars-pill" aria-live="polite" aria-label="Stars earned">
+          <svg viewBox="0 0 24 24" fill="#ffb703" stroke="#5c3d00" stroke-width="1.4" aria-hidden="true"><path d="M12 2.6l2.9 5.9 6.5.95-4.7 4.58 1.1 6.47L12 17.45l-5.8 3.05 1.1-6.47L2.6 9.45l6.5-.95z"/></svg>
+          <span class="num" id="starCount">0</span>
+          <span class="label">Stars</span>
+          <span class="streak" id="streakLabel"></span>
+        </div>
+        </div>
+        <div class="controls">
+          <div class="mode-switch" role="group" aria-label="Game mode">
+            <button type="button" class="mode-btn" id="modePractice" aria-pressed="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5v13z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg>
+              Practice
+            </button>
+            <button type="button" class="mode-btn" id="modeFast" aria-pressed="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg>
+              Fast Mode
+            </button>
+          </div>
+          <button type="button" class="ctl-btn" id="soundBtn" aria-pressed="true" aria-label="Toggle sound">
+            <svg class="on-state" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H3v6h3l5 4V5z" fill="currentColor" stroke="none"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.2 6a9 9 0 0 1 0 12"/></svg>
+            <svg class="off-state" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H3v6h3l5 4V5z" fill="currentColor" stroke="none"/><path d="M16 9l6 6M22 9l-6 6"/></svg>
+            <span class="on-state">Sound On</span><span class="off-state">Sound Off</span>
+          </button>
+          <button type="button" class="ctl-btn new-game" id="newGameBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36M21 3v6h-6"/></svg>
+            New Game
+          </button>
+        </div>
+      </div>
+
+      <!-- Timer (fast mode only) -->
+      <div class="timer-wrap" id="timerWrap" role="timer" aria-label="Time remaining">
+        <span class="timer-clock">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg>
+          <span id="timerText">60</span>
+        </span>
+        <div class="timer-track"><div class="timer-fill" id="timerFill"></div></div>
+        <span style="font-weight:900;color:var(--muted);white-space:nowrap">seconds</span>
+      </div>
+
+      <!-- Stage -->
+      <div class="stage" id="playStage">
+        <section class="fact-card" id="factCard" aria-label="Doubles question">
+          <p class="prompt">What is the double?</p>
+          <div class="fact" id="factDisplay" aria-live="polite">
+            <span class="n1" id="factN1">5</span> + <span class="n2" id="factN2">5</span> = <span class="q" id="factQ">?</span>
+          </div>
+          <div class="dots" id="dotsVisual" aria-hidden="true"></div>
+          <div class="fact-actions">
+            <button type="button" class="hear-btn" id="hearBtn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H3v6h3l5 4V5z" fill="currentColor" stroke="none"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.2 6a9 9 0 0 1 0 12"/></svg>
+              Hear It
+            </button>
+          </div>
+          <p class="feedback" id="feedback" aria-live="polite">Tap the answer that matches the double!</p>
+        </section>
+
+        <div class="choices" id="choices" role="group" aria-label="Answer choices"></div>
+        <p class="hint" id="modeHint">Practice mode — take your time, no timer.</p>
+      </div>
+
+      <!-- Fast-mode finish -->
+      <div class="end-card" id="endCard">
+        <h2>Time's Up!</h2>
+        <p id="endMessage">Great doubling!</p>
+        <div class="end-stars" id="endStars" aria-hidden="true"></div>
+        <button type="button" class="big-btn" id="playAgainBtn">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36M21 3v6h-6"/></svg>
+          Play Again
+        </button>
+      </div>
+    </div>
+
+    <script>
+      (function(){
+        "use strict";
+
+        var FAST_SECONDS = 60;
+
+        var starCountEl = document.getElementById('starCount');
+        var streakEl = document.getElementById('streakLabel');
+        var factN1 = document.getElementById('factN1');
+        var factN2 = document.getElementById('factN2');
+        var factQ = document.getElementById('factQ');
+        var factCard = document.getElementById('factCard');
+        var dotsEl = document.getElementById('dotsVisual');
+        var feedbackEl = document.getElementById('feedback');
+        var choicesEl = document.getElementById('choices');
+        var hearBtn = document.getElementById('hearBtn');
+        var soundBtn = document.getElementById('soundBtn');
+        var newGameBtn = document.getElementById('newGameBtn');
+        var playAgainBtn = document.getElementById('playAgainBtn');
+        var modePracticeBtn = document.getElementById('modePractice');
+        var modeFastBtn = document.getElementById('modeFast');
+        var modeHint = document.getElementById('modeHint');
+        var timerWrap = document.getElementById('timerWrap');
+        var timerText = document.getElementById('timerText');
+        var timerFill = document.getElementById('timerFill');
+        var playStage = document.getElementById('playStage');
+        var endCard = document.getElementById('endCard');
+        var endMessage = document.getElementById('endMessage');
+        var endStars = document.getElementById('endStars');
+
+        var state = {
+          mode: 'practice',       // 'practice' | 'fast'
+          soundOn: true,
+          stars: 0,
+          streak: 0,
+          solved: 0,
+          currentN: 5,
+          correct: 10,
+          lastN: -1,
+          locked: false,
+          gameOver: false,
+          timeLeft: FAST_SECONDS,
+          timerId: null,
+          advanceId: null
+        };
+
+        var PRAISE = [
+          'Yes! That is the double!',
+          'Great job! You found the double!',
+          'Super work! That is right!',
+          'You did it! Double trouble solved!',
+          'Wonderful! That is the double!'
+        ];
+        var TRY_AGAIN = [
+          'Good try! Count the dots and try again.',
+          'Almost! Look at the double once more.',
+          'Nice trying! Tap another answer.',
+          'Keep going! You can find the double.'
+        ];
+
+        /* ---------- Sound (Web Audio, in-browser only) ---------- */
+        var audioCtx = null;
+        function ensureAudio(){
+          if (!state.soundOn) return null;
+          try{
+            if (!audioCtx){
+              var AC = window.AudioContext || window.webkitAudioContext;
+              if (!AC) return null;
+              audioCtx = new AC();
+            }
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            return audioCtx;
+          }catch(e){ return null; }
+        }
+        function tone(freq, start, dur, type, vol){
+          var ctx = ensureAudio(); if (!ctx) return;
+          var t = ctx.currentTime + start;
+          var osc = ctx.createOscillator();
+          var gain = ctx.createGain();
+          osc.type = type || 'sine';
+          osc.frequency.setValueAtTime(freq, t);
+          gain.gain.setValueAtTime(0.0001, t);
+          gain.gain.exponentialRampToValueAtTime(vol || 0.22, t + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.start(t); osc.stop(t + dur + 0.05);
+        }
+        function playHappy(){
+          if (!state.soundOn) return;
+          tone(523.25, 0,    0.18, 'triangle', 0.25);
+          tone(659.25, 0.09, 0.18, 'triangle', 0.25);
+          tone(783.99, 0.18, 0.22, 'triangle', 0.25);
+          tone(1046.5, 0.27, 0.34, 'triangle', 0.28);
+        }
+        function playGentle(){
+          if (!state.soundOn) return;
+          tone(330, 0, 0.16, 'sine', 0.16);
+          tone(262, 0.13, 0.22, 'sine', 0.14);
+        }
+        function playFinish(){
+          if (!state.soundOn) return;
+          var notes = [523.25, 659.25, 783.99, 1046.5, 783.99, 1046.5];
+          for (var i = 0; i < notes.length; i++) tone(notes[i], i * 0.13, 0.3, 'triangle', 0.24);
+        }
+
+        /* ---------- Speech ---------- */
+        function speakFact(){
+          try{
+            if (!('speechSynthesis' in window)) {
+              setFeedback('Sound is not available here — read it together: ' + state.currentN + ' plus ' + state.currentN + '.', '');
+              return;
+            }
+            window.speechSynthesis.cancel();
+            var text = state.locked && !state.gameOver
+              ? state.currentN + ' plus ' + state.currentN + ' equals ' + state.correct + '.'
+              : state.currentN + ' plus ' + state.currentN + ' equals what?';
+            var u = new SpeechSynthesisUtterance(text);
+            u.rate = 0.92; u.pitch = 1.05;
+            window.speechSynthesis.speak(u);
+          }catch(e){ /* speech is a bonus; never break the game */ }
+        }
+
+        /* ---------- Helpers ---------- */
+        function shuffle(arr){
+          for (var i = arr.length - 1; i > 0; i--){
+            var j = Math.floor(Math.random() * (i + 1));
+            var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+          }
+          return arr;
+        }
+        function setFeedback(text, kind){
+          feedbackEl.textContent = text;
+          feedbackEl.className = 'feedback' + (kind ? ' ' + kind : '');
+        }
+        function updateStars(){
+          starCountEl.textContent = state.stars;
+          streakEl.textContent = state.streak >= 2 ? '· ' + state.streak + ' in a row!' : '';
+        }
+
+        function renderDots(n){
+          dotsEl.innerHTML = '';
+          function group(cls){
+            var g = document.createElement('div');
+            g.className = 'dot-group ' + cls;
+            for (var i = 0; i < n; i++){
+              var d = document.createElement('span');
+              d.className = 'dot';
+              g.appendChild(d);
+            }
+            return g;
+          }
+          dotsEl.appendChild(group('g1'));
+          var plus = document.createElement('span');
+          plus.className = 'dots-plus'; plus.textContent = '+';
+          dotsEl.appendChild(plus);
+          dotsEl.appendChild(group('g2'));
+        }
+
+        function makeDistractors(correct){
+          var pool = shuffle([correct - 2, correct + 2, correct - 1, correct + 1, correct - 4, correct + 4, correct - 3, correct + 3].slice());
+          var picks = [];
+          for (var i = 0; i < pool.length && picks.length < 2; i++){
+            var v = pool[i];
+            if (v > 0 && v !== correct && picks.indexOf(v) === -1) picks.push(v);
+          }
+          while (picks.length < 2){
+            var extra = correct + (picks.length ? 5 : -5);
+            if (extra > 0 && extra !== correct && picks.indexOf(extra) === -1) picks.push(extra);
+            else picks.push(correct + 10);
+          }
+          return picks;
+        }
+
+        /* ---------- Game flow ---------- */
+        function newFact(){
+          if (state.advanceId){ clearTimeout(state.advanceId); state.advanceId = null; }
+          state.locked = false;
+          var n;
+          do { n = 1 + Math.floor(Math.random() * 10); } while (n === state.lastN);
+          state.lastN = n;
+          state.currentN = n;
+          state.correct = n * 2;
+
+          factN1.textContent = n;
+          factN2.textContent = n;
+          factQ.textContent = '?';
+          factQ.classList.remove('solved');
+          factCard.classList.remove('celebrate');
+          renderDots(n);
+
+          var answers = shuffle([state.correct].concat(makeDistractors(state.correct)));
+          choicesEl.innerHTML = '';
+          answers.forEach(function(val){
+            var b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'choice-btn';
+            b.textContent = val;
+            b.setAttribute('aria-label', 'Answer ' + val);
+            b.addEventListener('click', function(){ onChoice(val, b); });
+            choicesEl.appendChild(b);
+          });
+          setFeedback('Tap the answer that matches the double!', '');
+        }
+
+        function starBurst(){
+          if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+          for (var i = 0; i < 7; i++){
+            (function(i){
+              var s = document.createElement('span');
+              s.className = 'burst-star';
+              var size = 18 + Math.random() * 20;
+              s.style.width = size + 'px'; s.style.height = size + 'px';
+              s.style.left = '50%'; s.style.top = '34%';
+              s.innerHTML = '<svg viewBox="0 0 24 24" fill="#ffb703" stroke="#5c3d00" stroke-width="1.2"><path d="M12 2.6l2.9 5.9 6.5.95-4.7 4.58 1.1 6.47L12 17.45l-5.8 3.05 1.1-6.47L2.6 9.45l6.5-.95z"/></svg>';
+              factCard.appendChild(s);
+              var angle = (Math.PI * 2 * i / 7) + Math.random() * 0.5;
+              var dist = 80 + Math.random() * 90;
+              var anim = s.animate([
+                { transform: 'translate(-50%,-50%) scale(.4) rotate(0deg)', opacity: 1 },
+                { transform: 'translate(calc(-50% + ' + Math.cos(angle) * dist + 'px), calc(-50% + ' + Math.sin(angle) * dist + 'px)) scale(1.1) rotate(160deg)', opacity: 0 }
+              ], { duration: 750, easing: 'cubic-bezier(.17,.67,.35,1)' });
+              anim.onfinish = function(){ s.remove(); };
+            })(i);
+          }
+        }
+
+        function onChoice(val, btn){
+          if (state.locked || state.gameOver) return;
+          ensureAudio();
+          if (val === state.correct){
+            state.locked = true;
+            state.stars++;
+            state.solved++;
+            state.streak++;
+            updateStars();
+            btn.classList.add('right-pick');
+            var all = choicesEl.querySelectorAll('.choice-btn');
+            for (var i = 0; i < all.length; i++){ if (all[i] !== btn) all[i].disabled = true; }
+            factQ.textContent = state.correct;
+            factQ.classList.add('solved');
+            factCard.classList.add('celebrate');
+            setFeedback(PRAISE[Math.floor(Math.random() * PRAISE.length)] + ' ' + state.currentN + ' + ' + state.currentN + ' = ' + state.correct, 'good');
+            playHappy();
+            starBurst();
+            state.advanceId = setTimeout(function(){
+              state.advanceId = null;
+              if (!state.gameOver) newFact();
+            }, 1400);
+          } else {
+            state.streak = 0;
+            updateStars();
+            btn.classList.add('wrong-pick');
+            btn.disabled = true;
+            btn.classList.remove('shake');
+            void btn.offsetWidth;
+            btn.classList.add('shake');
+            setFeedback(TRY_AGAIN[Math.floor(Math.random() * TRY_AGAIN.length)], 'try');
+            playGentle();
+          }
+        }
+
+        /* ---------- Timer (fast mode) ---------- */
+        function renderTimer(){
+          timerText.textContent = Math.max(0, Math.ceil(state.timeLeft));
+          var pct = Math.max(0, (state.timeLeft / FAST_SECONDS) * 100);
+          timerFill.style.width = pct + '%';
+          timerWrap.classList.toggle('low', state.timeLeft <= 10 && state.timeLeft > 0);
+        }
+        function stopTimer(){
+          if (state.timerId){ clearInterval(state.timerId); state.timerId = null; }
+        }
+        function startTimer(){
+          stopTimer();
+          state.timeLeft = FAST_SECONDS;
+          renderTimer();
+          var last = Date.now();
+          state.timerId = setInterval(function(){
+            var now = Date.now();
+            state.timeLeft -= (now - last) / 1000;
+            last = now;
+            if (state.timeLeft <= 0){
+              state.timeLeft = 0;
+              renderTimer();
+              finishFastGame();
+              return;
+            }
+            renderTimer();
+          }, 200);
+        }
+        function finishFastGame(){
+          stopTimer();
+          state.gameOver = true;
+          if (state.advanceId){ clearTimeout(state.advanceId); state.advanceId = null; }
+          try{ if ('speechSynthesis' in window) window.speechSynthesis.cancel(); }catch(e){}
+          playStage.style.display = 'none';
+          timerWrap.classList.remove('show');
+          endMessage.textContent = state.stars === 1
+            ? 'You earned 1 star in 60 seconds. Great doubling!'
+            : 'You earned ' + state.stars + ' stars in 60 seconds. Great doubling!';
+          endStars.innerHTML = '';
+          var show = Math.min(state.stars, 20);
+          for (var i = 0; i < show; i++){
+            var sp = document.createElement('span');
+            sp.innerHTML = '<svg viewBox="0 0 24 24" fill="#ffb703" stroke="#5c3d00" stroke-width="1.2"><path d="M12 2.6l2.9 5.9 6.5.95-4.7 4.58 1.1 6.47L12 17.45l-5.8 3.05 1.1-6.47L2.6 9.45l6.5-.95z"/></svg>';
+            endStars.appendChild(sp);
+          }
+          if (state.stars === 0) endStars.innerHTML = '<span style="font-weight:900;color:var(--muted)">Press Play Again and give it another go!</span>';
+          endCard.classList.add('show');
+          playFinish();
+        }
+
+        /* ---------- Mode + new game ---------- */
+        function setMode(mode, startFresh){
+          state.mode = mode;
+          modePracticeBtn.setAttribute('aria-pressed', mode === 'practice' ? 'true' : 'false');
+          modeFastBtn.setAttribute('aria-pressed', mode === 'fast' ? 'true' : 'false');
+          modeHint.textContent = mode === 'fast'
+            ? 'Fast Mode — answer as many doubles as you can in 60 seconds!'
+            : 'Practice mode — take your time, no timer.';
+          if (startFresh) newGame();
+        }
+        function newGame(){
+          stopTimer();
+          if (state.advanceId){ clearTimeout(state.advanceId); state.advanceId = null; }
+          state.stars = 0;
+          state.solved = 0;
+          state.streak = 0;
+          state.gameOver = false;
+          state.lastN = -1;
+          updateStars();
+          endCard.classList.remove('show');
+          playStage.style.display = '';
+          if (state.mode === 'fast'){
+            timerWrap.classList.add('show');
+            startTimer();
+          } else {
+            timerWrap.classList.remove('show');
+          }
+          newFact();
+          if (state.mode === 'fast') setFeedback('Ready? Tap the double — fast!', '');
+        }
+
+        /* ---------- Wiring ---------- */
+        modePracticeBtn.addEventListener('click', function(){ ensureAudio(); if (state.mode !== 'practice') setMode('practice', true); });
+        modeFastBtn.addEventListener('click', function(){ ensureAudio(); if (state.mode !== 'fast') setMode('fast', true); });
+        newGameBtn.addEventListener('click', function(){ ensureAudio(); newGame(); });
+        playAgainBtn.addEventListener('click', function(){ ensureAudio(); newGame(); });
+        hearBtn.addEventListener('click', function(){ ensureAudio(); speakFact(); });
+        soundBtn.addEventListener('click', function(){
+          state.soundOn = !state.soundOn;
+          soundBtn.setAttribute('aria-pressed', state.soundOn ? 'true' : 'false');
+          soundBtn.classList.toggle('is-off', !state.soundOn);
+          if (!state.soundOn){
+            try{ if ('speechSynthesis' in window) window.speechSynthesis.cancel(); }catch(e){}
+          } else {
+            ensureAudio();
+            tone(660, 0, 0.12, 'triangle', 0.2);
+          }
+        });
+
+        /* Start in practice mode */
+        updateStars();
+        newFact();
+      })();
+    </script>
+  </body>
+</html>

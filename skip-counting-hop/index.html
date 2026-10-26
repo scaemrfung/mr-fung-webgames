@@ -1,0 +1,694 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>Skip Counting Hop</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet" />
+    <style>
+      :root{
+        --bg:#eaf6ec;
+        --panel:#ffffff;
+        --panel-2:#f2faf3;
+        --ink:#17351f;
+        --ink-soft:#40614a;
+        --line:#bfe0c6;
+        --accent:#2e9e4f;
+        --accent-dark:#1f7a3a;
+        --accent-soft:#d8f3de;
+        --amber:#f5a623;
+        --amber-soft:#fff1cf;
+        --wrong:#e07b39;
+        --wrong-soft:#fdeadb;
+        --shadow:0 6px 0 rgba(23,53,31,.12);
+        --choice:#ffffff;
+      }
+      @media (prefers-color-scheme: dark){
+        :root{
+          --bg:#0f1f14;
+          --panel:#1a2f20;
+          --panel-2:#16281b;
+          --ink:#eaf7ec;
+          --ink-soft:#a9cbb2;
+          --line:#33573d;
+          --accent:#4cc26e;
+          --accent-dark:#8fe3a6;
+          --accent-soft:#234530;
+          --amber:#ffc44d;
+          --amber-soft:#3d3010;
+          --wrong:#f09a5c;
+          --wrong-soft:#3d2716;
+          --shadow:0 6px 0 rgba(0,0,0,.35);
+          --choice:#21382a;
+        }
+      }
+      *{ box-sizing:border-box; }
+      html,body{ margin:0; padding:0; }
+      body{
+        font-family:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
+        background:var(--bg);
+        color:var(--ink);
+        min-height:100vh;
+      }
+      .wrap{
+        max-width:1060px;
+        margin:0 auto;
+        padding:16px 16px 28px;
+        display:flex;
+        flex-direction:column;
+        gap:14px;
+      }
+      header.top{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:12px;
+        flex-wrap:wrap;
+      }
+      h1{
+        font-family:"Fredoka","Nunito",sans-serif;
+        font-size:clamp(26px,4.5vw,40px);
+        font-weight:700;
+        margin:0;
+        letter-spacing:.2px;
+      }
+      .stars{
+        font-family:"Fredoka","Nunito",sans-serif;
+        font-size:clamp(20px,3.4vw,28px);
+        font-weight:600;
+        background:var(--amber-soft);
+        border:3px solid var(--amber);
+        color:var(--ink);
+        border-radius:999px;
+        padding:6px 18px;
+        display:flex;
+        align-items:center;
+        gap:8px;
+        min-height:52px;
+      }
+      .stars .star-ico{ font-size:1.15em; line-height:1; }
+      .controls{
+        display:flex;
+        flex-wrap:wrap;
+        gap:10px;
+        align-items:stretch;
+      }
+      .seg{
+        display:flex;
+        background:var(--panel);
+        border:3px solid var(--line);
+        border-radius:16px;
+        overflow:hidden;
+      }
+      .seg button{
+        font-family:"Fredoka","Nunito",sans-serif;
+        font-size:clamp(17px,2.6vw,22px);
+        font-weight:600;
+        border:0;
+        background:transparent;
+        color:var(--ink-soft);
+        padding:10px 18px;
+        min-height:56px;
+        min-width:86px;
+        cursor:pointer;
+      }
+      .seg button + button{ border-left:3px solid var(--line); }
+      .seg button[aria-pressed="true"]{
+        background:var(--accent);
+        color:#fff;
+      }
+      @media (prefers-color-scheme: dark){
+        .seg button[aria-pressed="true"]{ color:#0f1f14; }
+      }
+      .btn{
+        font-family:"Fredoka","Nunito",sans-serif;
+        font-size:clamp(17px,2.6vw,22px);
+        font-weight:600;
+        border-radius:16px;
+        border:3px solid var(--line);
+        background:var(--panel);
+        color:var(--ink);
+        padding:10px 18px;
+        min-height:56px;
+        cursor:pointer;
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+      }
+      .btn:active{ transform:translateY(2px); }
+      a.btn{ text-decoration:none; }
+      .home-btn{ border-color:var(--amber); background:var(--amber-soft); }
+      .btn.primary{
+        background:var(--accent);
+        border-color:var(--accent-dark);
+        color:#fff;
+        box-shadow:var(--shadow);
+      }
+      @media (prefers-color-scheme: dark){
+        .btn.primary{ color:#0f1f14; }
+      }
+      button:focus-visible{ outline:4px solid var(--amber); outline-offset:2px; }
+      .prompt{
+        background:var(--panel);
+        border:3px solid var(--line);
+        border-radius:20px;
+        padding:14px 18px;
+        text-align:center;
+      }
+      .prompt .big{
+        font-family:"Fredoka","Nunito",sans-serif;
+        font-size:clamp(24px,4.6vw,40px);
+        font-weight:600;
+        margin:0;
+      }
+      .prompt .big .next-num{ color:var(--accent-dark); }
+      .chant{
+        margin:6px 0 0;
+        font-size:clamp(17px,3vw,24px);
+        font-weight:800;
+        color:var(--ink-soft);
+        letter-spacing:.5px;
+        min-height:1.3em;
+      }
+      .board{
+        position:relative;
+        background:var(--panel-2);
+        border:3px solid var(--line);
+        border-radius:20px;
+        padding:64px 14px 18px;
+      }
+      .track{
+        position:relative;
+        display:flex;
+        justify-content:space-between;
+        align-items:flex-start;
+        gap:4px;
+      }
+      .track::before{
+        content:"";
+        position:absolute;
+        left:4%;
+        right:4%;
+        top:34px;
+        height:8px;
+        border-radius:99px;
+        background:var(--line);
+      }
+      .stone{
+        position:relative;
+        z-index:1;
+        flex:1 1 0;
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        gap:6px;
+        min-width:0;
+      }
+      .stone .disc{
+        width:clamp(44px,9.5vw,68px);
+        height:clamp(44px,9.5vw,68px);
+        border-radius:50%;
+        border:4px solid var(--line);
+        background:var(--panel);
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-family:"Fredoka","Nunito",sans-serif;
+        font-size:clamp(19px,3.6vw,30px);
+        font-weight:700;
+        color:var(--ink-soft);
+      }
+      .stone.done .disc{
+        background:var(--accent);
+        border-color:var(--accent-dark);
+        color:#fff;
+      }
+      @media (prefers-color-scheme: dark){
+        .stone.done .disc{ color:#0f1f14; }
+      }
+      .stone.here .disc{
+        border-color:var(--amber);
+        box-shadow:0 0 0 4px var(--amber-soft);
+      }
+      .stone .tag{
+        font-size:clamp(11px,2vw,14px);
+        font-weight:800;
+        text-transform:uppercase;
+        letter-spacing:1px;
+        color:var(--ink-soft);
+      }
+      #frog{
+        position:absolute;
+        z-index:3;
+        width:clamp(46px,9vw,64px);
+        height:auto;
+        pointer-events:none;
+        transition:left .12s ease;
+        will-change:transform,left,top;
+      }
+      .choices{
+        display:flex;
+        gap:12px;
+        justify-content:center;
+        flex-wrap:wrap;
+      }
+      .choice{
+        font-family:"Fredoka","Nunito",sans-serif;
+        font-size:clamp(34px,7vw,54px);
+        font-weight:700;
+        min-width:clamp(104px,26vw,170px);
+        min-height:92px;
+        padding:10px 18px;
+        border-radius:20px;
+        border:4px solid var(--accent);
+        background:var(--choice);
+        color:var(--ink);
+        cursor:pointer;
+        box-shadow:var(--shadow);
+      }
+      .choice:active{ transform:translateY(3px); }
+      .choice.bad{
+        border-color:var(--wrong);
+        background:var(--wrong-soft);
+        color:var(--ink-soft);
+        opacity:.55;
+        box-shadow:none;
+      }
+      .choice.good{
+        background:var(--accent);
+        color:#fff;
+      }
+      @media (prefers-color-scheme: dark){
+        .choice.good{ color:#0f1f14; }
+      }
+      @keyframes shake{
+        0%,100%{ transform:translateX(0); }
+        25%{ transform:translateX(-7px); }
+        75%{ transform:translateX(7px); }
+      }
+      .shake{ animation:shake .3s ease 2; }
+      .feedback{
+        text-align:center;
+        font-family:"Fredoka","Nunito",sans-serif;
+        font-size:clamp(20px,3.6vw,30px);
+        font-weight:600;
+        min-height:1.4em;
+        margin:0;
+      }
+      .feedback.good{ color:var(--accent-dark); }
+      .feedback.try{ color:var(--wrong); }
+      .progress{
+        text-align:center;
+        font-size:clamp(15px,2.4vw,19px);
+        font-weight:800;
+        color:var(--ink-soft);
+        margin:0;
+      }
+      .finish{
+        display:none;
+        text-align:center;
+        background:var(--amber-soft);
+        border:3px solid var(--amber);
+        border-radius:20px;
+        padding:18px;
+      }
+      .finish.show{ display:block; }
+      .finish .yay{
+        font-family:"Fredoka","Nunito",sans-serif;
+        font-size:clamp(28px,5.4vw,44px);
+        font-weight:700;
+        margin:0 0 6px;
+      }
+      .finish p{ margin:0 0 14px; font-size:clamp(17px,3vw,22px); font-weight:700; }
+      .confetti-bit{
+        position:fixed;
+        top:-14px;
+        z-index:50;
+        width:12px;
+        height:16px;
+        border-radius:3px;
+        pointer-events:none;
+      }
+      @keyframes fall{
+        to{ transform:translateY(105vh) rotate(560deg); }
+      }
+      @media (max-width:560px){
+        .controls{ gap:8px; }
+        .seg{ flex:1 1 100%; }
+        .seg button{ flex:1 1 0; min-width:0; }
+        .btn{ flex:1 1 auto; justify-content:center; }
+        .choice{ flex:1 1 28%; min-width:96px; }
+        .board{ padding-top:58px; }
+      }
+      @media (prefers-reduced-motion: reduce){
+        #frog{ transition:none; }
+        .shake{ animation:none; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <header class="top">
+        <h1>Skip Counting Hop</h1>
+        <div class="stars" aria-label="Stars earned"><span class="star-ico" aria-hidden="true">⭐</span><span>Stars: <span id="starCount">0</span></span></div>
+      </header>
+
+      <div class="controls">
+        <a class="btn home-btn" href="https://scaemrfung.github.io/mr-fung-webgames/" aria-label="Home — back to all games">🏠 Home</a>
+        <div class="seg" role="group" aria-label="Choose how to count">
+          <button type="button" id="step2" aria-pressed="true">By 2s</button>
+          <button type="button" id="step5" aria-pressed="false">By 5s</button>
+          <button type="button" id="step10" aria-pressed="false">By 10s</button>
+        </div>
+        <button type="button" class="btn primary" id="newGameBtn">🔄 New Game</button>
+        <button type="button" class="btn" id="hearBtn">🔊 Hear It</button>
+        <button type="button" class="btn" id="soundBtn" aria-pressed="true">🔔 Sound: On</button>
+      </div>
+
+      <section class="prompt" aria-label="What to do">
+        <p class="big" id="promptText">Hop by 2s! What comes after <span class="next-num" id="promptNum">0</span>?</p>
+        <p class="chant" id="chantLine" aria-hidden="true"></p>
+      </section>
+
+      <section class="board" aria-label="Number line">
+        <svg id="frog" viewBox="0 0 100 84" role="img" aria-label="Frog" style="left:8px; top:6px;">
+          <ellipse cx="28" cy="18" rx="13" ry="14" fill="#3fae5a"/>
+          <ellipse cx="72" cy="18" rx="13" ry="14" fill="#3fae5a"/>
+          <circle cx="28" cy="16" r="8" fill="#ffffff"/>
+          <circle cx="72" cy="16" r="8" fill="#ffffff"/>
+          <circle cx="29" cy="18" r="4" fill="#17351f"/>
+          <circle cx="73" cy="18" r="4" fill="#17351f"/>
+          <ellipse cx="50" cy="50" rx="42" ry="32" fill="#4cc26e"/>
+          <circle cx="36" cy="44" r="5" fill="#ffb3c2" opacity="0.8"/>
+          <circle cx="64" cy="44" r="5" fill="#ffb3c2" opacity="0.8"/>
+          <path d="M 34 54 Q 50 68 66 54" stroke="#17351f" stroke-width="4" fill="none" stroke-linecap="round"/>
+        </svg>
+        <div class="track" id="track"></div>
+      </section>
+
+      <div class="choices" id="choices" role="group" aria-label="Choose the next number"></div>
+
+      <p class="feedback" id="feedback" aria-live="polite"></p>
+      <p class="progress" id="progressText">Hop 1 of 8</p>
+
+      <section class="finish" id="finishBox">
+        <p class="yay">🎉 Great Job!</p>
+        <p id="finishText">You hopped all the way!</p>
+        <button type="button" class="btn primary" id="playAgainBtn">▶ Play Again</button>
+      </section>
+    </main>
+
+    <script>
+      (function(){
+        "use strict";
+        var HOPS = 8;
+        var step = 2;
+        var start = 0;
+        var values = [];
+        var current = 0; // index of the stone the frog is on
+        var stars = 0;
+        var soundOn = true;
+        var busy = false;
+        var audioCtx = null;
+
+        var trackEl = document.getElementById('track');
+        var frogEl = document.getElementById('frog');
+        var choicesEl = document.getElementById('choices');
+        var feedbackEl = document.getElementById('feedback');
+        var chantEl = document.getElementById('chantLine');
+        var promptNumEl = document.getElementById('promptNum');
+        var promptTextEl = document.getElementById('promptText');
+        var progressEl = document.getElementById('progressText');
+        var starCountEl = document.getElementById('starCount');
+        var finishBox = document.getElementById('finishBox');
+        var finishText = document.getElementById('finishText');
+        var soundBtn = document.getElementById('soundBtn');
+
+        var stepWords = { 2: 'twos', 5: 'fives', 10: 'tens' };
+
+        function ensureAudio(){
+          if(!audioCtx){
+            var AC = window.AudioContext || window.webkitAudioContext;
+            if(AC){ audioCtx = new AC(); }
+          }
+          if(audioCtx && audioCtx.state === 'suspended'){ audioCtx.resume(); }
+          return audioCtx;
+        }
+        function tone(freq, t, dur, type, vol){
+          if(!audioCtx) return;
+          var o = audioCtx.createOscillator();
+          var g = audioCtx.createGain();
+          o.type = type || 'sine';
+          o.frequency.value = freq;
+          var startT = audioCtx.currentTime + t;
+          g.gain.setValueAtTime(0.0001, startT);
+          g.gain.exponentialRampToValueAtTime(vol || 0.22, startT + 0.02);
+          g.gain.exponentialRampToValueAtTime(0.0001, startT + dur);
+          o.connect(g); g.connect(audioCtx.destination);
+          o.start(startT); o.stop(startT + dur + 0.05);
+        }
+        function happySound(){
+          if(!soundOn || !ensureAudio()) return;
+          tone(523.25, 0, 0.16, 'triangle');
+          tone(659.25, 0.09, 0.16, 'triangle');
+          tone(783.99, 0.18, 0.26, 'triangle');
+        }
+        function trySound(){
+          if(!soundOn || !ensureAudio()) return;
+          tone(330, 0, 0.16, 'sine', 0.14);
+          tone(294, 0.1, 0.22, 'sine', 0.14);
+        }
+        function fanfare(){
+          if(!soundOn || !ensureAudio()) return;
+          var notes = [523.25, 659.25, 783.99, 1046.5];
+          for(var i = 0; i < notes.length; i++){ tone(notes[i], i * 0.12, 0.3, 'triangle'); }
+          tone(1318.5, 0.52, 0.45, 'triangle');
+        }
+
+        function buildValues(){
+          values = [];
+          for(var i = 0; i <= HOPS; i++){ values.push(start + step * i); }
+        }
+
+        function renderTrack(){
+          trackEl.innerHTML = '';
+          for(var i = 0; i < values.length; i++){
+            var stone = document.createElement('div');
+            stone.className = 'stone' + (i <= current ? ' done' : '') + (i === current ? ' here' : '');
+            var disc = document.createElement('div');
+            disc.className = 'disc';
+            disc.textContent = i <= current ? String(values[i]) : '?';
+            var tag = document.createElement('div');
+            tag.className = 'tag';
+            tag.textContent = i === 0 ? 'Start' : '';
+            stone.appendChild(disc);
+            stone.appendChild(tag);
+            trackEl.appendChild(stone);
+          }
+          positionFrog(false);
+        }
+
+        function positionFrog(animate){
+          var stones = trackEl.children;
+          if(!stones.length || !stones[current]) return;
+          var disc = stones[current].querySelector('.disc');
+          var board = trackEl.parentElement;
+          var bRect = board.getBoundingClientRect();
+          var dRect = disc.getBoundingClientRect();
+          var frogW = frogEl.offsetWidth || 56;
+          var left = dRect.left - bRect.left + dRect.width / 2 - frogW / 2;
+          var top = dRect.top - bRect.top - frogW - 2;
+          if(top < 0) top = 0;
+          if(animate && frogEl.animate){
+            var oldLeft = parseFloat(frogEl.style.left) || 0;
+            var oldTop = parseFloat(frogEl.style.top) || 0;
+            frogEl.style.left = left + 'px';
+            frogEl.style.top = top + 'px';
+            var dx = left - oldLeft;
+            frogEl.animate([
+              { transform: 'translate(0px, 0px)' },
+              { transform: 'translate(' + (-dx / 2) + 'px, -44px) scale(1.08)' },
+              { transform: 'translate(0px, 0px)' }
+            ], { duration: 480, easing: 'ease-out' });
+          } else {
+            frogEl.style.left = left + 'px';
+            frogEl.style.top = top + 'px';
+          }
+        }
+
+        function chantText(upto){
+          var parts = [];
+          for(var i = 0; i <= upto; i++){ parts.push(values[i]); }
+          return parts.join('  ·  ');
+        }
+
+        function makeChoices(){
+          choicesEl.innerHTML = '';
+          var correct = values[current + 1];
+          var pool = [correct + step, correct + step * 2, correct - step, correct + 1, correct - 1, correct + 10, correct - 2, correct + 2];
+          var distractors = [];
+          for(var i = 0; i < pool.length && distractors.length < 2; i++){
+            var v = pool[i];
+            if(v !== correct && v >= 0 && distractors.indexOf(v) === -1){
+              distractors.push(v);
+            }
+          }
+          // Fallback fill if pool ran dry
+          var extra = correct + step * 3;
+          while(distractors.length < 2){
+            if(extra !== correct && distractors.indexOf(extra) === -1){ distractors.push(extra); }
+            extra += step;
+          }
+          var opts = [correct].concat(distractors);
+          // Shuffle
+          for(var j = opts.length - 1; j > 0; j--){
+            var k = Math.floor(Math.random() * (j + 1));
+            var tmp = opts[j]; opts[j] = opts[k]; opts[k] = tmp;
+          }
+          opts.forEach(function(v){
+            var b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'choice';
+            b.textContent = String(v);
+            b.setAttribute('aria-label', 'Hop to ' + v);
+            b.addEventListener('click', function(){ pick(b, v); });
+            choicesEl.appendChild(b);
+          });
+        }
+
+        function updatePrompt(){
+          promptTextEl.innerHTML = 'Hop by ' + step + 's! What comes after <span class="next-num">' + values[current] + '</span>?';
+          chantEl.textContent = chantText(current);
+          progressEl.textContent = 'Hop ' + Math.min(current + 1, HOPS) + ' of ' + HOPS;
+        }
+
+        function setFeedback(msg, kind){
+          feedbackEl.textContent = msg;
+          feedbackEl.className = 'feedback' + (kind ? ' ' + kind : '');
+        }
+
+        function confetti(){
+          var colors = ['#2e9e4f', '#f5a623', '#ff6b81', '#3d9bd6', '#ffd93d'];
+          for(var i = 0; i < 42; i++){
+            var bit = document.createElement('div');
+            bit.className = 'confetti-bit';
+            bit.style.left = Math.random() * 100 + 'vw';
+            bit.style.background = colors[i % colors.length];
+            bit.style.animation = 'fall ' + (1.1 + Math.random() * 0.9) + 's ease-in ' + (Math.random() * 0.35) + 's forwards';
+            document.body.appendChild(bit);
+            (function(el){
+              setTimeout(function(){ if(el.parentNode){ el.parentNode.removeChild(el); } }, 2600);
+            })(bit);
+          }
+        }
+
+        function pick(btn, v){
+          if(busy) return;
+          ensureAudio();
+          var correct = values[current + 1];
+          if(v === correct){
+            busy = true;
+            btn.classList.add('good');
+            stars++;
+            starCountEl.textContent = String(stars);
+            current++;
+            renderTrack();
+            positionFrog(true);
+            happySound();
+            if(current >= HOPS){
+              setFeedback('⭐ Yes! ' + correct + ' is right!', 'good');
+              setTimeout(finishGame, 550);
+            } else {
+              setFeedback('⭐ Yes! ' + correct + ' is right! Keep hopping!', 'good');
+              updatePrompt();
+              setTimeout(function(){ makeChoices(); busy = false; }, 500);
+            }
+          } else {
+            btn.classList.add('bad', 'shake');
+            btn.disabled = true;
+            trySound();
+            setFeedback('Good try! Count by ' + step + 's from ' + values[current] + ' — what comes next?', 'try');
+            setTimeout(function(){ btn.classList.remove('shake'); }, 650);
+          }
+        }
+
+        function finishGame(){
+          busy = false;
+          choicesEl.innerHTML = '';
+          chantEl.textContent = chantText(HOPS);
+          promptTextEl.innerHTML = 'You counted by ' + step + 's all the way to <span class="next-num">' + values[HOPS] + '</span>!';
+          progressEl.textContent = 'All ' + HOPS + ' hops done!';
+          finishText.textContent = 'You earned ' + stars + (stars === 1 ? ' star' : ' stars') + ' counting by ' + step + 's: ' + values.join(', ') + '.';
+          finishBox.classList.add('show');
+          fanfare();
+          confetti();
+          speak('Great job! You counted by ' + stepWords[step] + ': ' + values.join(', ') + '.');
+        }
+
+        function newGame(){
+          var offsets = [0, step, step * 2];
+          start = offsets[Math.floor(Math.random() * offsets.length)];
+          current = 0;
+          stars = 0;
+          starCountEl.textContent = '0';
+          busy = false;
+          finishBox.classList.remove('show');
+          buildValues();
+          renderTrack();
+          updatePrompt();
+          makeChoices();
+          setFeedback('Tap the next number to help the frog hop!', '');
+        }
+
+        function speak(text){
+          if(!('speechSynthesis' in window)) return;
+          try{
+            window.speechSynthesis.cancel();
+            var u = new SpeechSynthesisUtterance(text);
+            u.rate = 0.92;
+            u.pitch = 1.05;
+            window.speechSynthesis.speak(u);
+          }catch(e){ /* speech unavailable */ }
+        }
+
+        function hearIt(){
+          ensureAudio();
+          var said = values.slice(0, current + 1).join(', ');
+          if(current >= HOPS){
+            speak('You counted by ' + stepWords[step] + ': ' + values.join(', ') + '.');
+          } else {
+            speak('Let\u2019s count by ' + stepWords[step] + '. ' + said + '. What comes next?');
+          }
+        }
+
+        function setStep(newStep){
+          step = newStep;
+          [2, 5, 10].forEach(function(s){
+            document.getElementById('step' + s).setAttribute('aria-pressed', s === step ? 'true' : 'false');
+          });
+          newGame();
+        }
+
+        document.getElementById('step2').addEventListener('click', function(){ setStep(2); });
+        document.getElementById('step5').addEventListener('click', function(){ setStep(5); });
+        document.getElementById('step10').addEventListener('click', function(){ setStep(10); });
+        document.getElementById('newGameBtn').addEventListener('click', function(){ ensureAudio(); newGame(); });
+        document.getElementById('playAgainBtn').addEventListener('click', function(){ ensureAudio(); newGame(); });
+        document.getElementById('hearBtn').addEventListener('click', hearIt);
+        soundBtn.addEventListener('click', function(){
+          soundOn = !soundOn;
+          soundBtn.setAttribute('aria-pressed', soundOn ? 'true' : 'false');
+          soundBtn.textContent = soundOn ? '🔔 Sound: On' : '🔕 Sound: Off';
+          if(soundOn){ happySound(); }
+        });
+        window.addEventListener('resize', function(){ positionFrog(false); });
+
+        newGame();
+      })();
+    </script>
+  </body>
+</html>

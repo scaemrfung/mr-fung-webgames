@@ -131,6 +131,32 @@
       button:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0,0,0,0.15); }
       button:focus-visible { outline: 4px solid var(--gold); outline-offset: 2px; }
 
+      .btn-home {
+        font-family: "Fredoka", sans-serif;
+        font-weight: 600;
+        font-size: clamp(1rem, 2.5vw, 1.2rem);
+        padding: 12px 20px;
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        background: var(--accent);
+        border: 2px solid var(--accent-dark);
+        color: #ffffff;
+        border-radius: 999px;
+        box-shadow: var(--shadow);
+        text-decoration: none;
+        transition: transform 0.08s ease, background 0.15s ease;
+        touch-action: manipulation;
+        user-select: none;
+        -webkit-user-select: none;
+        line-height: 1;
+      }
+      .btn-home:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0,0,0,0.15); }
+      .btn-home:focus-visible { outline: 4px solid var(--gold); outline-offset: 2px; }
+      .btn-home svg { width: 22px; height: 22px; flex: none; }
+      @media (prefers-color-scheme: dark) {
+        .btn-home { color: #0c231d; }
+      }
       .btn-sound {
         font-size: clamp(1rem, 2.5vw, 1.2rem);
         padding: 12px 20px;
@@ -342,8 +368,16 @@
     <canvas id="confetti-canvas" aria-hidden="true"></canvas>
 
     <main class="app">
-      <!-- Top bar: star counter + sound toggle -->
+      <!-- Top bar: home link + star counter + sound toggle -->
       <div class="topbar">
+        <a class="btn-home" href="https://scaemrfung.github.io/mr-fung-webgames/" aria-label="Home — back to all games">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 10.5 12 3l9 7.5"></path>
+            <path d="M5 9.5V21h14V9.5"></path>
+            <path d="M9 21v-6h6v6"></path>
+          </svg>
+          Home
+        </a>
         <div class="stars" id="stars-box" aria-label="Stars earned">
           <span class="star-glyph" aria-hidden="true">★</span>
           <span>Stars: <span id="star-count">0</span></span>
@@ -500,17 +534,91 @@
         }
 
         /* ---------------- Speech ---------------- */
+        /*
+          Words are SHOWN in ALL CAPS for early readers, but ALL-CAPS text
+          makes many text-to-speech voices spell words out letter by letter
+          (they treat "CAT" like an acronym: "C-A-T"). So every spoken string
+          is converted to natural sentence case first — "The cat sat on the
+          mat." — which voices pronounce as whole words.
+        */
+        function toSpokenText(text) {
+          var clean = String(text == null ? "" : text).replace(/\s+/g, " ").trim();
+          if (!clean) return "";
+          var lower = clean.toLowerCase();
+          /* Capitalize the first letter of the sentence */
+          lower = lower.charAt(0).toUpperCase() + lower.slice(1);
+          /* The pronoun is always a capital I (spoken as the word "I") */
+          lower = lower.replace(/\bi\b/g, "I");
+          /* One ending period gives the voice natural sentence prosody */
+          lower = lower.replace(/\.+$/, "");
+          return lower + ".";
+        }
+        function toSpokenWord(word) {
+          var w = String(word == null ? "" : word).trim();
+          if (!w) return "";
+          if (w.toUpperCase() === "I") return "I";
+          /* Lowercase so a single word like "UP" or "CAT" is said as a
+             word, never spelled out as letters. */
+          return w.toLowerCase();
+        }
+
+        var cachedVoice = null;
+        function pickVoice() {
+          if (!("speechSynthesis" in window)) return null;
+          var voices = window.speechSynthesis.getVoices();
+          if (!voices || !voices.length) return cachedVoice;
+          var en = [];
+          for (var i = 0; i < voices.length; i++) {
+            if (voices[i].lang && voices[i].lang.toLowerCase().indexOf("en") === 0) en.push(voices[i]);
+          }
+          var pool = en.length ? en : voices;
+          var preferred = null;
+          for (var j = 0; j < pool.length; j++) {
+            var v = pool[j];
+            var name = (v.name || "").toLowerCase();
+            var lang = (v.lang || "").toLowerCase();
+            if (lang === "en-ca" || lang === "en-us") { preferred = v; break; }
+            if (!preferred && name.indexOf("google us english") !== -1) preferred = v;
+          }
+          cachedVoice = preferred || pool[0];
+          return cachedVoice;
+        }
+        if ("speechSynthesis" in window && window.speechSynthesis.addEventListener) {
+          window.speechSynthesis.addEventListener("voiceschanged", pickVoice);
+          pickVoice();
+        }
+
         function speak(text) {
           if (!("speechSynthesis" in window)) {
             setFeedback("Sorry, my voice is not working on this device.", "try");
             return;
           }
           try {
+            var spoken = toSpokenText(text);
+            if (!spoken) return;
             window.speechSynthesis.cancel();
-            var u = new SpeechSynthesisUtterance(text);
-            u.rate = 0.82;
+            var u = new SpeechSynthesisUtterance(spoken);
+            u.rate = 0.88;
             u.pitch = 1.05;
-            u.lang = "en-US";
+            u.lang = "en-CA";
+            var voice = pickVoice();
+            if (voice) { u.voice = voice; u.lang = voice.lang || u.lang; }
+            window.speechSynthesis.speak(u);
+          } catch (e) { /* speech unavailable — stay silent */ }
+        }
+        function speakWord(word) {
+          if (!soundOn) return;
+          if (!("speechSynthesis" in window)) return;
+          try {
+            var spoken = toSpokenWord(word);
+            if (!spoken) return;
+            window.speechSynthesis.cancel();
+            var u = new SpeechSynthesisUtterance(spoken);
+            u.rate = 0.88;
+            u.pitch = 1.05;
+            u.lang = "en-CA";
+            var voice = pickVoice();
+            if (voice) { u.voice = voice; u.lang = voice.lang || u.lang; }
             window.speechSynthesis.speak(u);
           } catch (e) { /* speech unavailable — stay silent */ }
         }
@@ -541,7 +649,12 @@
           b.type = "button";
           b.className = "tile enter" + (inAnswer ? " in-answer" : "");
           b.textContent = t.word;
-          b.setAttribute("aria-label", (inAnswer ? "Remove word " : "Add word ") + t.word);
+          /* Aria label in normal case so screen readers say the word too,
+             instead of spelling the ALL-CAPS tile text. */
+          var labelWord = t.word.toUpperCase() === "I"
+            ? "I"
+            : t.word.charAt(0).toUpperCase() + t.word.slice(1).toLowerCase();
+          b.setAttribute("aria-label", (inAnswer ? "Remove word " : "Add word ") + labelWord);
           b.addEventListener("click", function () {
             if (inAnswer) returnTile(id); else placeTile(id);
           });
@@ -592,6 +705,9 @@
           bankIds.splice(i, 1);
           answerIds.push(id);
           sndTap();
+          /* Say the word just placed — as a whole word, not spelled out */
+          var placed = tileById(id);
+          if (placed) speakWord(placed.word);
           if (feedbackEl.classList.contains("try")) setFeedback("", "");
           render();
           if (answerIds.length === targetWords.length) {
@@ -757,7 +873,7 @@
         });
 
         btnRead.addEventListener("click", function () {
-          speak(sentenceText + ".");
+          speak(sentenceText);
         });
 
         btnSound.addEventListener("click", function () {

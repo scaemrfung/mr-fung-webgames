@@ -78,6 +78,24 @@
         width: 100%;
         margin: 0 auto;
       }
+      .home-btn {
+        text-decoration: none;
+        border-radius: 999px;
+        padding: 9px 18px;
+        font-family: "Fredoka", sans-serif;
+        font-weight: 600;
+        font-size: clamp(1rem, 2.4vw, 1.25rem);
+        background: var(--tab-active);
+        color: var(--tab-active-ink);
+        box-shadow: var(--shadow);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: transform 0.1s;
+      }
+      .home-btn:hover { transform: translateY(-1px); }
+      .home-btn:focus-visible { outline: 4px solid var(--focus-ring); outline-offset: 2px; }
+      .home-btn svg { width: 22px; height: 22px; flex: none; }
       .modes { display: flex; flex-wrap: wrap; gap: 8px; }
       .mode-btn {
         border: 3px solid transparent;
@@ -420,6 +438,10 @@
   </head>
   <body>
     <div class="topbar">
+      <a class="home-btn" href="https://scaemrfung.github.io/mr-fung-webgames/" aria-label="Home — back to the main games page">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9.5 21v-6h5v6"/></svg>
+        Home
+      </a>
       <div class="modes" role="group" aria-label="Choose a game">
         <button class="mode-btn" data-mode="counting" aria-pressed="true">Counting</button>
         <button class="mode-btn" data-mode="adding" aria-pressed="false">Adding</button>

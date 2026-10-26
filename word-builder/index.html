@@ -64,6 +64,12 @@
   button{font-family:inherit; cursor:pointer; -webkit-tap-highlight-color:transparent}
   .app{max-width:920px;margin:0 auto;padding:14px 16px 28px}
 
+  /* HOME BUTTON */
+  .home-btn{display:inline-flex;align-items:center;gap:8px;text-decoration:none;background:var(--primary);color:#fff;border:3px solid var(--ink);border-radius:999px;padding:11px 20px;font-family:"Fredoka",sans-serif;font-weight:700;font-size:1.08rem;line-height:1;box-shadow:0 5px 0 rgba(0,0,0,.18);margin-bottom:12px}
+  .home-btn:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.18)}
+  .home-btn:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+  .home-btn svg{flex:0 0 auto;display:block}
+
   /* TOP BAR */
   .topbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
   .mode-switch{display:flex;background:var(--card);border:3px solid var(--ink);border-radius:999px;padding:4px;gap:4px;box-shadow:var(--shadow);flex:1;min-width:280px}
@@ -142,6 +148,7 @@
 </head>
 <body>
 <div class="app">
+  <a class="home-btn" href="https://scaemrfung.github.io/mr-fung-webgames/" aria-label="Home — back to all games"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 11.2 12 4l9 7.2" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 9.8V20h13V9.8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.5 20v-5.5h5V20" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Home</a>
   <div class="topbar">
     <div class="mode-switch" role="tablist" aria-label="Choose a game">
       <button id="modeBuildBtn" class="mode-btn active" role="tab" aria-selected="true">🔤 Build the Word</button>

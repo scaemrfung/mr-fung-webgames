@@ -1,0 +1,657 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>Beginning and Ending Sounds</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --bg: #fff6e9;
+        --card: #ffffff;
+        --ink: #2b2118;
+        --ink-soft: #6b5d4f;
+        --line: #f0dfc8;
+        --teal: #0e7c66;
+        --teal-soft: #dff3ec;
+        --orange: #e85d26;
+        --orange-soft: #ffe7d9;
+        --gold: #f2b705;
+        --gold-soft: #fff3cf;
+        --good: #1e9e57;
+        --good-soft: #dcf5e5;
+        --btn-face: #fffdf8;
+        --btn-line: #e8d5b5;
+        --shadow: 0 6px 0 rgba(43, 33, 24, 0.08), 0 14px 28px rgba(43, 33, 24, 0.10);
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #1d1a16;
+          --card: #2a2620;
+          --ink: #fff3e0;
+          --ink-soft: #cbb99e;
+          --line: #453d31;
+          --teal: #3ec9a7;
+          --teal-soft: #173f35;
+          --orange: #ff8a50;
+          --orange-soft: #4a2c1a;
+          --gold: #ffc61a;
+          --gold-soft: #4a3a08;
+          --good: #4ade80;
+          --good-soft: #173d27;
+          --btn-face: #332e26;
+          --btn-line: #55483a;
+          --shadow: 0 6px 0 rgba(0,0,0,0.25), 0 14px 28px rgba(0,0,0,0.35);
+        }
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; }
+      body {
+        font-family: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+        background: var(--bg);
+        color: var(--ink);
+        min-height: 100vh;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .wrap {
+        max-width: 880px;
+        margin: 0 auto;
+        padding: 14px 16px 28px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      /* ---------- Top bar ---------- */
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .star-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--gold-soft);
+        border: 3px solid var(--gold);
+        border-radius: 999px;
+        padding: 6px 18px 6px 12px;
+        font-family: "Fredoka", sans-serif;
+        font-weight: 700;
+        font-size: 1.6rem;
+        line-height: 1;
+        min-height: 56px;
+      }
+      .star-pill svg { width: 30px; height: 30px; flex: none; }
+      .progress {
+        font-family: "Fredoka", sans-serif;
+        font-weight: 600;
+        font-size: 1.25rem;
+        color: var(--ink-soft);
+      }
+      .top-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+      .tool-btn {
+        font-family: "Fredoka", sans-serif;
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: var(--ink);
+        background: var(--card);
+        border: 3px solid var(--line);
+        border-radius: 14px;
+        padding: 10px 16px;
+        min-height: 56px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .tool-btn:active { transform: translateY(2px); }
+      a.tool-btn { text-decoration: none; }
+      .home-btn { background: var(--gold-soft); border-color: var(--gold); }
+      .tool-btn svg { width: 24px; height: 24px; flex: none; }
+      .tool-btn.new-game { background: var(--teal); border-color: var(--teal); color: #fff; }
+      @media (prefers-color-scheme: dark) {
+        .tool-btn.new-game { color: #10201b; }
+      }
+
+      /* ---------- Stage card ---------- */
+      .stage {
+        background: var(--card);
+        border: 3px solid var(--line);
+        border-radius: 24px;
+        box-shadow: var(--shadow);
+        padding: 20px 20px 24px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
+      .pic-stage {
+        width: 190px;
+        height: 190px;
+        margin: 4px auto 6px;
+        border-radius: 50%;
+        background: var(--teal-soft);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 6.4rem;
+        line-height: 1;
+      }
+      .word-row {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin: 10px 0 4px;
+        flex-wrap: wrap;
+      }
+      .wl {
+        width: 58px;
+        height: 68px;
+        border-radius: 12px;
+        background: var(--btn-face);
+        border: 3px solid var(--btn-line);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Fredoka", sans-serif;
+        font-weight: 700;
+        font-size: 2.3rem;
+      }
+      .wl.missing {
+        border-style: dashed;
+        color: var(--orange);
+        background: var(--orange-soft);
+      }
+      .wl.missing.at-start { color: var(--teal); background: var(--teal-soft); border-color: var(--teal); }
+      .wl.missing.at-end { color: var(--orange); background: var(--orange-soft); border-color: var(--orange); }
+      .wl.filled { border-style: solid; }
+
+      .prompt {
+        font-family: "Fredoka", sans-serif;
+        font-weight: 600;
+        font-size: clamp(1.45rem, 4.6vw, 2.1rem);
+        margin: 14px 0 4px;
+        line-height: 1.25;
+      }
+      .prompt .kind {
+        padding: 2px 14px;
+        border-radius: 999px;
+        color: #fff;
+        white-space: nowrap;
+      }
+      .prompt .kind.start { background: var(--teal); }
+      .prompt .kind.end { background: var(--orange); }
+      @media (prefers-color-scheme: dark) {
+        .prompt .kind.start { color: #10201b; }
+        .prompt .kind.end { color: #2a1503; }
+      }
+
+      .hear-btn {
+        margin-top: 12px;
+        font-family: "Fredoka", sans-serif;
+        font-weight: 600;
+        font-size: 1.3rem;
+        background: var(--gold);
+        border: 3px solid var(--gold);
+        color: #3a2a00;
+        border-radius: 16px;
+        padding: 12px 26px;
+        min-height: 60px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .hear-btn:active { transform: translateY(2px); }
+      .hear-btn svg { width: 28px; height: 28px; }
+
+      .feedback {
+        min-height: 2.2rem;
+        margin-top: 14px;
+        font-family: "Fredoka", sans-serif;
+        font-weight: 600;
+        font-size: clamp(1.25rem, 4vw, 1.6rem);
+      }
+      .feedback.good { color: var(--good); }
+      .feedback.try { color: var(--orange); }
+
+      /* ---------- Letter choices ---------- */
+      .choices {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+      }
+      .choice {
+        font-family: "Fredoka", sans-serif;
+        font-weight: 700;
+        font-size: clamp(2.6rem, 9vw, 3.6rem);
+        line-height: 1;
+        min-height: 110px;
+        border-radius: 20px;
+        border: 4px solid var(--btn-line);
+        background: var(--btn-face);
+        color: var(--ink);
+        cursor: pointer;
+        box-shadow: 0 5px 0 rgba(43,33,24,0.12);
+      }
+      .choice:active:not(:disabled) { transform: translateY(3px); box-shadow: none; }
+      .choice:disabled { cursor: default; }
+      .choice.wrong {
+        opacity: 0.38;
+        background: var(--card);
+        box-shadow: none;
+      }
+      .choice.correct {
+        background: var(--good-soft);
+        border-color: var(--good);
+        color: var(--good);
+        box-shadow: 0 5px 0 rgba(30,158,87,0.35);
+      }
+      @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-7px); }
+        75% { transform: translateX(7px); }
+      }
+      .choice.shake { animation: shake 0.28s ease-in-out 2; }
+      @keyframes pop {
+        0% { transform: scale(1); }
+        40% { transform: scale(1.14); }
+        100% { transform: scale(1); }
+      }
+      .choice.pop { animation: pop 0.35s ease; }
+
+      /* floating stars on a correct answer */
+      .burst-star {
+        position: absolute;
+        color: var(--gold);
+        font-size: 2rem;
+        pointer-events: none;
+        animation: floatUp 0.9s ease-out forwards;
+        z-index: 5;
+      }
+      @keyframes floatUp {
+        0% { opacity: 1; transform: translateY(0) scale(0.6) rotate(0deg); }
+        100% { opacity: 0; transform: translateY(-110px) scale(1.3) rotate(40deg); }
+      }
+
+      /* ---------- Finish panel ---------- */
+      .finish { display: none; text-align: center; padding: 18px 6px 8px; }
+      .finish.show { display: block; }
+      .finish .big-pic { font-size: 5.2rem; line-height: 1.2; }
+      .finish h2 {
+        font-family: "Fredoka", sans-serif;
+        font-weight: 700;
+        font-size: clamp(2rem, 6vw, 2.8rem);
+        margin: 8px 0 6px;
+      }
+      .finish p {
+        font-size: clamp(1.2rem, 4vw, 1.45rem);
+        font-weight: 800;
+        color: var(--ink-soft);
+        margin: 0 0 20px;
+      }
+      .finish .stars-row {
+        color: var(--gold);
+        font-size: 2rem;
+        letter-spacing: 4px;
+        margin-bottom: 18px;
+        word-break: break-all;
+      }
+      .play-again {
+        font-family: "Fredoka", sans-serif;
+        font-weight: 700;
+        font-size: 1.5rem;
+        background: var(--teal);
+        border: 3px solid var(--teal);
+        color: #fff;
+        border-radius: 18px;
+        padding: 16px 36px;
+        min-height: 68px;
+        cursor: pointer;
+      }
+      @media (prefers-color-scheme: dark) { .play-again { color: #10201b; } }
+      .play-again:active { transform: translateY(2px); }
+
+      .game-area.hide { display: none; }
+
+      @media (max-width: 560px) {
+        .pic-stage { width: 160px; height: 160px; font-size: 5.4rem; }
+        .wl { width: 48px; height: 58px; font-size: 1.9rem; }
+        .choice { min-height: 96px; }
+        .star-pill { font-size: 1.4rem; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .choice.shake, .choice.pop, .burst-star { animation: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <!-- Top bar: stars, progress, sound, new game -->
+      <div class="topbar">
+        <a class="tool-btn home-btn" href="https://scaemrfung.github.io/mr-fung-webgames/">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9.5 21v-6h5v6"/></svg>
+          Home
+        </a>
+        <div class="star-pill" aria-label="Stars earned">
+          <svg viewBox="0 0 24 24" fill="#f2b705" stroke="#d99e00" stroke-width="1" aria-hidden="true"><path d="M12 2.6l2.9 5.9 6.5.95-4.7 4.58 1.1 6.47L12 17.45l-5.8 3.05 1.1-6.47L2.6 9.45l6.5-.95z"/></svg>
+          <span id="starCount">0</span>
+        </div>
+        <div class="progress" id="progress">Word 1 of 10</div>
+        <div class="top-actions">
+          <button class="tool-btn" id="soundBtn" type="button" aria-pressed="true">
+            <svg id="soundIconOn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H3v6h3l5 4z" fill="currentColor" stroke="none"/><path d="M15.5 8.5a5 5 0 010 7"/><path d="M18.4 5.6a9 9 0 010 12.8"/></svg>
+            <svg id="soundIconOff" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:none" aria-hidden="true"><path d="M11 5L6 9H3v6h3l5 4z" fill="currentColor" stroke="none"/><line x1="16" y1="9" x2="22" y2="15"/><line x1="22" y1="9" x2="16" y2="15"/></svg>
+            <span id="soundLabel">Sound: On</span>
+          </button>
+          <button class="tool-btn new-game" id="newGameBtn" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 11-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
+            New Game
+          </button>
+        </div>
+      </div>
+
+      <!-- Game stage -->
+      <div class="stage" id="stage">
+        <div class="game-area" id="gameArea">
+          <div class="pic-stage" id="picStage" role="img" aria-label="Picture of the word">🐱</div>
+
+          <div class="word-row" id="wordRow" aria-hidden="true"></div>
+
+          <p class="prompt" id="prompt"></p>
+
+          <button class="hear-btn" id="hearBtn" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H3v6h3l5 4z" fill="currentColor" stroke="none"/><path d="M15.5 8.5a5 5 0 010 7"/><path d="M18.4 5.6a9 9 0 010 12.8"/></svg>
+            Hear It
+          </button>
+
+          <div class="feedback" id="feedback" aria-live="polite"></div>
+
+          <div class="choices" id="choices"></div>
+        </div>
+
+        <!-- Finish panel -->
+        <div class="finish" id="finishPanel">
+          <div class="big-pic" aria-hidden="true">🎉</div>
+          <h2>Great Job!</h2>
+          <p id="finishText">You finished all 10 words!</p>
+          <div class="stars-row" id="finishStars" aria-hidden="true"></div>
+          <button class="play-again" id="playAgainBtn" type="button">▶ Play Again</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        "use strict";
+
+        var WORDS = [
+          { word: "CAT",  pic: "🐱", name: "cat" },
+          { word: "DOG",  pic: "🐶", name: "dog" },
+          { word: "SUN",  pic: "☀️", name: "sun" },
+          { word: "FISH", pic: "🐟", name: "fish" },
+          { word: "BALL", pic: "⚽", name: "ball" },
+          { word: "DUCK", pic: "🦆", name: "duck" },
+          { word: "PIG",  pic: "🐷", name: "pig" },
+          { word: "HEN",  pic: "🐔", name: "hen" },
+          { word: "BOOK", pic: "📖", name: "book" },
+          { word: "CAR",  pic: "🚗", name: "car" }
+        ];
+        var ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+
+        var deck = [];
+        var index = 0;
+        var stars = 0;
+        var soundOn = true;
+        var locked = false;
+        var current = null;   // { item, kind: 'start'|'end', answer }
+        var interacted = false;
+        var audioCtx = null;
+
+        var starCountEl = document.getElementById("starCount");
+        var progressEl = document.getElementById("progress");
+        var picStage = document.getElementById("picStage");
+        var wordRow = document.getElementById("wordRow");
+        var promptEl = document.getElementById("prompt");
+        var feedbackEl = document.getElementById("feedback");
+        var choicesEl = document.getElementById("choices");
+        var gameArea = document.getElementById("gameArea");
+        var finishPanel = document.getElementById("finishPanel");
+        var finishText = document.getElementById("finishText");
+        var finishStars = document.getElementById("finishStars");
+        var stage = document.getElementById("stage");
+        var soundBtn = document.getElementById("soundBtn");
+        var soundLabel = document.getElementById("soundLabel");
+        var soundIconOn = document.getElementById("soundIconOn");
+        var soundIconOff = document.getElementById("soundIconOff");
+
+        function shuffle(arr) {
+          var a = arr.slice();
+          for (var i = a.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var t = a[i]; a[i] = a[j]; a[j] = t;
+          }
+          return a;
+        }
+
+        /* ---------- Sound effects (Web Audio, in-browser only) ---------- */
+        function ensureAudio() {
+          if (!audioCtx) {
+            var AC = window.AudioContext || window.webkitAudioContext;
+            if (AC) audioCtx = new AC();
+          }
+          if (audioCtx && audioCtx.state === "suspended") audioCtx.resume();
+          return audioCtx;
+        }
+        function tone(freq, start, dur, type, gain) {
+          if (!soundOn) return;
+          var ctx = ensureAudio();
+          if (!ctx) return;
+          var osc = ctx.createOscillator();
+          var g = ctx.createGain();
+          osc.type = type || "triangle";
+          osc.frequency.value = freq;
+          var t0 = ctx.currentTime + start;
+          g.gain.setValueAtTime(0.0001, t0);
+          g.gain.exponentialRampToValueAtTime(gain || 0.22, t0 + 0.02);
+          g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+          osc.connect(g); g.connect(ctx.destination);
+          osc.start(t0); osc.stop(t0 + dur + 0.05);
+        }
+        function playHappy() {
+          tone(523.25, 0, 0.22, "triangle", 0.25);   // C5
+          tone(659.25, 0.09, 0.22, "triangle", 0.25); // E5
+          tone(783.99, 0.18, 0.34, "triangle", 0.28); // G5
+          tone(1046.5, 0.27, 0.4, "sine", 0.22);      // C6
+        }
+        function playTryAgain() {
+          tone(330, 0, 0.25, "sine", 0.12);
+          tone(262, 0.14, 0.3, "sine", 0.10);
+        }
+        function playFanfare() {
+          var notes = [523.25, 659.25, 783.99, 1046.5, 783.99, 1046.5, 1318.5];
+          for (var i = 0; i < notes.length; i++) {
+            tone(notes[i], i * 0.13, 0.32, "triangle", 0.24);
+          }
+        }
+
+        /* ---------- Speech ---------- */
+        function speakWord() {
+          if (!current) return;
+          if (!("speechSynthesis" in window)) return;
+          try {
+            window.speechSynthesis.cancel();
+            var u = new SpeechSynthesisUtterance(current.item.word.toLowerCase());
+            u.rate = 0.85;
+            u.pitch = 1.05;
+            window.speechSynthesis.speak(u);
+          } catch (e) { /* speech unavailable — game still works */ }
+        }
+
+        /* ---------- Game flow ---------- */
+        function newGame() {
+          deck = shuffle(WORDS);
+          index = 0;
+          stars = 0;
+          starCountEl.textContent = "0";
+          finishPanel.classList.remove("show");
+          gameArea.classList.remove("hide");
+          nextQuestion(false);
+        }
+
+        function nextQuestion(autoSpeak) {
+          locked = false;
+          if (index >= deck.length) { showFinish(); return; }
+          var item = deck[index];
+          var kind = Math.random() < 0.5 ? "start" : "end";
+          var answer = kind === "start" ? item.word.charAt(0) : item.word.charAt(item.word.length - 1);
+          current = { item: item, kind: kind, answer: answer };
+
+          progressEl.textContent = "Word " + (index + 1) + " of " + deck.length;
+          picStage.textContent = item.pic;
+          picStage.setAttribute("aria-label", "Picture of a " + item.name);
+
+          // Word row with the target letter as a "?"
+          wordRow.innerHTML = "";
+          var targetIdx = kind === "start" ? 0 : item.word.length - 1;
+          for (var i = 0; i < item.word.length; i++) {
+            var span = document.createElement("span");
+            span.className = "wl";
+            if (i === targetIdx) {
+              span.classList.add("missing");
+              span.classList.add(kind === "start" ? "at-start" : "at-end");
+              span.textContent = "?";
+              span.id = "missingSlot";
+            } else {
+              span.textContent = item.word.charAt(i);
+            }
+            wordRow.appendChild(span);
+          }
+
+          promptEl.innerHTML = kind === "start"
+            ? 'What is the <span class="kind start">FIRST</span> sound in ' + item.word + "?"
+            : 'What is the <span class="kind end">LAST</span> sound in ' + item.word + "?";
+
+          feedbackEl.textContent = "";
+          feedbackEl.className = "feedback";
+
+          // Three choices: the answer + two random other letters
+          var pool = shuffle(ALPHABET.filter(function (L) { return L !== answer; }));
+          var options = shuffle([answer, pool[0], pool[1]]);
+          choicesEl.innerHTML = "";
+          options.forEach(function (letter) {
+            var b = document.createElement("button");
+            b.type = "button";
+            b.className = "choice";
+            b.textContent = letter;
+            b.setAttribute("aria-label", "Letter " + letter);
+            b.addEventListener("click", function () { pickLetter(b, letter); });
+            choicesEl.appendChild(b);
+          });
+
+          if (autoSpeak && interacted) speakWord();
+        }
+
+        function pickLetter(btn, letter) {
+          if (locked || btn.disabled) return;
+          interacted = true;
+          if (letter === current.answer) {
+            locked = true;
+            btn.classList.add("correct", "pop");
+            btn.disabled = true;
+            var buttons = choicesEl.querySelectorAll(".choice");
+            for (var i = 0; i < buttons.length; i++) buttons[i].disabled = true;
+
+            // Fill in the missing letter
+            var slot = document.getElementById("missingSlot");
+            if (slot) {
+              slot.textContent = current.answer;
+              slot.classList.add("filled");
+            }
+
+            stars++;
+            starCountEl.textContent = String(stars);
+            playHappy();
+            starBurst();
+
+            feedbackEl.className = "feedback good";
+            feedbackEl.textContent = current.kind === "start"
+              ? "⭐ Yes! " + current.item.word + " starts with " + current.answer + "!"
+              : "⭐ Yes! " + current.item.word + " ends with " + current.answer + "!";
+
+            index++;
+            setTimeout(function () { nextQuestion(true); }, 1500);
+          } else {
+            btn.disabled = true;
+            btn.classList.add("wrong", "shake");
+            playTryAgain();
+            feedbackEl.className = "feedback try";
+            feedbackEl.textContent = "Good try! Listen again and pick another letter. 🙂";
+          }
+        }
+
+        function starBurst() {
+          if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+          var rect = stage.getBoundingClientRect();
+          for (var i = 0; i < 7; i++) {
+            var s = document.createElement("span");
+            s.className = "burst-star";
+            s.textContent = "★";
+            s.style.left = (30 + Math.random() * 40) + "%";
+            s.style.top = (55 + Math.random() * 15) + "%";
+            s.style.animationDelay = (i * 0.06) + "s";
+            stage.appendChild(s);
+            (function (el) { setTimeout(function () { el.remove(); }, 1200); })(s);
+          }
+        }
+
+        function showFinish() {
+          current = null;
+          gameArea.classList.add("hide");
+          finishPanel.classList.add("show");
+          progressEl.textContent = "All done!";
+          finishText.textContent = "You finished all " + deck.length + " words and earned " + stars + (stars === 1 ? " star!" : " stars!");
+          var row = "";
+          for (var i = 0; i < stars; i++) row += "★";
+          finishStars.textContent = row;
+          playFanfare();
+        }
+
+        /* ---------- Controls ---------- */
+        document.getElementById("hearBtn").addEventListener("click", function () {
+          interacted = true;
+          ensureAudio();
+          speakWord();
+        });
+        document.getElementById("newGameBtn").addEventListener("click", function () {
+          interacted = true;
+          ensureAudio();
+          if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+          newGame();
+        });
+        document.getElementById("playAgainBtn").addEventListener("click", function () {
+          interacted = true;
+          ensureAudio();
+          newGame();
+        });
+        soundBtn.addEventListener("click", function () {
+          interacted = true;
+          soundOn = !soundOn;
+          soundLabel.textContent = soundOn ? "Sound: On" : "Sound: Off";
+          soundBtn.setAttribute("aria-pressed", soundOn ? "true" : "false");
+          soundIconOn.style.display = soundOn ? "" : "none";
+          soundIconOff.style.display = soundOn ? "none" : "";
+          if (soundOn) playHappy();
+        });
+
+        newGame();
+      })();
+    </script>
+  </body>
+</html>

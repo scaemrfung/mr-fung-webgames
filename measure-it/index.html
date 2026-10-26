@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>Measure It</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --bg: #eaf5fb;
+        --card: #ffffff;
+        --card-edge: #cfe3ee;
+        --ink: #1d2b38;
+        --muted: #4a6070;
+        --accent: #0e7c66;
+        --accent-ink: #ffffff;
+        --amber: #f5a301;
+        --amber-soft: #fff3cf;
+        --good: #2e9e5b;
+        --good-soft: #e2f5e9;
+        --try: #e2703a;
+        --try-soft: #fdeee4;
+        --ground: #b08954;
+        --btn: #ffffff;
+        --btn-edge: #b9d2e0;
+        --shadow: 0 6px 0 rgba(29, 43, 56, 0.10), 0 14px 28px rgba(29, 43, 56, 0.10);
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0f1620;
+          --card: #1d2836;
+          --card-edge: #33465c;
+          --ink: #f2f6f9;
+          --muted: #a9bccb;
+          --accent: #2bb598;
+          --accent-ink: #06231c;
+          --amber: #ffb62e;
+          --amber-soft: #3d2f08;
+          --good: #4cc47e;
+          --good-soft: #14301f;
+          --try: #f08a54;
+          --try-soft: #3a2113;
+          --ground: #8a6b42;
+          --btn: #243447;
+          --btn-edge: #3d5a76;
+          --shadow: 0 6px 0 rgba(0, 0, 0, 0.35), 0 14px 28px rgba(0, 0, 0, 0.35);
+        }
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; }
+      body {
+        font-family: "Fredoka", "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--ink);
+        min-height: 100dvh;
+        display: flex;
+        flex-direction: column;
+        padding: clamp(10px, 2.5vw, 22px);
+        gap: clamp(8px, 1.6vh, 16px);
+      }
+
+      /* ---------- top bar ---------- */
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .home-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        min-height: 56px;
+        padding: 8px 22px 8px 16px;
+        border-radius: 999px;
+        border: 3px solid var(--btn-edge);
+        background: var(--btn);
+        color: var(--ink);
+        font: inherit;
+        font-size: clamp(19px, 2.6vw, 24px);
+        font-weight: 600;
+        text-decoration: none;
+        box-shadow: var(--shadow);
+        cursor: pointer;
+      }
+      .home-btn:active { transform: translateY(2px); }
+      .home-btn svg { width: 28px; height: 28px; flex: none; }
+      .stars-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        min-height: 56px;
+        padding: 8px 22px;
+        border-radius: 999px;
+        border: 3px solid var(--amber);
+        background: var(--amber-soft);
+        color: var(--ink);
+        font-size: clamp(19px, 2.6vw, 24px);
+        font-weight: 600;
+      }
+      .stars-pill .star-glyph { color: var(--amber); font-size: 1.25em; line-height: 1; }
+      .stars-pill.pop { animation: pillpop 0.45s ease; }
+      @keyframes pillpop {
+        0% { transform: scale(1); }
+        40% { transform: scale(1.14); }
+        100% { transform: scale(1); }
+      }
+
+      /* ---------- main ---------- */
+      main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: clamp(8px, 1.8vh, 18px);
+        width: 100%;
+        max-width: 1180px;
+        margin: 0 auto;
+      }
+      .question {
+        margin: 0;
+        text-align: center;
+        font-size: clamp(32px, 6.2vw, 58px);
+        font-weight: 700;
+        line-height: 1.12;
+        letter-spacing: 0.01em;
+      }
+      .question .word { color: var(--accent); text-decoration: underline; text-underline-offset: 6px; }
+
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 12px;
+      }
+      .btn {
+        font: inherit;
+        font-size: clamp(19px, 2.6vw, 24px);
+        font-weight: 600;
+        min-height: 60px;
+        padding: 10px 26px;
+        border-radius: 999px;
+        border: 3px solid var(--btn-edge);
+        background: var(--btn);
+        color: var(--ink);
+        box-shadow: var(--shadow);
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+      }
+      .btn:active { transform: translateY(2px); }
+      .btn.hear {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: var(--accent-ink);
+      }
+      .btn:focus-visible, .home-btn:focus-visible, .card:focus-visible {
+        outline: 4px solid var(--amber);
+        outline-offset: 3px;
+      }
+
+      /* ---------- cards ---------- */
+      .cards {
+        display: flex;
+        gap: clamp(12px, 2.5vw, 28px);
+        width: 100%;
+        flex: 1;
+        align-items: stretch;
+      }
+      .card {
+        flex: 1 1 0;
+        min-width: 0;
+        font: inherit;
+        color: var(--ink);
+        background: var(--card);
+        border: 5px solid var(--card-edge);
+        border-radius: 28px;
+        box-shadow: var(--shadow);
+        cursor: pointer;
+        padding: clamp(10px, 2vw, 20px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        position: relative;
+        overflow: hidden;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+      }
+      .card:active { transform: translateY(2px); }
+      .stage {
+        flex: 1;
+        width: 100%;
+        min-height: clamp(170px, 40vh, 360px);
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        position: relative;
+        padding-bottom: 12px;
+      }
+      .stage::after {
+        content: "";
+        position: absolute;
+        left: 6%;
+        right: 6%;
+        bottom: 4px;
+        height: 7px;
+        border-radius: 99px;
+        background: var(--ground);
+        opacity: 0.55;
+      }
+      .obj { display: flex; align-items: flex-end; justify-content: center; }
+      .obj svg { display: block; }
+      .obj-long svg { width: 100%; height: auto; }
+      .obj-tall svg { height: 100%; width: auto; }
+      .card .name {
+        font-size: clamp(26px, 4.4vw, 42px);
+        font-weight: 700;
+        line-height: 1.1;
+        text-align: center;
+      }
+      .card.correct {
+        border-color: var(--good);
+        background: var(--good-soft);
+      }
+      .card.wrong { animation: wiggle 0.45s ease; border-color: var(--try); background: var(--try-soft); }
+      @keyframes wiggle {
+        0%, 100% { transform: translateX(0); }
+        20% { transform: translateX(-9px); }
+        40% { transform: translateX(9px); }
+        60% { transform: translateX(-6px); }
+        80% { transform: translateX(6px); }
+      }
+      .burst-star {
+        position: absolute;
+        color: var(--amber);
+        font-size: 34px;
+        line-height: 1;
+        pointer-events: none;
+        animation: burst 0.95s ease-out forwards;
+        z-index: 3;
+      }
+      @keyframes burst {
+        0% { transform: translate(0, 0) scale(0.4) rotate(0deg); opacity: 1; }
+        100% { transform: translate(var(--dx), var(--dy)) scale(1.25) rotate(140deg); opacity: 0; }
+      }
+
+      .feedback {
+        min-height: 1.4em;
+        margin: 0;
+        text-align: center;
+        font-size: clamp(22px, 4vw, 36px);
+        font-weight: 600;
+        color: var(--muted);
+      }
+      .feedback.good { color: var(--good); }
+      .feedback.try { color: var(--try); }
+
+      /* ---------- phones: stack and scroll ---------- */
+      @media (max-width: 640px) {
+        .cards { flex-direction: column; }
+        .stage { min-height: 170px; }
+        .topbar { justify-content: space-between; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .card.wrong, .stars-pill.pop, .burst-star { animation: none; }
+        .burst-star { display: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="home-btn" href="https://scaemrfung.github.io/mr-fung-webgames/" aria-label="Home — back to all games">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 11.2 12 3l9 8.2" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 9.8V21h13V9.8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.8 21v-6.2h4.4V21" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Home
+      </a>
+      <div class="stars-pill" id="starsPill" aria-live="polite">
+        <span class="star-glyph" aria-hidden="true">★</span>
+        <span>Stars: <span id="starCount">0</span></span>
+      </div>
+    </header>
+
+    <main>
+      <h1 class="question" id="question">Which one is <span class="word">longer</span>?</h1>
+
+      <div class="controls">
+        <button class="btn hear" id="hearBtn" type="button"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.6V5.4L7.5 9.5H4Z" fill="currentColor"/><path d="M15.5 9.2a4 4 0 0 1 0 5.6M18.2 6.8a7.6 7.6 0 0 1 0 10.4" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></svg> Hear It</button>
+        <button class="btn" id="soundBtn" type="button">Sound: On</button>
+        <button class="btn" id="newBtn" type="button">↻ New Game</button>
+      </div>
+
+      <div class="cards">
+        <button class="card" id="cardA" type="button" aria-label="First object">
+          <div class="stage"><div class="obj" id="objA"></div></div>
+          <div class="name" id="nameA">…</div>
+        </button>
+        <button class="card" id="cardB" type="button" aria-label="Second object">
+          <div class="stage"><div class="obj" id="objB"></div></div>
+          <div class="name" id="nameB">…</div>
+        </button>
+      </div>
+
+      <p class="feedback" id="feedback" aria-live="polite">Tap the picture that matches!</p>
+    </main>
+
+    <script>
+      "use strict";
+
+      /* ---------- object artwork (hand-drawn SVG) ---------- */
+      var ART = {
+        /* ----- long objects: viewBox 0 0 200 90 ----- */
+        worm: '<svg viewBox="0 0 200 90" role="img" aria-label="Worm"><ellipse cx="100" cy="80" rx="88" ry="6" fill="#000" opacity="0.08"/><g fill="#f28bb4"><circle cx="28" cy="58" r="15"/><circle cx="58" cy="50" r="16"/><circle cx="90" cy="58" r="16"/><circle cx="122" cy="50" r="16"/><circle cx="152" cy="58" r="15"/></g><circle cx="176" cy="52" r="16" fill="#f6a8c6"/><circle cx="181" cy="48" r="2.6" fill="#333"/><path d="M176 58 q5 4 10 0" stroke="#333" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>',
+        crayon: '<svg viewBox="0 0 200 90" role="img" aria-label="Crayon"><ellipse cx="100" cy="80" rx="88" ry="6" fill="#000" opacity="0.08"/><g transform="rotate(-7 100 45)"><rect x="22" y="32" width="118" height="27" rx="4" fill="#2aa7a0"/><rect x="34" y="32" width="10" height="27" fill="#1d7f79"/><rect x="116" y="32" width="10" height="27" fill="#1d7f79"/><polygon points="140,32 140,59 172,45.5" fill="#f3d9ae"/><polygon points="158,39.5 158,51.5 172,45.5" fill="#20706b"/></g></svg>',
+        pencil: '<svg viewBox="0 0 200 90" role="img" aria-label="Pencil"><ellipse cx="100" cy="80" rx="88" ry="6" fill="#000" opacity="0.08"/><g transform="rotate(-4 100 45)"><rect x="14" y="31" width="20" height="28" rx="6" fill="#f28bb4"/><rect x="34" y="31" width="12" height="28" fill="#b9c4cc"/><rect x="46" y="31" width="102" height="28" fill="#ffc93c"/><rect x="46" y="40" width="102" height="4" fill="#f0ad1d"/><polygon points="148,31 148,59 182,45" fill="#f3d9ae"/><polygon points="166,38.5 166,51.5 182,45" fill="#3a3a3a"/></g></svg>',
+        carrot: '<svg viewBox="0 0 200 90" role="img" aria-label="Carrot"><ellipse cx="105" cy="80" rx="82" ry="6" fill="#000" opacity="0.08"/><path d="M52 38 Q30 16 14 20 Q26 34 40 44 Q22 44 12 56 Q30 62 48 54 Z" fill="#43a854"/><path d="M52 30 Q120 26 188 40 Q192 42 188 46 Q120 62 54 56 Q44 44 52 30 Z" fill="#f2811d"/><path d="M96 36 l-3 12 M128 38 l-3 12 M158 41 l-2 9" stroke="#d96a0e" stroke-width="4" stroke-linecap="round"/></svg>',
+        spoon: '<svg viewBox="0 0 200 90" role="img" aria-label="Spoon"><ellipse cx="100" cy="80" rx="88" ry="6" fill="#000" opacity="0.08"/><g transform="rotate(-5 100 45)"><rect x="72" y="39" width="118" height="13" rx="6.5" fill="#aebbc4"/><ellipse cx="44" cy="45" rx="33" ry="24" fill="#c7d2da"/><ellipse cx="44" cy="45" rx="24" ry="16" fill="#dde6ec"/></g></svg>',
+        banana: '<svg viewBox="0 0 200 90" role="img" aria-label="Banana"><ellipse cx="100" cy="82" rx="84" ry="5" fill="#000" opacity="0.08"/><path d="M22 18 Q60 84 168 62 Q186 58 190 44 Q120 66 62 40 Q34 28 22 18 Z" fill="#ffd93b" stroke="#dfa400" stroke-width="3" stroke-linejoin="round"/><rect x="14" y="10" width="13" height="14" rx="4" fill="#7a5b23" transform="rotate(-18 20 17)"/></svg>',
+        fish: '<svg viewBox="0 0 200 90" role="img" aria-label="Fish"><ellipse cx="100" cy="82" rx="84" ry="5" fill="#000" opacity="0.08"/><polygon points="146,45 184,18 184,72" fill="#e2703a"/><ellipse cx="92" cy="45" rx="62" ry="27" fill="#f59e2d"/><path d="M84 22 q10 -12 24 -6 q-6 10 -12 12 Z" fill="#e2703a"/><circle cx="58" cy="40" r="5" fill="#fff"/><circle cx="58" cy="40" r="2.8" fill="#333"/><path d="M110 30 q6 15 0 30" stroke="#e2703a" stroke-width="4" fill="none" stroke-linecap="round"/></svg>',
+        ribbon: '<svg viewBox="0 0 200 90" role="img" aria-label="Ribbon"><ellipse cx="100" cy="82" rx="88" ry="5" fill="#000" opacity="0.08"/><path d="M8 48 Q36 18 66 44 T124 44 T192 40" stroke="#ef476f" stroke-width="17" fill="none" stroke-linecap="round"/><path d="M8 48 Q36 18 66 44 T124 44 T192 40" stroke="#ff7d9c" stroke-width="6" fill="none" stroke-linecap="round"/></svg>',
+        bus: '<svg viewBox="0 0 200 90" role="img" aria-label="Bus"><ellipse cx="100" cy="82" rx="90" ry="5" fill="#000" opacity="0.08"/><rect x="12" y="12" width="176" height="52" rx="12" fill="#ffb703"/><rect x="12" y="44" width="176" height="9" fill="#f08c00"/><g fill="#dff3fb"><rect x="22" y="20" width="26" height="19" rx="3"/><rect x="54" y="20" width="26" height="19" rx="3"/><rect x="86" y="20" width="26" height="19" rx="3"/><rect x="118" y="20" width="26" height="19" rx="3"/><rect x="152" y="20" width="26" height="19" rx="3"/></g><circle cx="52" cy="68" r="12" fill="#37424c"/><circle cx="52" cy="68" r="5.5" fill="#cfd8dc"/><circle cx="150" cy="68" r="12" fill="#37424c"/><circle cx="150" cy="68" r="5.5" fill="#cfd8dc"/></svg>',
+        snake: '<svg viewBox="0 0 200 90" role="img" aria-label="Snake"><ellipse cx="98" cy="82" rx="90" ry="5" fill="#000" opacity="0.08"/><path d="M10 62 Q34 26 60 54 T112 54 T158 50" stroke="#43a854" stroke-width="17" fill="none" stroke-linecap="round"/><path d="M10 62 Q34 26 60 54 T112 54 T158 50" stroke="#6cc476" stroke-width="7" fill="none" stroke-linecap="round"/><circle cx="172" cy="48" r="15" fill="#43a854"/><circle cx="177" cy="44" r="2.8" fill="#fff"/><circle cx="177" cy="44" r="1.6" fill="#222"/><path d="M186 50 l12 -3 M186 52 l11 4" stroke="#e63946" stroke-width="3" stroke-linecap="round"/></svg>',
+        train: '<svg viewBox="0 0 200 90" role="img" aria-label="Train"><ellipse cx="100" cy="84" rx="92" ry="5" fill="#000" opacity="0.08"/><rect x="4" y="32" width="66" height="34" rx="5" fill="#e63946"/><rect x="12" y="38" width="20" height="14" rx="2" fill="#dff3fb"/><rect x="40" y="38" width="20" height="14" rx="2" fill="#dff3fb"/><rect x="70" y="52" width="10" height="7" fill="#8d99ae"/><rect x="84" y="26" width="74" height="40" rx="5" fill="#2f6fb2"/><rect x="126" y="4" width="36" height="62" rx="5" fill="#2f6fb2"/><rect x="133" y="12" width="22" height="18" rx="2" fill="#dff3fb"/><rect x="92" y="8" width="14" height="20" rx="3" fill="#37424c"/><circle cx="88" cy="30" r="6" fill="#ffd93b"/><circle cx="24" cy="70" r="10" fill="#37424c"/><circle cx="52" cy="70" r="10" fill="#37424c"/><circle cx="104" cy="70" r="10" fill="#37424c"/><circle cx="142" cy="70" r="10" fill="#37424c"/></svg>',
+
+        /* ----- tall objects: viewBox 0 0 90 200 ----- */
+        mushroom: '<svg viewBox="0 0 90 200" role="img" aria-label="Mushroom"><ellipse cx="45" cy="192" rx="32" ry="5" fill="#000" opacity="0.08"/><path d="M33 118 h24 l4 68 a6 6 0 0 1 -6 6 h-20 a6 6 0 0 1 -6 -6 Z" fill="#f5e6c8"/><path d="M6 122 Q45 62 84 122 Q45 138 6 122 Z" fill="#e63946"/><circle cx="32" cy="102" r="7" fill="#fff" opacity="0.85"/><circle cx="56" cy="92" r="5.5" fill="#fff" opacity="0.85"/><circle cx="64" cy="112" r="4.5" fill="#fff" opacity="0.85"/></svg>',
+        candle: '<svg viewBox="0 0 90 200" role="img" aria-label="Candle"><ellipse cx="45" cy="192" rx="30" ry="5" fill="#000" opacity="0.08"/><ellipse cx="45" cy="52" rx="11" ry="19" fill="#ff9f1c"/><ellipse cx="45" cy="58" rx="6" ry="11" fill="#ffd93b"/><rect x="43.4" y="66" width="3.2" height="10" fill="#5b4a2f"/><rect x="27" y="76" width="36" height="112" rx="7" fill="#ff6b8a"/><path d="M27 104 h36 M27 134 h36 M27 164 h36" stroke="#e7547a" stroke-width="7"/></svg>',
+        flower: '<svg viewBox="0 0 90 200" role="img" aria-label="Flower"><ellipse cx="45" cy="192" rx="30" ry="5" fill="#000" opacity="0.08"/><path d="M45 192 V96" stroke="#43a854" stroke-width="6" stroke-linecap="round"/><path d="M45 152 q-20 -4 -24 -22 q20 2 24 22 Z" fill="#43a854"/><path d="M45 168 q20 -4 24 -22 q-20 2 -24 22 Z" fill="#37914a"/><g fill="#f28bb4"><circle cx="45" cy="34" r="14"/><circle cx="24" cy="50" r="14"/><circle cx="66" cy="50" r="14"/><circle cx="30" cy="72" r="14"/><circle cx="60" cy="72" r="14"/></g><circle cx="45" cy="54" r="13" fill="#ffd93b"/></svg>',
+        dog: '<svg viewBox="0 0 90 200" role="img" aria-label="Dog"><ellipse cx="45" cy="192" rx="34" ry="5" fill="#000" opacity="0.08"/><path d="M18 128 Q4 118 8 100" stroke="#96683c" stroke-width="7" fill="none" stroke-linecap="round"/><rect x="24" y="146" width="9" height="42" rx="4" fill="#96683c"/><rect x="54" y="146" width="9" height="42" rx="4" fill="#96683c"/><ellipse cx="42" cy="132" rx="28" ry="18" fill="#b07d4f"/><circle cx="70" cy="106" r="16" fill="#b07d4f"/><ellipse cx="61" cy="98" rx="6.5" ry="13" fill="#7d5527" transform="rotate(14 61 98)"/><ellipse cx="82" cy="112" rx="9" ry="6.5" fill="#c99a68"/><circle cx="88" cy="110" r="3" fill="#333"/><circle cx="72" cy="103" r="2.6" fill="#333"/></svg>',
+        sunflower: '<svg viewBox="0 0 90 200" role="img" aria-label="Sunflower"><ellipse cx="45" cy="192" rx="30" ry="5" fill="#000" opacity="0.08"/><path d="M45 192 V84" stroke="#43a854" stroke-width="6" stroke-linecap="round"/><path d="M45 150 q-20 -4 -24 -22 q20 2 24 22 Z" fill="#43a854"/><path d="M45 168 q20 -4 24 -22 q-20 2 -24 22 Z" fill="#37914a"/><g fill="#ffb703"><circle cx="45" cy="16" r="10"/><circle cx="24" cy="26" r="10"/><circle cx="66" cy="26" r="10"/><circle cx="18" cy="46" r="10"/><circle cx="72" cy="46" r="10"/><circle cx="26" cy="64" r="10"/><circle cx="64" cy="64" r="10"/><circle cx="45" cy="70" r="10"/></g><circle cx="45" cy="44" r="17" fill="#7a4a21"/><g fill="#5d3717"><circle cx="39" cy="40" r="2"/><circle cx="50" cy="38" r="2"/><circle cx="45" cy="48" r="2"/><circle cx="36" cy="50" r="2"/><circle cx="54" cy="50" r="2"/></g></svg>',
+        house: '<svg viewBox="0 0 90 200" role="img" aria-label="House"><ellipse cx="45" cy="192" rx="36" ry="5" fill="#000" opacity="0.08"/><rect x="58" y="56" width="11" height="26" fill="#a4713d"/><rect x="14" y="106" width="62" height="82" fill="#ffd9a0"/><polygon points="4,108 45,64 86,108" fill="#c1443c"/><rect x="37" y="146" width="17" height="42" rx="3" fill="#7a4a21"/><circle cx="50" cy="168" r="2.2" fill="#ffd93b"/><rect x="21" y="120" width="13" height="13" rx="2" fill="#dff3fb"/><rect x="57" y="120" width="13" height="13" rx="2" fill="#dff3fb"/></svg>',
+        tree: '<svg viewBox="0 0 90 200" role="img" aria-label="Tree"><ellipse cx="45" cy="192" rx="32" ry="5" fill="#000" opacity="0.08"/><path d="M39 192 L42 128 h6 l3 64 Z" fill="#8a5a2b"/><circle cx="45" cy="76" r="40" fill="#43a854"/><circle cx="20" cy="104" r="25" fill="#37914a"/><circle cx="70" cy="104" r="25" fill="#37914a"/><circle cx="45" cy="52" r="26" fill="#55b768"/><g fill="#e63946"><circle cx="34" cy="70" r="4"/><circle cx="56" cy="88" r="4"/><circle cx="44" cy="102" r="4"/><circle cx="62" cy="58" r="4"/></g></svg>',
+        castle: '<svg viewBox="0 0 90 200" role="img" aria-label="Castle"><ellipse cx="45" cy="192" rx="38" ry="5" fill="#000" opacity="0.08"/><path d="M45 8 v22" stroke="#5b6b7a" stroke-width="3.5"/><polygon points="45,8 63,13 45,19" fill="#e63946"/><g fill="#9fb2c1"><rect x="6" y="52" width="17" height="138"/><rect x="67" y="52" width="17" height="138"/><rect x="20" y="82" width="50" height="108"/></g><g fill="#8299ab"><rect x="6" y="44" width="17" height="10"/><rect x="67" y="44" width="17" height="10"/><rect x="20" y="74" width="50" height="10"/></g><rect x="11" y="66" width="7" height="12" rx="3.5" fill="#37424c"/><rect x="72" y="66" width="7" height="12" rx="3.5" fill="#37424c"/><rect x="41" y="94" width="8" height="12" rx="4" fill="#37424c"/><path d="M36 190 v-26 a9 9 0 0 1 18 0 v26 Z" fill="#5b4632"/></svg>',
+        giraffe: '<svg viewBox="0 0 90 200" role="img" aria-label="Giraffe"><ellipse cx="45" cy="192" rx="36" ry="5" fill="#000" opacity="0.08"/><path d="M16 118 q-10 14 -4 28" stroke="#e0a83e" stroke-width="5" fill="none" stroke-linecap="round"/><rect x="26" y="138" width="8" height="50" rx="4" fill="#f0b95a"/><rect x="56" y="138" width="8" height="50" rx="4" fill="#f0b95a"/><ellipse cx="43" cy="124" rx="27" ry="17" fill="#f7c873"/><polygon points="56,116 66,34 79,38 70,120" fill="#f7c873"/><g fill="#d98e4a"><circle cx="34" cy="118" r="5"/><circle cx="48" cy="130" r="4"/><circle cx="26" cy="130" r="3.4"/><circle cx="68" cy="76" r="3.6"/><circle cx="71" cy="54" r="3"/></g><ellipse cx="80" cy="30" rx="12" ry="9" fill="#f7c873"/><path d="M72 22 l-3 -9 M82 20 l0 -10" stroke="#d98e4a" stroke-width="3.5" stroke-linecap="round"/><circle cx="69" cy="12" r="3.4" fill="#d98e4a"/><circle cx="82" cy="9" r="3.4" fill="#d98e4a"/><circle cx="84" cy="28" r="2.2" fill="#333"/><circle cx="88" cy="33" r="1.8" fill="#8a5a2b"/></svg>',
+        lighthouse: '<svg viewBox="0 0 90 200" role="img" aria-label="Lighthouse"><ellipse cx="45" cy="192" rx="36" ry="5" fill="#000" opacity="0.08"/><polygon points="45,4 58,26 32,26" fill="#37424c"/><rect x="31" y="26" width="28" height="24" rx="3" fill="#ffd93b"/><rect x="27" y="50" width="36" height="7" fill="#37424c"/><polygon points="33,190 57,190 51,57 39,57" fill="#ffffff"/><clipPath id="lhclip"><polygon points="33,190 57,190 51,57 39,57"/></clipPath><g clip-path="url(#lhclip)" fill="#e63946"><rect x="28" y="76" width="34" height="17"/><rect x="28" y="116" width="34" height="17"/><rect x="28" y="156" width="34" height="17"/></g><polygon points="33,190 57,190 51,57 39,57" fill="none" stroke="#c8d2da" stroke-width="2"/><rect x="41" y="128" width="8" height="13" rx="4" fill="#37424c"/></svg>',
+        building: '<svg viewBox="0 0 90 200" role="img" aria-label="Building"><ellipse cx="45" cy="192" rx="34" ry="5" fill="#000" opacity="0.08"/><rect x="17" y="14" width="56" height="176" fill="#7f9bb3"/><rect x="17" y="14" width="56" height="10" fill="#5d7d99"/><g fill="#dff3fb"><rect x="25" y="34" width="10" height="14"/><rect x="40" y="34" width="10" height="14"/><rect x="55" y="34" width="10" height="14"/><rect x="25" y="58" width="10" height="14"/><rect x="40" y="58" width="10" height="14" fill="#ffd93b"/><rect x="55" y="58" width="10" height="14"/><rect x="25" y="82" width="10" height="14"/><rect x="40" y="82" width="10" height="14"/><rect x="55" y="82" width="10" height="14"/><rect x="25" y="106" width="10" height="14"/><rect x="40" y="106" width="10" height="14"/><rect x="55" y="106" width="10" height="14" fill="#ffd93b"/><rect x="25" y="130" width="10" height="14"/><rect x="40" y="130" width="10" height="14"/><rect x="55" y="130" width="10" height="14"/></g><rect x="38" y="158" width="15" height="32" rx="2" fill="#37424c"/></svg>'
+      };
+
+      /* ---------- object data: size is relative, bigger number = bigger picture ---------- */
+      var LONG_OBJECTS = [
+        { id: "worm",   name: "Worm",   size: 2 },
+        { id: "fish",   name: "Fish",   size: 3 },
+        { id: "crayon", name: "Crayon", size: 3 },
+        { id: "spoon",  name: "Spoon",  size: 4 },
+        { id: "carrot", name: "Carrot", size: 4 },
+        { id: "pencil", name: "Pencil", size: 5 },
+        { id: "banana", name: "Banana", size: 5 },
+        { id: "ribbon", name: "Ribbon", size: 7 },
+        { id: "bus",    name: "Bus",    size: 8 },
+        { id: "snake",  name: "Snake",  size: 9 },
+        { id: "train",  name: "Train",  size: 10 }
+      ];
+      var TALL_OBJECTS = [
+        { id: "mushroom",  name: "Mushroom",  size: 2 },
+        { id: "candle",    name: "Candle",    size: 3 },
+        { id: "flower",    name: "Flower",    size: 3 },
+        { id: "dog",       name: "Dog",       size: 4 },
+        { id: "sunflower", name: "Sunflower", size: 5 },
+        { id: "house",     name: "House",     size: 6 },
+        { id: "tree",      name: "Tree",      size: 7 },
+        { id: "castle",    name: "Castle",    size: 8 },
+        { id: "giraffe",   name: "Giraffe",   size: 9 },
+        { id: "lighthouse",name: "Lighthouse",size: 9 },
+        { id: "building",  name: "Building",  size: 10 }
+      ];
+
+      /* ---------- game state ---------- */
+      var stars = 0;
+      var soundOn = true;
+      var locked = false;
+      var round = null; /* { a, b, answer, word, orient } */
+      var lastPairKey = "";
+
+      var questionEl = document.getElementById("question");
+      var feedbackEl = document.getElementById("feedback");
+      var starCountEl = document.getElementById("starCount");
+      var starsPill = document.getElementById("starsPill");
+      var cards = [
+        { card: document.getElementById("cardA"), obj: document.getElementById("objA"), name: document.getElementById("nameA") },
+        { card: document.getElementById("cardB"), obj: document.getElementById("objB"), name: document.getElementById("nameB") }
+      ];
+
+      function pickPair(list) {
+        var a, b, tries = 0;
+        do {
+          a = list[Math.floor(Math.random() * list.length)];
+          b = list[Math.floor(Math.random() * list.length)];
+          tries++;
+        } while ((a === b || Math.abs(a.size - b.size) < 2 || [a.id, b.id].sort().join("-") === lastPairKey) && tries < 60);
+        lastPairKey = [a.id, b.id].sort().join("-");
+        return [a, b];
+      }
+
+      function newRound() {
+        locked = false;
+        var orient = Math.random() < 0.5 ? "long" : "tall";
+        var pair = pickPair(orient === "long" ? LONG_OBJECTS : TALL_OBJECTS);
+        if (Math.random() < 0.5) pair.reverse();
+        var bigWord = orient === "long" ? "longer" : "taller";
+        var word = Math.random() < 0.38 ? "shorter" : bigWord;
+        var answer = word === "shorter"
+          ? (pair[0].size < pair[1].size ? pair[0] : pair[1])
+          : (pair[0].size > pair[1].size ? pair[0] : pair[1]);
+        round = { a: pair[0], b: pair[1], answer: answer, word: word, orient: orient };
+
+        questionEl.innerHTML = 'Which one is <span class="word">' + word + "</span>?";
+        setFeedback("Tap the picture that is " + word + "!", "");
+        for (var i = 0; i < 2; i++) {
+          var item = i === 0 ? round.a : round.b;
+          var slot = cards[i];
+          slot.card.classList.remove("correct", "wrong");
+          slot.card.setAttribute("aria-label", item.name);
+          slot.obj.className = "obj " + (orient === "long" ? "obj-long" : "obj-tall");
+          slot.obj.innerHTML = ART[item.id];
+          if (orient === "long") {
+            slot.obj.style.width = (24 + item.size * 7.4) + "%";
+            slot.obj.style.height = "";
+          } else {
+            slot.obj.style.height = (26 + item.size * 7.2) + "%";
+            slot.obj.style.width = "";
+          }
+          slot.name.textContent = item.name;
+        }
+      }
+
+      function setFeedback(text, kind) {
+        feedbackEl.textContent = text;
+        feedbackEl.className = "feedback" + (kind ? " " + kind : "");
+      }
+
+      function starBurst(cardEl) {
+        for (var i = 0; i < 7; i++) {
+          var s = document.createElement("span");
+          s.className = "burst-star";
+          s.textContent = "★";
+          var angle = (Math.PI * 2 * i) / 7 + Math.random() * 0.5;
+          var dist = 70 + Math.random() * 70;
+          s.style.left = "50%";
+          s.style.top = "38%";
+          s.style.setProperty("--dx", Math.cos(angle) * dist + "px");
+          s.style.setProperty("--dy", Math.sin(angle) * dist - 30 + "px");
+          cardEl.appendChild(s);
+          (function (el) { setTimeout(function () { el.remove(); }, 1000); })(s);
+        }
+      }
+
+      function onPick(slot) {
+        if (locked || !round) return;
+        ensureAudio();
+        var item = slot === 0 ? round.a : round.b;
+        var cardEl = cards[slot].card;
+        if (item === round.answer) {
+          locked = true;
+          stars++;
+          starCountEl.textContent = stars;
+          starsPill.classList.remove("pop");
+          void starsPill.offsetWidth;
+          starsPill.classList.add("pop");
+          cardEl.classList.add("correct");
+          starBurst(cardEl);
+          playHappy();
+          setFeedback("Yes! The " + item.name.toLowerCase() + " is " + round.word + "! You earned a star!", "good");
+          setTimeout(newRound, 1700);
+        } else {
+          playTryAgain();
+          cardEl.classList.remove("wrong");
+          void cardEl.offsetWidth;
+          cardEl.classList.add("wrong");
+          setFeedback("Good try! Look again — which one is " + round.word + "?", "try");
+          setTimeout(function () { cardEl.classList.remove("wrong"); }, 500);
+        }
+      }
+
+      cards[0].card.addEventListener("click", function () { onPick(0); });
+      cards[1].card.addEventListener("click", function () { onPick(1); });
+
+      /* ---------- sounds (WebAudio, in-browser only) ---------- */
+      var audioCtx = null;
+      function ensureAudio() {
+        if (!audioCtx) {
+          var AC = window.AudioContext || window.webkitAudioContext;
+          if (AC) audioCtx = new AC();
+        }
+        if (audioCtx && audioCtx.state === "suspended") audioCtx.resume();
+      }
+      function tone(freq, startOffset, dur, type, vol) {
+        if (!audioCtx || !soundOn) return;
+        var t0 = audioCtx.currentTime + startOffset;
+        var osc = audioCtx.createOscillator();
+        var gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, t0);
+        gain.gain.setValueAtTime(0.0001, t0);
+        gain.gain.exponentialRampToValueAtTime(vol, t0 + 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(t0);
+        osc.stop(t0 + dur + 0.05);
+      }
+      function playHappy() {
+        tone(523.25, 0, 0.22, "triangle", 0.22);
+        tone(659.25, 0.09, 0.22, "triangle", 0.22);
+        tone(783.99, 0.18, 0.22, "triangle", 0.22);
+        tone(1046.5, 0.27, 0.4, "triangle", 0.24);
+      }
+      function playTryAgain() {
+        tone(330, 0, 0.18, "sine", 0.12);
+        tone(262, 0.14, 0.26, "sine", 0.12);
+      }
+
+      /* ---------- speech ---------- */
+      function speakQuestion() {
+        if (!round || !("speechSynthesis" in window)) return;
+        try {
+          window.speechSynthesis.cancel();
+          var text = "Which one is " + round.word + "? The " + round.a.name.toLowerCase() + ", or the " + round.b.name.toLowerCase() + "?";
+          var u = new SpeechSynthesisUtterance(text);
+          u.rate = 0.92;
+          u.pitch = 1.1;
+          window.speechSynthesis.speak(u);
+        } catch (e) { /* speech unavailable — game continues silently */ }
+      }
+
+      /* ---------- controls ---------- */
+      document.getElementById("hearBtn").addEventListener("click", function () {
+        ensureAudio();
+        speakQuestion();
+      });
+      document.getElementById("soundBtn").addEventListener("click", function () {
+        soundOn = !soundOn;
+        this.textContent = soundOn ? "Sound: On" : "Sound: Off";
+        if (soundOn) { ensureAudio(); playHappy(); }
+      });
+      document.getElementById("newBtn").addEventListener("click", function () {
+        ensureAudio();
+        stars = 0;
+        starCountEl.textContent = "0";
+        lastPairKey = "";
+        newRound();
+      });
+
+      newRound();
+    </script>
+  </body>
+</html>

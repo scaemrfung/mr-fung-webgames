@@ -78,6 +78,31 @@
       }
       h1, h2 { font-family: "Fredoka", "Nunito", sans-serif; }
 
+      /* ---------- Home button ---------- */
+      .home-row { display: flex; justify-content: flex-start; }
+      .home-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        font-family: "Nunito", sans-serif;
+        font-weight: 900;
+        font-size: 18px;
+        line-height: 1;
+        text-decoration: none;
+        color: #fff;
+        background: var(--teal);
+        border: 3px solid var(--teal-dark);
+        border-radius: 999px;
+        padding: 11px 22px 11px 16px;
+        box-shadow: 0 4px 0 var(--teal-dark);
+        transition: transform 0.08s ease, box-shadow 0.08s ease;
+        touch-action: manipulation;
+      }
+      .home-btn:hover { filter: brightness(1.05); }
+      .home-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--teal-dark); }
+      .home-btn:focus-visible { outline: 4px solid var(--orange); outline-offset: 2px; }
+      .home-btn svg { width: 22px; height: 22px; flex: none; display: block; }
+
       /* ---------- Top bar ---------- */
       .topbar {
         display: flex;
@@ -425,6 +450,14 @@
   </head>
   <body>
     <div class="wrap">
+      <!-- Home -->
+      <div class="home-row">
+        <a class="home-btn" href="https://scaemrfung.github.io/mr-fung-webgames/" aria-label="Home — back to all games">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 11.2 12 3l9 8.2" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 9.8V21h13V9.8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.5 21v-6h5v6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Home
+        </a>
+      </div>
+
       <!-- Top bar -->
       <div class="topbar">
         <h1 class="title"><span class="n1">Number Order</span> &amp; <span class="n2">Place Value</span></h1>

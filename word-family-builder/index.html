@@ -1,0 +1,800 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>Word Family Builder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --bg: #fdf3e3;
+        --bg-soft: #fffaf1;
+        --card: #ffffff;
+        --ink: #26324b;
+        --ink-soft: #5a6a8a;
+        --line: #f0ddba;
+        --coral: #e4572e;
+        --coral-dark: #c7431f;
+        --teal: #0e7c86;
+        --teal-dark: #095e66;
+        --sun: #f6b81e;
+        --sun-soft: #fdeec3;
+        --green: #2e9e5b;
+        --green-soft: #dff5e6;
+        --tile: #ffffff;
+        --tile-edge: #e8d9bd;
+        --shadow: 0 6px 0 rgba(38, 50, 75, 0.10), 0 14px 28px rgba(38, 50, 75, 0.10);
+        --chip: #eef4fb;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #1b2036;
+          --bg-soft: #232949;
+          --card: #262c4a;
+          --ink: #f4f1e8;
+          --ink-soft: #b9c0d8;
+          --line: #3a4166;
+          --coral: #ff7a52;
+          --coral-dark: #e4572e;
+          --teal: #35b6c2;
+          --teal-dark: #7fd4dc;
+          --sun: #ffc93d;
+          --sun-soft: #4a3d14;
+          --green: #4cc97e;
+          --green-soft: #1e4030;
+          --tile: #2e3557;
+          --tile-edge: #454e7d;
+          --shadow: 0 6px 0 rgba(0, 0, 0, 0.25), 0 14px 28px rgba(0, 0, 0, 0.35);
+          --chip: #313a63;
+        }
+      }
+
+      * { box-sizing: border-box; }
+      html { -webkit-text-size-adjust: 100%; }
+      body {
+        margin: 0;
+        font-family: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+        background:
+          radial-gradient(circle at 12% 8%, rgba(246, 184, 30, 0.16), transparent 260px),
+          radial-gradient(circle at 88% 4%, rgba(14, 124, 134, 0.14), transparent 300px),
+          var(--bg);
+        color: var(--ink);
+        min-height: 100vh;
+      }
+      button { font-family: inherit; cursor: pointer; }
+      button:focus-visible { outline: 4px solid var(--sun); outline-offset: 2px; }
+
+      .wrap {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: clamp(12px, 2.5vw, 28px);
+      }
+
+      /* ---------- Top bar ---------- */
+      .topbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .top-left { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+      .btn.btn-home {
+        background: var(--teal);
+        border-color: var(--teal-dark);
+        color: #fff;
+        text-decoration: none;
+      }
+      .btn.btn-home:hover { background: var(--teal-dark); }
+      @media (prefers-color-scheme: dark) { .btn.btn-home { color: #0d2126; } }
+      .stars-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--card);
+        border: 3px solid var(--sun);
+        border-radius: 999px;
+        padding: 8px 20px 8px 14px;
+        box-shadow: var(--shadow);
+        font-family: "Fredoka", sans-serif;
+        font-weight: 600;
+        font-size: clamp(1.3rem, 3vw, 1.7rem);
+      }
+      .stars-pill svg { width: 30px; height: 30px; flex: none; }
+      .stars-pill.pop { animation: pop 0.35s ease; }
+      .top-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: 3px solid transparent;
+        border-radius: 999px;
+        padding: 10px 20px;
+        font-family: "Fredoka", sans-serif;
+        font-weight: 600;
+        font-size: clamp(1rem, 2.4vw, 1.2rem);
+        background: var(--card);
+        color: var(--ink);
+        border-color: var(--line);
+        box-shadow: 0 4px 0 rgba(38, 50, 75, 0.12);
+        transition: transform 0.08s ease, box-shadow 0.08s ease;
+      }
+      .btn:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(38, 50, 75, 0.12); }
+      .btn svg { width: 22px; height: 22px; flex: none; }
+      .btn-primary { background: var(--coral); border-color: var(--coral-dark); color: #fff; }
+      .btn-primary:hover { background: var(--coral-dark); }
+      .btn-hear { background: var(--teal); border-color: var(--teal-dark); color: #fff; font-size: clamp(1.1rem, 2.6vw, 1.35rem); padding: 12px 26px; }
+      .btn-hear:hover { background: var(--teal-dark); }
+      @media (prefers-color-scheme: dark) {
+        .btn-hear { color: #10222b; }
+        .btn-primary { color: #2b1408; }
+      }
+
+      /* ---------- Heading ---------- */
+      h1 {
+        font-family: "Fredoka", sans-serif;
+        font-weight: 700;
+        font-size: clamp(2rem, 5.5vw, 3.2rem);
+        line-height: 1.05;
+        margin: 18px 0 4px;
+        letter-spacing: 0.01em;
+      }
+      h1 .w1 { color: var(--coral); }
+      h1 .w2 { color: var(--teal); }
+      .tagline {
+        margin: 0 0 18px;
+        font-size: clamp(1.05rem, 2.6vw, 1.3rem);
+        font-weight: 700;
+        color: var(--ink-soft);
+      }
+
+      /* ---------- Family picker ---------- */
+      .step-label {
+        font-family: "Fredoka", sans-serif;
+        font-weight: 600;
+        font-size: clamp(1.1rem, 2.6vw, 1.35rem);
+        margin: 0 0 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .step-num {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px; height: 34px;
+        border-radius: 50%;
+        background: var(--sun);
+        color: #4a3200;
+        font-size: 1.15rem;
+        flex: none;
+      }
+      .families { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 22px; }
+      .fam-chip {
+        font-family: "Fredoka", sans-serif;
+        font-weight: 600;
+        font-size: clamp(1.4rem, 3.4vw, 1.8rem);
+        padding: 10px 26px;
+        border-radius: 18px;
+        border: 3px solid var(--tile-edge);
+        background: var(--card);
+        color: var(--ink);
+        box-shadow: 0 4px 0 rgba(38, 50, 75, 0.10);
+        transition: transform 0.08s ease;
+      }
+      .fam-chip:active { transform: translateY(3px); }
+      .fam-chip.active {
+        background: var(--teal);
+        border-color: var(--teal-dark);
+        color: #fff;
+      }
+      @media (prefers-color-scheme: dark) { .fam-chip.active { color: #0d2126; } }
+
+      /* ---------- Main grid ---------- */
+      .main-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 20px;
+        align-items: start;
+      }
+      @media (min-width: 880px) {
+        .main-grid { grid-template-columns: minmax(0, 1fr) 300px; }
+      }
+      .card {
+        background: var(--card);
+        border: 3px solid var(--line);
+        border-radius: 26px;
+        box-shadow: var(--shadow);
+        padding: clamp(16px, 3vw, 28px);
+        position: relative;
+        overflow: hidden;
+      }
+
+      /* ---------- Word display ---------- */
+      .word-stage {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: clamp(8px, 2vw, 14px);
+        background: var(--bg-soft);
+        border: 3px dashed var(--line);
+        border-radius: 20px;
+        padding: clamp(16px, 3vw, 26px) 12px;
+        min-height: 132px;
+      }
+      .letter-box {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: clamp(64px, 13vw, 96px);
+        height: clamp(76px, 15vw, 110px);
+        padding: 0 10px;
+        border-radius: 18px;
+        font-family: "Fredoka", sans-serif;
+        font-weight: 700;
+        font-size: clamp(2.6rem, 7vw, 4.2rem);
+        line-height: 1;
+        text-transform: uppercase;
+      }
+      .letter-box.onset {
+        background: var(--card);
+        border: 4px dashed var(--coral);
+        color: var(--coral);
+      }
+      .letter-box.onset.filled {
+        border-style: solid;
+        background: var(--coral);
+        color: #fff;
+        animation: pop 0.3s ease;
+      }
+      @media (prefers-color-scheme: dark) { .letter-box.onset.filled { color: #2b1408; } }
+      .letter-box.ending {
+        background: var(--teal);
+        color: #fff;
+        border: 4px solid var(--teal-dark);
+      }
+      @media (prefers-color-scheme: dark) { .letter-box.ending { color: #0d2126; } }
+      .word-stage.wobble { animation: wobble 0.45s ease; }
+      .word-stage.cheer { animation: cheer 0.5s ease; border-color: var(--green); }
+
+      .message {
+        min-height: 2.2em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-family: "Fredoka", sans-serif;
+        font-weight: 600;
+        font-size: clamp(1.25rem, 3.2vw, 1.7rem);
+        margin: 16px 4px 6px;
+      }
+      .message.good { color: var(--green); }
+      .message.try { color: var(--coral); }
+      .hear-row { display: flex; justify-content: center; margin-top: 6px; }
+
+      /* ---------- Tiles ---------- */
+      .tiles {
+        display: flex;
+        flex-wrap: wrap;
+        gap: clamp(8px, 1.8vw, 14px);
+        margin-top: 14px;
+      }
+      .tile {
+        flex: 1 1 76px;
+        max-width: 118px;
+        min-height: clamp(72px, 12vw, 92px);
+        border-radius: 20px;
+        border: 3px solid var(--tile-edge);
+        border-bottom-width: 7px;
+        background: var(--tile);
+        color: var(--ink);
+        font-family: "Fredoka", sans-serif;
+        font-weight: 700;
+        font-size: clamp(1.7rem, 4.5vw, 2.3rem);
+        text-transform: uppercase;
+        transition: transform 0.08s ease, background 0.15s ease;
+      }
+      .tile:hover { transform: translateY(-2px); }
+      .tile:active { transform: translateY(3px); }
+      .tile.found {
+        background: var(--green-soft);
+        border-color: var(--green);
+        color: var(--green);
+        position: relative;
+      }
+      .tile.found::after {
+        content: "★";
+        position: absolute;
+        top: 2px; right: 8px;
+        font-size: 1rem;
+        color: var(--sun);
+      }
+      .tile.nope { animation: wobble 0.4s ease; }
+
+      /* ---------- Found words ---------- */
+      .found-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+      .found-head h2 {
+        font-family: "Fredoka", sans-serif;
+        font-weight: 600;
+        font-size: clamp(1.3rem, 3vw, 1.6rem);
+        margin: 0;
+      }
+      .found-count {
+        font-weight: 800;
+        color: var(--ink-soft);
+        font-size: 1.05rem;
+        white-space: nowrap;
+      }
+      .progress-track {
+        height: 14px;
+        border-radius: 999px;
+        background: var(--chip);
+        overflow: hidden;
+        margin-bottom: 16px;
+      }
+      .progress-fill {
+        height: 100%;
+        width: 0%;
+        border-radius: 999px;
+        background: var(--sun);
+        transition: width 0.4s ease;
+      }
+      .found-list { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin: 0; padding: 0; }
+      .found-list li {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--green-soft);
+        color: var(--green);
+        border: 2px solid var(--green);
+        border-radius: 999px;
+        padding: 6px 14px;
+        font-family: "Fredoka", sans-serif;
+        font-weight: 600;
+        font-size: 1.15rem;
+        text-transform: uppercase;
+        animation: pop 0.3s ease;
+      }
+      .found-list li svg { width: 15px; height: 15px; }
+      .found-empty {
+        color: var(--ink-soft);
+        font-weight: 700;
+        font-size: 1.05rem;
+        margin: 0;
+      }
+
+      /* ---------- Confetti ---------- */
+      .confetti-bit {
+        position: absolute;
+        top: -14px;
+        width: 12px; height: 18px;
+        border-radius: 3px;
+        pointer-events: none;
+        animation: fall 1.4s ease-in forwards;
+        z-index: 5;
+      }
+
+      @keyframes pop {
+        0% { transform: scale(0.7); }
+        60% { transform: scale(1.12); }
+        100% { transform: scale(1); }
+      }
+      @keyframes wobble {
+        0%, 100% { transform: translateX(0); }
+        20% { transform: translateX(-9px); }
+        40% { transform: translateX(9px); }
+        60% { transform: translateX(-6px); }
+        80% { transform: translateX(6px); }
+      }
+      @keyframes cheer {
+        0% { transform: scale(1); }
+        40% { transform: scale(1.03); }
+        100% { transform: scale(1); }
+      }
+      @keyframes fall {
+        to { transform: translateY(560px) rotate(560deg); opacity: 0; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="topbar">
+        <div class="top-left">
+          <a class="btn btn-home" href="https://scaemrfung.github.io/mr-fung-webgames/">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/><path d="M9.5 20v-6h5v6"/></svg>
+            Home
+          </a>
+          <div class="stars-pill" id="starsPill" aria-label="Stars earned">
+          <svg viewBox="0 0 24 24" fill="#f6b81e" stroke="#c78f06" stroke-width="1.2" aria-hidden="true"><path d="M12 2.6l2.9 6.2 6.8.8-5 4.7 1.3 6.7L12 17.7l-6 3.3 1.3-6.7-5-4.7 6.8-.8z"/></svg>
+          <span><span id="starCount">0</span> stars</span>
+          </div>
+        </div>
+        <div class="top-actions">
+          <button class="btn" id="soundBtn" type="button" aria-pressed="true"></button>
+          <button class="btn btn-primary" id="newFamilyBtn" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></svg>
+            New Family
+          </button>
+        </div>
+      </div>
+
+      <h1><span class="w1">Word Family</span> <span class="w2">Builder</span></h1>
+      <p class="tagline">Tap a letter tile to build a word. Find all the words in the family!</p>
+
+      <p class="step-label" id="famLabel"><span class="step-num">1</span> Pick a word family</p>
+      <div class="families" id="families" role="group" aria-labelledby="famLabel"></div>
+
+      <div class="main-grid">
+        <section class="card" id="playCard" aria-label="Build a word">
+          <p class="step-label"><span class="step-num">2</span> Tap a letter to build your word</p>
+
+          <div class="word-stage" id="wordStage">
+            <div class="letter-box onset" id="onsetBox">?</div>
+            <div class="letter-box ending" id="endBox1"></div>
+            <div class="letter-box ending" id="endBox2"></div>
+          </div>
+
+          <p class="message" id="message" aria-live="polite"></p>
+
+          <div class="hear-row">
+            <button class="btn btn-hear" id="hearBtn" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor" stroke="none"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.4 5.6a9 9 0 0 1 0 12.8"/></svg>
+              Hear It
+            </button>
+          </div>
+
+          <div class="tiles" id="tiles"></div>
+        </section>
+
+        <aside class="card" aria-label="Words you found">
+          <div class="found-head">
+            <h2>Words I Found</h2>
+            <span class="found-count" id="foundCount"></span>
+          </div>
+          <div class="progress-track" aria-hidden="true"><div class="progress-fill" id="progressFill"></div></div>
+          <ul class="found-list" id="foundList"></ul>
+          <p class="found-empty" id="foundEmpty">No words yet. Tap a letter tile to start!</p>
+        </aside>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        "use strict";
+
+        /* Each family: the ending, plus onset tiles.
+           word:true  -> onset + ending is a real Grade One word
+           word:false -> a decoy tile that gives a gentle "try again" */
+        var FAMILIES = {
+          at: { ending: "at", tiles: [
+            { t: "c", word: true }, { t: "h", word: true }, { t: "m", word: true },
+            { t: "b", word: true }, { t: "r", word: true }, { t: "s", word: true },
+            { t: "p", word: true }, { t: "f", word: true },
+            { t: "fl", word: true }, { t: "br", word: true }, { t: "ch", word: true },
+            { t: "d", word: false }, { t: "k", word: false }, { t: "j", word: false }, { t: "z", word: false }
+          ]},
+          in: { ending: "in", tiles: [
+            { t: "p", word: true }, { t: "w", word: true }, { t: "b", word: true },
+            { t: "f", word: true }, { t: "t", word: true },
+            { t: "ch", word: true }, { t: "gr", word: true }, { t: "sp", word: true },
+            { t: "tw", word: true }, { t: "th", word: true },
+            { t: "j", word: false }, { t: "z", word: false }, { t: "v", word: false }, { t: "x", word: false }
+          ]},
+          op: { ending: "op", tiles: [
+            { t: "h", word: true }, { t: "m", word: true }, { t: "t", word: true },
+            { t: "p", word: true }, { t: "c", word: true },
+            { t: "dr", word: true }, { t: "sh", word: true }, { t: "st", word: true },
+            { t: "fl", word: true }, { t: "ch", word: true }, { t: "pl", word: true },
+            { t: "d", word: false }, { t: "g", word: false }, { t: "j", word: false }, { t: "z", word: false }
+          ]},
+          an: { ending: "an", tiles: [
+            { t: "c", word: true }, { t: "f", word: true }, { t: "m", word: true },
+            { t: "p", word: true }, { t: "r", word: true }, { t: "t", word: true },
+            { t: "v", word: true }, { t: "b", word: true },
+            { t: "pl", word: true },
+            { t: "d", word: false }, { t: "j", word: false }, { t: "k", word: false }, { t: "z", word: false }
+          ]},
+          ig: { ending: "ig", tiles: [
+            { t: "b", word: true }, { t: "d", word: true }, { t: "p", word: true },
+            { t: "w", word: true }, { t: "f", word: true }, { t: "j", word: true },
+            { t: "r", word: true },
+            { t: "tw", word: true },
+            { t: "h", word: false }, { t: "k", word: false }, { t: "l", word: false }, { t: "x", word: false }
+          ]},
+          et: { ending: "et", tiles: [
+            { t: "g", word: true }, { t: "j", word: true }, { t: "p", word: true },
+            { t: "n", word: true }, { t: "s", word: true }, { t: "w", word: true },
+            { t: "l", word: true }, { t: "m", word: true }, { t: "b", word: true },
+            { t: "v", word: true },
+            { t: "d", word: false }, { t: "f", word: false }, { t: "k", word: false }, { t: "z", word: false }
+          ]}
+        };
+        var FAMILY_KEYS = Object.keys(FAMILIES);
+        var PRAISE = ["Great job!", "Way to go!", "Super work!", "You did it!", "Fantastic!"];
+
+        var state = {
+          family: "at",
+          found: {},          // word -> true, for the current family
+          totalInFamily: 0,
+          stars: 0,
+          currentWord: null,  // last word built (uppercase display form stored lowercase)
+          currentOnset: null,
+          soundOn: true
+        };
+
+        var els = {
+          families: document.getElementById("families"),
+          tiles: document.getElementById("tiles"),
+          onsetBox: document.getElementById("onsetBox"),
+          endBox1: document.getElementById("endBox1"),
+          endBox2: document.getElementById("endBox2"),
+          stage: document.getElementById("wordStage"),
+          message: document.getElementById("message"),
+          foundList: document.getElementById("foundList"),
+          foundEmpty: document.getElementById("foundEmpty"),
+          foundCount: document.getElementById("foundCount"),
+          progressFill: document.getElementById("progressFill"),
+          starCount: document.getElementById("starCount"),
+          starsPill: document.getElementById("starsPill"),
+          soundBtn: document.getElementById("soundBtn"),
+          newFamilyBtn: document.getElementById("newFamilyBtn"),
+          hearBtn: document.getElementById("hearBtn"),
+          playCard: document.getElementById("playCard")
+        };
+
+        /* ---------------- Sound (Web Audio, in-browser only) ---------------- */
+        var audioCtx = null;
+        function ac() {
+          if (!audioCtx) {
+            var AC = window.AudioContext || window.webkitAudioContext;
+            if (AC) audioCtx = new AC();
+          }
+          if (audioCtx && audioCtx.state === "suspended") audioCtx.resume();
+          return audioCtx;
+        }
+        function tone(freq, start, dur, type, vol) {
+          var ctx = ac();
+          if (!ctx) return;
+          var osc = ctx.createOscillator();
+          var gain = ctx.createGain();
+          osc.type = type || "triangle";
+          osc.frequency.value = freq;
+          var t0 = ctx.currentTime + start;
+          gain.gain.setValueAtTime(0.0001, t0);
+          gain.gain.exponentialRampToValueAtTime(vol || 0.22, t0 + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.start(t0); osc.stop(t0 + dur + 0.05);
+        }
+        function happySound() {
+          if (!state.soundOn) return;
+          tone(523.25, 0, 0.16); tone(659.25, 0.09, 0.16); tone(783.99, 0.18, 0.26);
+        }
+        function fanfareSound() {
+          if (!state.soundOn) return;
+          var notes = [523.25, 659.25, 783.99, 1046.5, 783.99, 1046.5];
+          for (var i = 0; i < notes.length; i++) tone(notes[i], i * 0.11, 0.24);
+        }
+        function trySound() {
+          if (!state.soundOn) return;
+          tone(233.08, 0, 0.16, "sine", 0.14); tone(196.0, 0.13, 0.22, "sine", 0.14);
+        }
+        function clickSound() {
+          if (!state.soundOn) return;
+          tone(660, 0, 0.07, "square", 0.06);
+        }
+
+        /* ---------------- Speech ---------------- */
+        function speak(text) {
+          if (!("speechSynthesis" in window)) return;
+          try {
+            window.speechSynthesis.cancel();
+            var u = new SpeechSynthesisUtterance(text);
+            u.rate = 0.82;
+            u.pitch = 1.1;
+            window.speechSynthesis.speak(u);
+          } catch (e) { /* speech unavailable — game still works silently */ }
+        }
+
+        /* ---------------- Rendering ---------------- */
+        function renderFamilies() {
+          els.families.innerHTML = "";
+          FAMILY_KEYS.forEach(function (key) {
+            var b = document.createElement("button");
+            b.type = "button";
+            b.className = "fam-chip" + (key === state.family ? " active" : "");
+            b.textContent = "-" + FAMILIES[key].ending;
+            b.setAttribute("aria-pressed", key === state.family ? "true" : "false");
+            b.addEventListener("click", function () {
+              if (key !== state.family) { clickSound(); loadFamily(key); }
+            });
+            els.families.appendChild(b);
+          });
+        }
+
+        function shuffled(arr) {
+          var a = arr.slice();
+          for (var i = a.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+          }
+          return a;
+        }
+
+        function renderTiles() {
+          els.tiles.innerHTML = "";
+          var fam = FAMILIES[state.family];
+          shuffled(fam.tiles).forEach(function (tile) {
+            var b = document.createElement("button");
+            b.type = "button";
+            b.className = "tile";
+            b.textContent = tile.t;
+            b.setAttribute("aria-label", "Letter " + tile.t.split("").join(" "));
+            b.addEventListener("click", function () { tapTile(tile, b); });
+            els.tiles.appendChild(b);
+          });
+        }
+
+        function renderFound() {
+          var words = Object.keys(state.found).sort();
+          els.foundList.innerHTML = "";
+          words.forEach(function (w) {
+            var li = document.createElement("li");
+            li.innerHTML = '<svg viewBox="0 0 24 24" fill="#f6b81e" stroke="#c78f06" stroke-width="1.2" aria-hidden="true"><path d="M12 2.6l2.9 6.2 6.8.8-5 4.7 1.3 6.7L12 17.7l-6 3.3 1.3-6.7-5-4.7 6.8-.8z"/></svg>' + w.toUpperCase();
+            els.foundList.appendChild(li);
+          });
+          els.foundEmpty.style.display = words.length ? "none" : "block";
+          els.foundCount.textContent = words.length + " of " + state.totalInFamily + " words";
+          var pct = state.totalInFamily ? (words.length / state.totalInFamily) * 100 : 0;
+          els.progressFill.style.width = pct + "%";
+        }
+
+        function setMessage(text, kind) {
+          els.message.textContent = text;
+          els.message.className = "message" + (kind ? " " + kind : "");
+        }
+
+        function showWord(onset) {
+          var fam = FAMILIES[state.family];
+          els.onsetBox.textContent = onset;
+          els.onsetBox.classList.add("filled");
+          els.endBox1.textContent = fam.ending.charAt(0);
+          els.endBox2.textContent = fam.ending.charAt(1);
+          // restart the pop animation
+          els.onsetBox.style.animation = "none";
+          void els.onsetBox.offsetWidth;
+          els.onsetBox.style.animation = "";
+        }
+
+        function confetti() {
+          if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+          var colors = ["#e4572e", "#0e7c86", "#f6b81e", "#2e9e5b", "#ff8fb2"];
+          for (var i = 0; i < 26; i++) {
+            var bit = document.createElement("div");
+            bit.className = "confetti-bit";
+            bit.style.left = (4 + Math.random() * 92) + "%";
+            bit.style.background = colors[i % colors.length];
+            bit.style.animationDelay = (Math.random() * 0.35) + "s";
+            bit.style.transform = "rotate(" + Math.floor(Math.random() * 360) + "deg)";
+            els.playCard.appendChild(bit);
+            (function (el) { setTimeout(function () { el.remove(); }, 2200); })(bit);
+          }
+        }
+
+        /* ---------------- Game logic ---------------- */
+        function tapTile(tile, btn) {
+          ac(); // unlock audio on the tap
+          var fam = FAMILIES[state.family];
+          var word = tile.t + fam.ending;
+          state.currentWord = word;
+          state.currentOnset = tile.t;
+          showWord(tile.t);
+
+          els.stage.classList.remove("wobble", "cheer");
+
+          if (tile.word) {
+            if (state.found[word]) {
+              clickSound();
+              setMessage("You already found " + word.toUpperCase() + "! Great memory!", "good");
+              return;
+            }
+            state.found[word] = true;
+            state.stars += 1;
+            els.starCount.textContent = state.stars;
+            els.starsPill.classList.remove("pop");
+            void els.starsPill.offsetWidth;
+            els.starsPill.classList.add("pop");
+            btn.classList.add("found");
+            els.stage.classList.add("cheer");
+            renderFound();
+
+            var foundCount = Object.keys(state.found).length;
+            if (foundCount >= state.totalInFamily) {
+              fanfareSound();
+              confetti();
+              setMessage("WOW! You found ALL the -" + fam.ending + " words! Amazing!", "good");
+            } else {
+              happySound();
+              var praise = PRAISE[Math.floor(Math.random() * PRAISE.length)];
+              setMessage("Yes! " + word.toUpperCase() + " is a word. " + praise, "good");
+            }
+          } else {
+            trySound();
+            btn.classList.remove("nope");
+            void btn.offsetWidth;
+            btn.classList.add("nope");
+            els.stage.classList.add("wobble");
+            setMessage("Hmm, " + word.toUpperCase() + " is not a word. Try another letter!", "try");
+          }
+        }
+
+        function loadFamily(key) {
+          state.family = key;
+          state.found = {};
+          state.currentWord = null;
+          state.currentOnset = null;
+          var fam = FAMILIES[key];
+          state.totalInFamily = fam.tiles.filter(function (t) { return t.word; }).length;
+          els.onsetBox.textContent = "?";
+          els.onsetBox.classList.remove("filled");
+          els.endBox1.textContent = fam.ending.charAt(0);
+          els.endBox2.textContent = fam.ending.charAt(1);
+          els.stage.classList.remove("wobble", "cheer");
+          setMessage("Tap a letter tile to build a word that ends in -" + fam.ending + "!", "");
+          renderFamilies();
+          renderTiles();
+          renderFound();
+        }
+
+        /* ---------------- Controls ---------------- */
+        function renderSoundBtn() {
+          var on = state.soundOn;
+          els.soundBtn.setAttribute("aria-pressed", on ? "true" : "false");
+          els.soundBtn.innerHTML = on
+            ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor" stroke="none"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.4 5.6a9 9 0 0 1 0 12.8"/></svg> Sound: On'
+            : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor" stroke="none"/><path d="M16 9l6 6M22 9l-6 6"/></svg> Sound: Off';
+        }
+        els.soundBtn.addEventListener("click", function () {
+          state.soundOn = !state.soundOn;
+          renderSoundBtn();
+          if (state.soundOn) clickSound();
+        });
+
+        els.newFamilyBtn.addEventListener("click", function () {
+          ac();
+          var others = FAMILY_KEYS.filter(function (k) { return k !== state.family; });
+          var next = others[Math.floor(Math.random() * others.length)];
+          clickSound();
+          loadFamily(next);
+        });
+
+        els.hearBtn.addEventListener("click", function () {
+          ac();
+          if (state.currentWord) {
+            speak(state.currentWord);
+          } else {
+            speak("Tap a letter to build a word that ends in " + FAMILIES[state.family].ending + ".");
+          }
+        });
+
+        /* ---------------- Start ---------------- */
+        renderSoundBtn();
+        loadFamily("at");
+      })();
+    </script>
+  </body>
+</html>

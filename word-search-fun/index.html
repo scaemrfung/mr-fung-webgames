@@ -58,6 +58,22 @@
       }
       .wrap { max-width: 1020px; margin: 0 auto; padding: 20px 16px 48px; }
 
+      .top-bar {
+        position: sticky; top: 10px; z-index: 10;
+        display: flex; justify-content: flex-start; align-items: center;
+        margin-bottom: 12px;
+      }
+      .btn-home {
+        display: inline-flex; align-items: center; gap: 8px;
+        font-family: "Fredoka", "Nunito", sans-serif; font-weight: 700; font-size: 1.1rem; line-height: 1;
+        text-decoration: none; color: #33302a; background: #ffd23f;
+        border: 3px solid #e9a800; border-radius: 999px; padding: 10px 20px 10px 16px;
+        box-shadow: 0 4px 0 rgba(51, 48, 42, 0.18), 0 8px 18px rgba(120, 90, 20, 0.18);
+      }
+      .btn-home svg { width: 22px; height: 22px; flex: none; display: block; }
+      .btn-home:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(51, 48, 42, 0.18), 0 4px 10px rgba(120, 90, 20, 0.16); }
+      .btn-home:focus-visible { outline: 3px solid var(--teal); outline-offset: 2px; }
+
       header { text-align: center; margin: 6px 0 18px; }
       h1 {
         font-family: "Fredoka", "Nunito", sans-serif;
@@ -236,6 +252,12 @@
   </head>
   <body>
     <div class="wrap">
+      <div class="top-bar">
+        <a class="btn-home" href="https://scaemrfung.github.io/mr-fung-webgames/" aria-label="Home — back to all games">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M12 3.1 21 11h-2.6v8.1a1.9 1.9 0 0 1-1.9 1.9h-3.6v-6.2H11.1V21H7.5A1.9 1.9 0 0 1 5.6 19.1V11H3L12 3.1z"/></svg>
+          <span>Home</span>
+        </a>
+      </div>
       <header>
         <h1><span class="w1">Word</span> <span class="w2">Search</span> <span class="w3">Fun!</span></h1>
         <p class="sub" id="subText">Find the school words hiding in the letters.</p>

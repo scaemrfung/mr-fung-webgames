@@ -1,0 +1,662 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>Morning Message Board</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet" />
+    <style>
+      :root{
+        --bg:#e8f2fb;
+        --bg-dot:#d4e6f5;
+        --board:#ffffff;
+        --board-border:#dbe9f6;
+        --ink:#16233a;
+        --ink-2:#4a5b74;
+        --ink-3:#7a8aa0;
+        --accent:#ff6b4a;
+        --accent-dark:#e5512f;
+        --accent-ink:#ffffff;
+        --teal:#0f9b8a;
+        --teal-dark:#0b7d6f;
+        --sunny-bg:#fff3cf;
+        --sunny-ring:#ffd75e;
+        --cloudy-bg:#e6edf5;
+        --rainy-bg:#dceeff;
+        --snowy-bg:#e8f6ff;
+        --windy-bg:#e2f5ec;
+        --pill:#f1f6fb;
+        --pill-border:#dbe9f6;
+        --shadow:0 18px 50px rgba(22,50,90,.16), 0 4px 14px rgba(22,50,90,.08);
+        --overlay:rgba(12,24,44,.55);
+        --focus:#ff6b4a;
+      }
+      @media (prefers-color-scheme: dark){
+        :root{
+          --bg:#0e1626;
+          --bg-dot:#16233c;
+          --board:#18253f;
+          --board-border:#2a3c5e;
+          --ink:#f2f6fc;
+          --ink-2:#b9c7db;
+          --ink-3:#8595b0;
+          --accent:#ff7d5f;
+          --accent-dark:#ff6b4a;
+          --teal:#1dbfa9;
+          --teal-dark:#15a892;
+          --sunny-bg:#3a3218;
+          --sunny-ring:#ffd75e;
+          --cloudy-bg:#24344f;
+          --rainy-bg:#1d3350;
+          --snowy-bg:#1e3448;
+          --windy-bg:#1c3a33;
+          --pill:#1f3050;
+          --pill-border:#2a3c5e;
+          --shadow:0 18px 50px rgba(0,0,0,.45), 0 4px 14px rgba(0,0,0,.3);
+          --overlay:rgba(2,6,14,.68);
+          --focus:#ffb09d;
+        }
+      }
+      *{box-sizing:border-box}
+      html,body{height:100%}
+      body{
+        margin:0;
+        font-family:"Nunito",system-ui,-apple-system,Segoe UI,sans-serif;
+        background:var(--bg);
+        background-image:radial-gradient(var(--bg-dot) 1.6px, transparent 1.7px);
+        background-size:26px 26px;
+        color:var(--ink);
+        -webkit-font-smoothing:antialiased;
+      }
+      button{font-family:inherit;cursor:pointer}
+      button:focus-visible, a:focus-visible, textarea:focus-visible, [tabindex]:focus-visible{outline:4px solid var(--focus);outline-offset:3px}
+
+      .shell{
+        min-height:100dvh;
+        display:flex;align-items:center;justify-content:center;
+        padding:clamp(10px,2.2vw,28px);
+      }
+      .board{
+        width:100%;max-width:1120px;
+        height:min(920px, calc(100dvh - clamp(20px,4.4vw,56px)));
+        min-height:0;
+        background:var(--board);
+        border:2px solid var(--board-border);
+        border-radius:28px;
+        box-shadow:var(--shadow);
+        display:flex;flex-direction:column;
+        overflow:hidden;
+      }
+
+      /* ---------- Top: greeting + date ---------- */
+      .top{
+        display:flex;align-items:flex-start;justify-content:space-between;gap:16px;
+        padding:clamp(16px,2.6vw,28px) clamp(18px,3vw,36px) 0;
+      }
+      .greeting{
+        font-family:"Fredoka",sans-serif;font-weight:700;
+        font-size:clamp(1.7rem,4.2vw,2.9rem);line-height:1.05;letter-spacing:.01em;
+        display:flex;align-items:center;gap:.45em;
+      }
+      .greeting .wave{display:inline-block;font-size:.92em}
+      .date-line{
+        margin-top:6px;
+        font-size:clamp(1.05rem,2.4vw,1.55rem);font-weight:800;color:var(--ink-2);
+      }
+      .date-line strong{color:var(--ink)}
+      .sound-btn{
+        flex:0 0 auto;
+        display:inline-flex;align-items:center;gap:10px;
+        min-height:60px;padding:10px 18px;
+        border-radius:999px;border:2px solid var(--pill-border);background:var(--pill);
+        color:var(--ink);font-weight:900;font-size:1.02rem;
+      }
+      .sound-btn svg{width:26px;height:26px;flex:0 0 auto}
+      .sound-btn[aria-pressed="false"]{color:var(--ink-3)}
+      .sound-btn .sound-state{font-variant-numeric:tabular-nums}
+      .top-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+      .home-btn{
+        flex:0 0 auto;text-decoration:none;
+        display:inline-flex;align-items:center;gap:10px;
+        min-height:60px;padding:10px 20px;
+        border-radius:999px;border:2px solid var(--teal);background:var(--teal);
+        color:#fff;font-weight:900;font-size:1.02rem;
+        box-shadow:0 4px 0 var(--teal-dark);
+      }
+      .home-btn:active{transform:scale(.97)}
+      .home-btn svg{width:26px;height:26px;flex:0 0 auto}
+
+      /* ---------- Weather hero ---------- */
+      .weather-hero{
+        margin:clamp(12px,2vw,20px) clamp(18px,3vw,36px) 0;
+        border-radius:22px;
+        display:flex;align-items:center;gap:clamp(16px,3vw,32px);
+        padding:clamp(14px,2.2vw,24px) clamp(18px,2.6vw,30px);
+        transition:background .35s ease;
+      }
+      .weather-hero[data-w="sunny"]{background:var(--sunny-bg)}
+      .weather-hero[data-w="cloudy"]{background:var(--cloudy-bg)}
+      .weather-hero[data-w="rainy"]{background:var(--rainy-bg)}
+      .weather-hero[data-w="snowy"]{background:var(--snowy-bg)}
+      .weather-hero[data-w="windy"]{background:var(--windy-bg)}
+      .weather-art{width:clamp(96px,16vw,168px);height:clamp(96px,16vw,168px);flex:0 0 auto;display:grid;place-items:center}
+      .weather-art svg{width:100%;height:100%;overflow:visible}
+      .weather-copy{min-width:0}
+      .weather-eyebrow{
+        font-weight:900;font-size:clamp(.82rem,1.6vw,.98rem);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);
+      }
+      .weather-name{
+        font-family:"Fredoka",sans-serif;font-weight:700;
+        font-size:clamp(2rem,5.2vw,3.6rem);line-height:1.02;margin-top:2px;
+      }
+      .weather-phrase{
+        margin-top:6px;font-size:clamp(1.05rem,2.3vw,1.5rem);font-weight:800;color:var(--ink-2);line-height:1.3;
+      }
+
+      /* ---------- Message ---------- */
+      .message-zone{
+        flex:1 1 auto;min-height:0;
+        display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+        padding:clamp(14px,2.4vw,26px) clamp(20px,4vw,56px) 6px;
+      }
+      .today-label{
+        display:inline-flex;align-items:center;gap:10px;
+        font-family:"Fredoka",sans-serif;font-weight:600;
+        font-size:clamp(1.15rem,2.6vw,1.7rem);color:var(--teal-dark);
+      }
+      @media (prefers-color-scheme: dark){ .today-label{color:var(--teal)} }
+      .today-label::before,.today-label::after{content:"";width:34px;height:3px;border-radius:99px;background:currentColor;opacity:.45}
+      .message-text{
+        margin-top:10px;
+        font-family:"Fredoka",sans-serif;font-weight:600;
+        font-size:clamp(2rem,6.2vw,4.3rem);line-height:1.14;letter-spacing:.005em;
+        max-width:22ch;
+        overflow-y:auto;min-height:0;
+        scrollbar-width:thin;
+        text-wrap:balance;
+      }
+      .message-text.is-long{font-size:clamp(1.6rem,4.6vw,3.2rem)}
+      .message-text.is-xlong{font-size:clamp(1.3rem,3.6vw,2.4rem)}
+
+      /* ---------- Controls ---------- */
+      .controls{
+        display:flex;gap:12px;flex-wrap:wrap;
+        padding:clamp(14px,2.2vw,22px) clamp(18px,3vw,36px) clamp(18px,2.6vw,28px);
+      }
+      .btn{
+        border:0;border-radius:18px;font-weight:900;
+        display:inline-flex;align-items:center;justify-content:center;gap:12px;
+        min-height:72px;padding:14px 26px;font-size:clamp(1.1rem,2.4vw,1.4rem);
+        transition:transform .12s ease, background .15s ease, box-shadow .15s ease;
+        -webkit-tap-highlight-color:transparent;
+      }
+      .btn:active{transform:scale(.97)}
+      .btn svg{width:30px;height:30px;flex:0 0 auto}
+      .btn-hear{
+        flex:1 1 240px;background:var(--accent);color:var(--accent-ink);
+        box-shadow:0 8px 0 var(--accent-dark);
+      }
+      .btn-hear:hover{background:#ff7a5c}
+      .btn-hear:active{box-shadow:0 3px 0 var(--accent-dark)}
+      .btn-hear.is-speaking{background:var(--teal);box-shadow:0 8px 0 var(--teal-dark)}
+      .btn-edit{
+        flex:0 1 auto;background:var(--pill);color:var(--ink);border:2px solid var(--pill-border);
+        box-shadow:0 6px 0 var(--pill-border);
+      }
+      .hint{
+        width:100%;text-align:center;font-weight:800;color:var(--ink-3);
+        font-size:1rem;min-height:1.4em;margin-top:2px;
+      }
+      .hint.show{color:var(--accent-dark)}
+      @media (prefers-color-scheme: dark){ .hint.show{color:#ffb09d} }
+
+      /* ---------- Weather icon animations ---------- */
+      @keyframes spinSlow{to{transform:rotate(360deg)}}
+      @keyframes drift{0%,100%{transform:translateX(0)}50%{transform:translateX(7px)}}
+      @keyframes dropFall{0%{transform:translateY(0);opacity:0}25%{opacity:1}80%{opacity:1}100%{transform:translateY(16px);opacity:0}}
+      @keyframes flakeFall{0%{transform:translateY(0) translateX(0);opacity:0}25%{opacity:1}100%{transform:translateY(18px) translateX(4px);opacity:0}}
+      @keyframes gust{0%,100%{transform:translateX(0);opacity:.55}50%{transform:translateX(8px);opacity:1}}
+      .rays{transform-origin:60px 58px;animation:spinSlow 26s linear infinite}
+      .cloud-drift{animation:drift 5s ease-in-out infinite}
+      .drop{animation:dropFall 1.5s ease-in infinite}
+      .drop.d2{animation-delay:.5s}.drop.d3{animation-delay:1s}
+      .flake{animation:flakeFall 2.6s linear infinite}
+      .flake.f2{animation-delay:.85s}.flake.f3{animation-delay:1.7s}
+      .gust{animation:gust 2.8s ease-in-out infinite}
+      .gust.g2{animation-delay:.5s}.gust.g3{animation-delay:1s}
+      @media (prefers-reduced-motion: reduce){
+        .rays,.cloud-drift,.drop,.flake,.gust{animation:none}
+        .btn{transition:none}
+      }
+
+      /* ---------- Teacher passcode gate ---------- */
+      .shell[hidden], .gate[hidden]{display:none !important}
+      .gate{
+        position:fixed;inset:0;z-index:60;
+        display:grid;place-items:center;
+        padding:20px;
+        background:var(--bg);
+        background-image:radial-gradient(var(--bg-dot) 1.6px, transparent 1.7px);
+        background-size:26px 26px;
+      }
+      .gate-card{
+        background:var(--board);color:var(--ink);
+        width:100%;max-width:420px;text-align:center;
+        border:2px solid var(--board-border);border-radius:28px;
+        box-shadow:var(--shadow);
+        padding:clamp(26px,5vw,40px) clamp(22px,5vw,36px);
+      }
+      .gate-lock{
+        width:72px;height:72px;margin:0 auto 14px;
+        display:grid;place-items:center;border-radius:50%;
+        background:var(--pill);border:2px solid var(--pill-border);color:var(--teal-dark);
+      }
+      @media (prefers-color-scheme: dark){ .gate-lock{color:var(--teal)} }
+      .gate-lock svg{width:36px;height:36px}
+      .gate-title{font-family:"Fredoka",sans-serif;font-weight:700;font-size:clamp(1.6rem,4.5vw,2.1rem);margin:0;line-height:1.1}
+      .gate-sub{margin:8px 0 0;color:var(--ink-2);font-weight:700;font-size:1.02rem;line-height:1.45}
+      .gate-label{display:block;font-weight:900;font-size:1.05rem;margin:22px 0 10px;text-align:left}
+      .gate-input{
+        width:100%;border:3px solid var(--pill-border);border-radius:18px;background:var(--pill);
+        color:var(--ink);font-family:"Nunito",sans-serif;font-weight:900;
+        font-size:1.6rem;letter-spacing:.5em;text-align:center;
+        padding:14px 10px 14px calc(10px + .5em);
+      }
+      .gate-input:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 4px color-mix(in srgb, var(--accent) 30%, transparent)}
+      .gate-error{
+        min-height:1.5em;margin:12px 0 0;
+        font-weight:800;font-size:1rem;color:var(--accent-dark);
+      }
+      @media (prefers-color-scheme: dark){ .gate-error{color:#ffb09d} }
+      .gate-btn{
+        width:100%;margin-top:14px;border:0;
+        background:var(--teal);color:#fff;box-shadow:0 7px 0 var(--teal-dark);
+      }
+      .gate-btn:active{box-shadow:0 2px 0 var(--teal-dark)}
+      @keyframes gateShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-9px)}40%{transform:translateX(9px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+      .gate-card.shake{animation:gateShake .45s ease}
+      @media (prefers-reduced-motion: reduce){ .gate-card.shake{animation:none} }
+
+      /* ---------- Edit overlay ---------- */
+      .overlay{
+        position:fixed;inset:0;background:var(--overlay);z-index:50;
+        display:none;align-items:flex-end;justify-content:center;
+        padding:0;
+      }
+      .overlay.open{display:flex}
+      .sheet{
+        background:var(--board);color:var(--ink);
+        width:100%;max-width:760px;max-height:92dvh;overflow-y:auto;
+        border-radius:26px 26px 0 0;
+        padding:26px clamp(18px,4vw,34px) calc(26px + env(safe-area-inset-bottom));
+        box-shadow:0 -12px 40px rgba(0,0,0,.25);
+      }
+      @media (min-width:640px){
+        .overlay{align-items:center;padding:20px}
+        .sheet{border-radius:26px}
+      }
+      .sheet h2{font-family:"Fredoka",sans-serif;font-weight:700;font-size:clamp(1.5rem,3.4vw,2rem);margin:0}
+      .sheet p.sub{margin:6px 0 0;color:var(--ink-2);font-weight:700;font-size:1.02rem}
+      .field-label{font-weight:900;font-size:1.05rem;margin:24px 0 10px;display:block}
+      .weather-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+      @media (max-width:560px){ .weather-grid{grid-template-columns:repeat(3,1fr)} }
+      .w-choice{
+        border:3px solid var(--pill-border);background:var(--pill);border-radius:18px;
+        padding:12px 6px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;
+        font-weight:900;font-size:1rem;color:var(--ink);min-height:104px;justify-content:center;
+      }
+      .w-choice svg{width:52px;height:52px}
+      .w-choice[aria-pressed="true"]{border-color:var(--accent);background:var(--sunny-bg);box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent)}
+      @media (prefers-color-scheme: dark){ .w-choice[aria-pressed="true"]{background:var(--pill)} }
+      textarea{
+        width:100%;border:3px solid var(--pill-border);border-radius:18px;background:var(--pill);
+        color:var(--ink);font-family:"Nunito",sans-serif;font-weight:800;
+        font-size:clamp(1.15rem,2.6vw,1.4rem);line-height:1.4;
+        padding:16px 18px;resize:vertical;min-height:110px;
+      }
+      textarea:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 4px color-mix(in srgb, var(--accent) 30%, transparent)}
+      .char-row{display:flex;justify-content:space-between;gap:10px;margin-top:8px;color:var(--ink-3);font-weight:800;font-size:.92rem}
+      .quick-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+      .quick-chip{
+        border:2px solid var(--pill-border);background:var(--board);color:var(--ink-2);
+        border-radius:999px;padding:9px 14px;font-weight:800;font-size:.95rem;min-height:44px;
+      }
+      .quick-chip:hover{border-color:var(--teal);color:var(--ink)}
+      .sheet-actions{display:flex;gap:12px;margin-top:22px;flex-wrap:wrap;position:sticky;bottom:0;background:var(--board);padding:14px 0 2px;box-shadow:0 -10px 18px -12px rgba(0,0,0,.25)}
+      .btn-done{flex:1 1 200px;background:var(--teal);color:#fff;box-shadow:0 7px 0 var(--teal-dark);border:0}
+      .btn-done:active{box-shadow:0 2px 0 var(--teal-dark)}
+      .btn-cancel{flex:0 1 auto;background:var(--pill);color:var(--ink);border:2px solid var(--pill-border)}
+
+      @media (max-width:560px){
+        .board{border-radius:22px}
+        .top{flex-wrap:wrap}
+        .weather-hero{flex-direction:column;text-align:center;padding-bottom:20px}
+        .weather-copy{text-align:center}
+        .controls{flex-direction:column}
+        .btn-hear,.btn-edit{flex:1 1 auto;width:100%}
+        .sound-btn,.home-btn{min-height:54px}
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Teacher passcode gate (shown before the board) -->
+    <div class="gate" id="gate">
+      <form class="gate-card" id="gateForm" novalidate>
+        <div class="gate-lock" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none"><rect x="4.5" y="10" width="15" height="10" rx="2.5" fill="currentColor"/><path d="M8 10V7.5a4 4 0 0 1 8 0V10" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="15" r="1.9" fill="var(--board)"/></svg>
+        </div>
+        <h1 class="gate-title" id="gateTitle">Teachers only</h1>
+        <p class="gate-sub">Please enter the teacher passcode to open the Morning Message Board.</p>
+        <label class="gate-label" for="gateInput">Passcode</label>
+        <input class="gate-input" id="gateInput" type="password" inputmode="numeric" pattern="[0-9]*" autocomplete="off" maxlength="4" placeholder="••••" aria-describedby="gateError" />
+        <p class="gate-error" id="gateError" role="alert"></p>
+        <button class="btn gate-btn" type="submit">Unlock</button>
+      </form>
+    </div>
+
+    <div class="shell" id="boardShell" hidden>
+      <main class="board" aria-label="Morning message board">
+
+        <div class="top">
+          <div>
+            <div class="greeting" id="greetingText">Good morning!</div>
+            <div class="date-line" id="dateLine">Today is <strong id="dateText">…</strong></div>
+          </div>
+          <div class="top-actions">
+            <a class="home-btn" href="https://scaemrfung.github.io/mr-fung-webgames/" aria-label="Home — back to all games">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3.5 11 12 3.8 20.5 11v8.2c0 .9-.7 1.6-1.6 1.6h-4.4v-6h-5v6H5.1c-.9 0-1.6-.7-1.6-1.6V11Z" fill="currentColor"/></svg>
+              Home
+            </a>
+            <button class="sound-btn" id="soundBtn" type="button" aria-pressed="true" aria-label="Toggle sound on or off">
+              <span id="soundIcon"></span>
+              <span>Sound&nbsp;<span class="sound-state" id="soundState">On</span></span>
+            </button>
+          </div>
+        </div>
+
+        <section class="weather-hero" id="weatherHero" data-w="sunny" aria-label="Today's weather">
+          <div class="weather-art" id="weatherArt" aria-hidden="true"></div>
+          <div class="weather-copy">
+            <div class="weather-eyebrow">Today's weather</div>
+            <div class="weather-name" id="weatherName">Sunny</div>
+            <div class="weather-phrase" id="weatherPhrase">The sun is shining — a bright day ahead!</div>
+          </div>
+        </section>
+
+        <section class="message-zone" aria-label="Today's message">
+          <div class="today-label">Today we will…</div>
+          <div class="message-text" id="messageText" tabindex="0">learn, play, and be kind to each other!</div>
+        </section>
+
+        <div class="controls">
+          <button class="btn btn-hear" id="hearBtn" type="button">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 9.5v5h3.2L12 18.6c.6.5 1.5.1 1.5-.7V6.1c0-.8-.9-1.2-1.5-.7L7.2 9.5H4Z" fill="currentColor"/><path d="M16.2 9.2a4 4 0 0 1 0 5.6M18.6 6.8a7.4 7.4 0 0 1 0 10.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <span id="hearLabel">Hear It</span>
+          </button>
+          <button class="btn btn-edit" id="editBtn" type="button">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 20h4.2L19.6 8.6a2.3 2.3 0 0 0-3.3-3.3L4.9 16.7 4 20Z" fill="currentColor" opacity=".95"/><path d="m14.8 6.8 3.3 3.3" stroke="var(--board)" stroke-width="1.8" stroke-linecap="round"/></svg>
+            Edit
+          </button>
+          <div class="hint" id="hint" role="status" aria-live="polite"></div>
+        </div>
+
+      </main>
+    </div>
+
+    <!-- Edit sheet -->
+    <div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="editTitle">
+      <div class="sheet">
+        <h2 id="editTitle">Set up today's board</h2>
+        <p class="sub">Pick the weather and type today's message. It takes just a few seconds.</p>
+
+        <span class="field-label" id="weatherLabel">1 · What's the weather today?</span>
+        <div class="weather-grid" role="group" aria-labelledby="weatherLabel" id="weatherGrid"></div>
+
+        <label class="field-label" for="messageInput">2 · Finish the sentence — “Today we will…”</label>
+        <textarea id="messageInput" maxlength="140" rows="3" placeholder="e.g. read a story, count to 100, and paint pictures!"></textarea>
+        <div class="char-row"><span>Keep it short so everyone can read it from the back.</span><span id="charCount">0 / 140</span></div>
+        <div class="quick-row" id="quickRow" aria-label="Quick message ideas"></div>
+
+        <div class="sheet-actions">
+          <button class="btn btn-cancel" id="cancelBtn" type="button">Cancel</button>
+          <button class="btn btn-done" id="doneBtn" type="button">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Show on Board
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      (function(){
+        "use strict";
+
+        /* ============ Weather artwork (hand-drawn inline SVG) ============ */
+        function sunCore(){
+          return '<g class="rays" stroke="#f5a623" stroke-width="6" stroke-linecap="round">' +
+            '<line x1="60" y1="8" x2="60" y2="22"/><line x1="60" y1="94" x2="60" y2="108"/>' +
+            '<line x1="10" y1="58" x2="24" y2="58"/><line x1="96" y1="58" x2="110" y2="58"/>' +
+            '<line x1="25" y1="23" x2="35" y2="33"/><line x1="85" y1="83" x2="95" y2="93"/>' +
+            '<line x1="95" y1="23" x2="85" y2="33"/><line x1="35" y1="83" x2="25" y2="93"/></g>' +
+            '<circle cx="60" cy="58" r="24" fill="#ffc93c" stroke="#f5a623" stroke-width="4"/>' +
+            '<circle cx="52" cy="54" r="3.4" fill="#8a5a00"/><circle cx="68" cy="54" r="3.4" fill="#8a5a00"/>' +
+            '<path d="M51 64q9 8 18 0" stroke="#8a5a00" stroke-width="3.6" fill="none" stroke-linecap="round"/>';
+        }
+        function cloudShape(fill, stroke){
+          return '<path d="M34 84a15 15 0 0 1-2-29.8A24 24 0 0 1 78 40a19 19 0 0 1 10 44H34Z" fill="' + fill + '" stroke="' + stroke + '" stroke-width="4" stroke-linejoin="round"/>';
+        }
+        var ART = {
+          sunny: '<svg viewBox="0 0 120 120" role="img" aria-label="Sun">' + sunCore() + '</svg>',
+          cloudy: '<svg viewBox="0 0 120 120" role="img" aria-label="Cloud"><g class="cloud-drift">' +
+            '<path d="M28 62a13 13 0 0 1-1-25.8A21 21 0 0 1 67 26a16 16 0 0 1 7 36H28Z" fill="#c7d5e4" stroke="#8fa5bd" stroke-width="4" stroke-linejoin="round" opacity=".75" transform="translate(6,-4)"/>' +
+            cloudShape('#eef3f8','#93a9c0') + '</g>' +
+            '<circle cx="52" cy="68" r="3" fill="#5c7189"/><circle cx="70" cy="68" r="3" fill="#5c7189"/>' +
+            '<path d="M53 76q8 5 16 0" stroke="#5c7189" stroke-width="3.2" fill="none" stroke-linecap="round"/></svg>',
+          rainy: '<svg viewBox="0 0 120 120" role="img" aria-label="Rain cloud"><g class="cloud-drift">' + cloudShape('#dbe7f3','#84a3c2') + '</g>' +
+            '<g stroke="#3d8bfd" stroke-width="6" stroke-linecap="round">' +
+            '<line class="drop" x1="42" y1="94" x2="38" y2="106"/><line class="drop d2" x1="62" y1="94" x2="58" y2="106"/><line class="drop d3" x1="82" y1="94" x2="78" y2="106"/></g></svg>',
+          snowy: '<svg viewBox="0 0 120 120" role="img" aria-label="Snow cloud"><g class="cloud-drift">' + cloudShape('#eef6fc','#9dbfd9') + '</g>' +
+            '<g fill="#57b6e8"><circle class="flake" cx="42" cy="98" r="5"/><circle class="flake f2" cx="62" cy="98" r="5"/><circle class="flake f3" cx="82" cy="98" r="5"/></g></svg>',
+          windy: '<svg viewBox="0 0 120 120" role="img" aria-label="Wind"><g class="cloud-drift"><path d="M22 40a11 11 0 0 1-1-21.8A18 18 0 0 1 56 10a13 13 0 0 1 6 30H22Z" fill="#eef3f8" stroke="#93a9c0" stroke-width="4" stroke-linejoin="round"/></g>' +
+            '<g fill="none" stroke="#2fb58f" stroke-width="6" stroke-linecap="round">' +
+            '<path class="gust" d="M14 62h52a10 10 0 1 0-10-10"/><path class="gust g2" d="M8 82h66a10 10 0 1 1-10 10"/><path class="gust g3" d="M22 102h38"/></g></svg>'
+        };
+        /* Small versions for the picker reuse the same art */
+        var WEATHERS = {
+          sunny:  { name:"Sunny",  phrase:"The sun is shining — a bright day ahead!" },
+          cloudy: { name:"Cloudy", phrase:"Grey clouds are covering the sky today." },
+          rainy:  { name:"Rainy",  phrase:"Raindrops are falling — don't forget your umbrella!" },
+          snowy:  { name:"Snowy",  phrase:"Snowflakes are falling — a cozy, wintry day!" },
+          windy:  { name:"Windy",  phrase:"The wind is whooshing through the trees!" }
+        };
+        var ORDER = ["sunny","cloudy","rainy","snowy","windy"];
+
+        var ICON_SOUND_ON = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true" width="26" height="26"><path d="M4 9.5v5h3.2L12 18.6c.6.5 1.5.1 1.5-.7V6.1c0-.8-.9-1.2-1.5-.7L7.2 9.5H4Z" fill="currentColor"/><path d="M16.2 9.2a4 4 0 0 1 0 5.6M18.6 6.8a7.4 7.4 0 0 1 0 10.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+        var ICON_SOUND_OFF = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true" width="26" height="26"><path d="M4 9.5v5h3.2L12 18.6c.6.5 1.5.1 1.5-.7V6.1c0-.8-.9-1.2-1.5-.7L7.2 9.5H4Z" fill="currentColor"/><path d="m16 9.5 5 5m0-5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+
+        var QUICK = [
+          "read a story and draw our favourite part!",
+          "count, sort, and play a math game!",
+          "sing songs and move our bodies in music!",
+          "learn about animals and how they live!",
+          "build, create, and share our art!",
+          "play outside and practise being kind!"
+        ];
+
+        /* ============ State (in memory only — nothing is saved) ============ */
+        var state = { weather:"sunny", message:"learn, play, and be kind to each other!", sound:true };
+        var draftWeather = state.weather;
+
+        var $ = function(id){ return document.getElementById(id); };
+        var dateText = $("dateText"), hero = $("weatherHero"), art = $("weatherArt"),
+            wName = $("weatherName"), wPhrase = $("weatherPhrase"), msgEl = $("messageText"),
+            soundBtn = $("soundBtn"), soundIcon = $("soundIcon"), soundState = $("soundState"),
+            hearBtn = $("hearBtn"), hearLabel = $("hearLabel"), hint = $("hint"),
+            overlay = $("overlay"), grid = $("weatherGrid"), input = $("messageInput"),
+            charCount = $("charCount"), quickRow = $("quickRow");
+
+        /* ============ Date (auto-filled from today) ============ */
+        var now = new Date();
+        var dateLong = new Intl.DateTimeFormat("en-CA",{ weekday:"long", month:"long", day:"numeric", year:"numeric" }).format(now);
+        dateText.textContent = dateLong;
+        var hour = now.getHours();
+        var greetingWord = "Good morning!";
+        if (hour >= 12 && hour < 17) greetingWord = "Good afternoon!";
+        else if (hour >= 17) greetingWord = "Good day!";
+        $("greetingText").textContent = greetingWord;
+
+        /* ============ In-browser sounds (Web Audio, no files) ============ */
+        var actx = null;
+        function audio(){
+          if (!actx){ try{ actx = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){ actx = null; } }
+          if (actx && actx.state === "suspended") actx.resume();
+          return actx;
+        }
+        function tone(freq, start, dur, type, vol){
+          var ac = audio(); if (!ac) return;
+          var t = ac.currentTime + start;
+          var o = ac.createOscillator(), g = ac.createGain();
+          o.type = type || "sine"; o.frequency.setValueAtTime(freq, t);
+          g.gain.setValueAtTime(0.0001, t);
+          g.gain.exponentialRampToValueAtTime(vol || 0.14, t + 0.02);
+          g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+          o.connect(g); g.connect(ac.destination);
+          o.start(t); o.stop(t + dur + 0.05);
+        }
+        function playPop(){ if (!state.sound) return; tone(520, 0, 0.12, "triangle", 0.12); tone(780, 0.05, 0.14, "triangle", 0.10); }
+        function playChime(){ if (!state.sound) return; tone(659, 0, 0.22, "sine", 0.13); tone(880, 0.1, 0.3, "sine", 0.13); tone(1318, 0.2, 0.36, "sine", 0.09); }
+
+        /* ============ Render ============ */
+        function render(){
+          hero.setAttribute("data-w", state.weather);
+          art.innerHTML = ART[state.weather];
+          wName.textContent = WEATHERS[state.weather].name;
+          wPhrase.textContent = WEATHERS[state.weather].phrase;
+          msgEl.textContent = state.message;
+          msgEl.classList.toggle("is-long", state.message.length > 60);
+          msgEl.classList.toggle("is-xlong", state.message.length > 100);
+          soundIcon.innerHTML = state.sound ? ICON_SOUND_ON : ICON_SOUND_OFF;
+          soundState.textContent = state.sound ? "On" : "Off";
+          soundBtn.setAttribute("aria-pressed", String(state.sound));
+        }
+        function showHint(text, warn){
+          hint.textContent = text || "";
+          hint.classList.toggle("show", !!warn);
+          if (text){ clearTimeout(showHint._t); showHint._t = setTimeout(function(){ hint.textContent=""; hint.classList.remove("show"); }, 4200); }
+        }
+
+        /* ============ Hear It (speech synthesis) ============ */
+        var speaking = false;
+        function stopSpeaking(){
+          if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+          speaking = false; hearBtn.classList.remove("is-speaking"); hearLabel.textContent = "Hear It";
+        }
+        hearBtn.addEventListener("click", function(){
+          if (speaking){ stopSpeaking(); return; }
+          if (!state.sound){ showHint("Sound is off — tap Sound On, then try Hear It again.", true); soundBtn.focus(); return; }
+          if (!("speechSynthesis" in window)){ showHint("Sorry — this browser can't read aloud.", true); return; }
+          playPop();
+          var text = greetingWord + " Today is " + dateLong + ". Today's weather is " + WEATHERS[state.weather].name.toLowerCase() + ". " +
+                     WEATHERS[state.weather].phrase + " Today we will " + state.message;
+          var u = new SpeechSynthesisUtterance(text);
+          u.rate = 0.92; u.pitch = 1.05;
+          var voices = window.speechSynthesis.getVoices();
+          for (var i = 0; i < voices.length; i++){ if (/en[-_]CA/i.test(voices[i].lang)){ u.voice = voices[i]; break; } }
+          if (!u.voice){ for (var j = 0; j < voices.length; j++){ if (/^en/i.test(voices[j].lang)){ u.voice = voices[j]; break; } } }
+          u.onend = stopSpeaking; u.onerror = stopSpeaking;
+          speaking = true; hearBtn.classList.add("is-speaking"); hearLabel.textContent = "Stop";
+          window.speechSynthesis.speak(u);
+        });
+        if ("speechSynthesis" in window && window.speechSynthesis.onvoiceschanged !== undefined){
+          window.speechSynthesis.onvoiceschanged = function(){};
+        }
+
+        /* ============ Sound toggle ============ */
+        soundBtn.addEventListener("click", function(){
+          state.sound = !state.sound;
+          if (!state.sound) stopSpeaking();
+          render();
+          if (state.sound){ playPop(); showHint("Sound is on."); } else { showHint("Sound is off."); }
+        });
+
+        /* ============ Edit sheet ============ */
+        ORDER.forEach(function(key){
+          var b = document.createElement("button");
+          b.type = "button"; b.className = "w-choice"; b.dataset.w = key;
+          b.setAttribute("aria-pressed", "false");
+          b.innerHTML = '<span aria-hidden="true">' + ART[key] + '</span><span>' + WEATHERS[key].name + '</span>';
+          b.querySelector("svg").setAttribute("width","52"); b.querySelector("svg").setAttribute("height","52");
+          b.addEventListener("click", function(){
+            draftWeather = key; playPop();
+            Array.prototype.forEach.call(grid.children, function(c){ c.setAttribute("aria-pressed", String(c.dataset.w === key)); });
+          });
+          grid.appendChild(b);
+        });
+        QUICK.forEach(function(q){
+          var c = document.createElement("button");
+          c.type = "button"; c.className = "quick-chip"; c.textContent = q;
+          c.addEventListener("click", function(){ input.value = q; updateCount(); input.focus(); playPop(); });
+          quickRow.appendChild(c);
+        });
+        function updateCount(){ charCount.textContent = input.value.length + " / 140"; }
+        input.addEventListener("input", updateCount);
+
+        var lastFocus = null;
+        function openEdit(){
+          lastFocus = document.activeElement;
+          draftWeather = state.weather;
+          Array.prototype.forEach.call(grid.children, function(c){ c.setAttribute("aria-pressed", String(c.dataset.w === draftWeather)); });
+          input.value = state.message; updateCount();
+          overlay.classList.add("open");
+          document.body.style.overflow = "hidden";
+          setTimeout(function(){ input.focus(); input.select(); }, 60);
+        }
+        function closeEdit(){
+          overlay.classList.remove("open");
+          document.body.style.overflow = "";
+          if (lastFocus) lastFocus.focus();
+        }
+        $("editBtn").addEventListener("click", function(){ playPop(); openEdit(); });
+        $("cancelBtn").addEventListener("click", function(){ playPop(); closeEdit(); });
+        overlay.addEventListener("click", function(e){ if (e.target === overlay) closeEdit(); });
+        document.addEventListener("keydown", function(e){ if (e.key === "Escape" && overlay.classList.contains("open")) closeEdit(); });
+        $("doneBtn").addEventListener("click", function(){
+          var v = input.value.replace(/\s+/g," ").trim();
+          state.weather = draftWeather;
+          if (v) state.message = v;
+          closeEdit(); render(); playChime();
+          showHint("Board updated — ready for the class!");
+          $("editBtn").focus();
+        });
+
+        /* ============ Teacher passcode gate ============ */
+        var gate = $("gate"), gateForm = $("gateForm"), gateCard = gateForm,
+            gateInput = $("gateInput"), gateError = $("gateError"), boardShell = $("boardShell");
+        gateForm.addEventListener("submit", function(e){
+          e.preventDefault();
+          if (gateInput.value.trim() === "4567"){
+            gateError.textContent = "";
+            gate.hidden = true;
+            boardShell.hidden = false;
+            $("editBtn").focus();
+          } else {
+            gateError.textContent = "Hmm, that's not quite right — please try again.";
+            gateInput.value = "";
+            gateCard.classList.remove("shake");
+            void gateCard.offsetWidth;
+            gateCard.classList.add("shake");
+            gateInput.focus();
+          }
+        });
+        gateCard.addEventListener("animationend", function(){ gateCard.classList.remove("shake"); });
+        gateInput.focus();
+
+        render();
+      })();
+    </script>
+  </body>
+</html>

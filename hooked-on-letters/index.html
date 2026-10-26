@@ -125,6 +125,23 @@
       }
       .tool-btn.primary:active { background: var(--teal-dark); }
       .tool-btn:active { transform: translateY(1px); }
+      a:focus-visible { outline: 4px solid var(--gold); outline-offset: 2px; }
+      .home-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        background: var(--accent);
+        border: 2px solid var(--accent);
+        color: #fff;
+        font-weight: 900;
+        font-size: clamp(16px, 2.1vw, 20px);
+        padding: 10px 20px;
+        border-radius: 999px;
+        box-shadow: var(--shadow);
+      }
+      .home-btn svg { width: 23px; height: 23px; flex: none; }
+      .home-btn:active { background: var(--accent-dark); transform: translateY(1px); }
 
       /* ---------- Target bar ---------- */
       .target-bar {
@@ -456,6 +473,10 @@
     <div class="page">
 
       <header class="topbar">
+        <a class="home-btn" href="https://scaemrfung.github.io/mr-fung-webgames/">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/></svg>
+          Home
+        </a>
         <div class="modes" role="group" aria-label="Choose a game">
           <button class="mode-btn active" id="modeCatch" type="button">Catch a Letter</button>
           <button class="mode-btn" id="modeSpell" type="button">Spell a Word</button>

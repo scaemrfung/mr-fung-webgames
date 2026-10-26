@@ -1,0 +1,594 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:," />
+<title>Odd One Out</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    color-scheme: light dark;
+    --bg:#eef7f3;
+    --panel:#ffffff;
+    --panel-border:#d7e8df;
+    --text:#17342a;
+    --muted:#5a7267;
+    --teal:#0f8a6d;
+    --teal-dark:#0a6b54;
+    --teal-soft:#d9f2e7;
+    --amber:#f5a800;
+    --amber-soft:#fff3cf;
+    --coral:#e85d3f;
+    --coral-soft:#ffe4dc;
+    --green:#1f9d55;
+    --green-soft:#dcf5e4;
+    --green-border:#1f9d55;
+    --shadow:0 10px 24px rgba(23,52,42,.10);
+    --radius:22px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#12211c;
+      --panel:#1c332a;
+      --panel-border:#2f5243;
+      --text:#eefaf3;
+      --muted:#a8c9b8;
+      --teal:#2ec4a0;
+      --teal-dark:#7be3c6;
+      --teal-soft:#1e4537;
+      --amber:#ffbe2e;
+      --amber-soft:#3d3416;
+      --coral:#ff8a6e;
+      --coral-soft:#4a2a21;
+      --green:#4ade80;
+      --green-soft:#1d3d28;
+      --green-border:#4ade80;
+      --shadow:0 10px 24px rgba(0,0,0,.35);
+    }
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:"Nunito",system-ui,-apple-system,Segoe UI,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    min-height:100dvh;
+  }
+  .wrap{
+    max-width:980px;
+    margin:0 auto;
+    padding:14px 16px 28px;
+  }
+
+  /* Top controls */
+  .topbar{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:10px;
+  }
+  .stars{
+    display:inline-flex;align-items:center;gap:8px;
+    background:var(--amber-soft);
+    border:2px solid var(--amber);
+    color:var(--text);
+    font-family:"Fredoka",sans-serif;
+    font-weight:700;
+    font-size:1.35rem;
+    padding:8px 16px 8px 12px;
+    border-radius:999px;
+    min-height:52px;
+  }
+  .stars .star-icon{font-size:1.6rem;line-height:1}
+  .stars.pop{animation:pop .45s ease}
+  @keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.18)}100%{transform:scale(1)}}
+  .left-group{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+  .controls{display:flex;flex-wrap:wrap;gap:10px}
+  .btn-home{background:var(--panel);border-color:var(--teal);color:var(--teal-dark);text-decoration:none;font-size:1.1rem}
+  .btn-home:hover{background:var(--teal-soft)}
+  .btn{
+    font-family:"Fredoka",sans-serif;
+    font-weight:600;
+    font-size:1.05rem;
+    border-radius:999px;
+    border:2px solid transparent;
+    padding:10px 18px;
+    min-height:52px;
+    cursor:pointer;
+    display:inline-flex;align-items:center;gap:8px;
+    transition:transform .08s ease, background .15s ease;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .btn:active{transform:scale(.97)}
+  .btn:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+  .btn-sound{background:var(--panel);border-color:var(--panel-border);color:var(--text)}
+  .btn-new{background:var(--teal);color:#fff;border-color:var(--teal)}
+  @media (prefers-color-scheme: dark){ .btn-new{color:#0b1f18} }
+  .btn-hear{background:var(--amber);color:#231a00;border-color:var(--amber)}
+  .btn-next{background:var(--teal);color:#fff;border-color:var(--teal);font-size:1.2rem;padding:12px 26px}
+  @media (prefers-color-scheme: dark){ .btn-next{color:#0b1f18} }
+
+  /* Heading */
+  header{text-align:center;margin:4px 0 14px}
+  h1{
+    font-family:"Fredoka",sans-serif;
+    font-weight:700;
+    font-size:clamp(2rem,5.5vw,3.1rem);
+    margin:0;
+    letter-spacing:.2px;
+  }
+  .prompt{
+    font-size:clamp(1.15rem,3vw,1.5rem);
+    font-weight:800;
+    color:var(--muted);
+    margin:6px 0 0;
+  }
+  .prompt strong{color:var(--text)}
+  .round-label{
+    display:inline-block;margin-top:8px;
+    font-family:"Fredoka",sans-serif;font-weight:600;font-size:.95rem;
+    background:var(--teal-soft);color:var(--teal-dark);
+    padding:4px 12px;border-radius:999px;
+  }
+
+  /* Grid */
+  .grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+  }
+  .card{
+    position:relative;
+    background:var(--panel);
+    border:3px solid var(--panel-border);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:18px 10px 14px;
+    min-height:172px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+    cursor:pointer;
+    user-select:none;
+    -webkit-tap-highlight-color:transparent;
+    transition:border-color .15s ease, background .15s ease, transform .08s ease;
+    text-align:center;
+    width:100%;
+    font:inherit;color:inherit;
+  }
+  .card:hover{border-color:var(--teal)}
+  .card:active{transform:scale(.98)}
+  .card:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+  .card .pic{font-size:clamp(3.6rem,13vw,5.6rem);line-height:1.05;display:block}
+  .card .word{
+    font-family:"Fredoka",sans-serif;font-weight:600;
+    font-size:clamp(1.2rem,3.6vw,1.6rem);
+  }
+  .card.wrong{animation:shake .45s ease;border-color:var(--coral);background:var(--coral-soft)}
+  .card.tried{opacity:.55}
+  .card.correct{border-color:var(--green-border);background:var(--green-soft);cursor:default}
+  .card.correct::after{
+    content:"✓";
+    position:absolute;top:10px;right:12px;
+    width:38px;height:38px;border-radius:50%;
+    background:var(--green);color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    font-size:1.3rem;font-weight:900;
+  }
+  @media (prefers-color-scheme: dark){ .card.correct::after{color:#0b1f18} }
+  .card.dim{opacity:.45;cursor:default}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+
+  /* Feedback */
+  .feedback{
+    margin-top:16px;
+    border-radius:var(--radius);
+    padding:16px 18px;
+    text-align:center;
+    min-height:118px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+  }
+  .feedback.idle{background:transparent;border:2px dashed var(--panel-border)}
+  .feedback.try{background:var(--coral-soft);border:2px solid var(--coral)}
+  .feedback.win{background:var(--green-soft);border:2px solid var(--green-border)}
+  .feedback .msg{
+    font-family:"Fredoka",sans-serif;font-weight:700;
+    font-size:clamp(1.25rem,3.6vw,1.7rem);margin:0;line-height:1.25;
+  }
+  .feedback .reason{
+    font-size:clamp(1.05rem,2.8vw,1.3rem);font-weight:800;margin:0;line-height:1.4;max-width:640px;
+  }
+  .feedback .hint{color:var(--muted);font-weight:800;font-size:1.05rem;margin:0}
+  .feedback-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+
+  /* Burst stars */
+  .burst{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:50}
+  .burst span{
+    position:absolute;font-size:1.8rem;
+    animation:burstFly 900ms ease-out forwards;
+  }
+  @keyframes burstFly{
+    0%{transform:translate(0,0) scale(.6) rotate(0deg);opacity:1}
+    100%{transform:translate(var(--dx),var(--dy)) scale(1.25) rotate(160deg);opacity:0}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .card.wrong,.stars.pop{animation:none}
+    .burst span{animation-duration:.01ms}
+  }
+
+  @media (min-width:760px){
+    .card{min-height:196px;padding:22px 12px 16px}
+    .wrap{padding-top:18px}
+  }
+  @media (max-width:420px){
+    .grid{gap:10px}
+    .card{min-height:150px;padding:12px 6px 10px}
+    .btn{padding:10px 14px;font-size:1rem}
+  }
+
+</style>
+</head>
+<body>
+<div class="wrap" id="gameWrap">
+
+  <div class="topbar">
+    <div class="left-group">
+      <a class="btn btn-home" href="https://scaemrfung.github.io/mr-fung-webgames/" aria-label="Home — back to all games">🏠 Home</a>
+      <div class="stars" id="starsBox" aria-label="Stars earned">
+        <span class="star-icon" aria-hidden="true">⭐</span>
+        <span id="starCount">0</span>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="btn btn-sound" id="soundBtn" type="button" aria-pressed="true">🔊 Sound: On</button>
+      <button class="btn btn-new" id="newBtn" type="button">↻ New Game</button>
+    </div>
+  </div>
+
+  <header>
+    <h1>Odd One Out</h1>
+    <p class="prompt">Which one does <strong>NOT</strong> belong? Tap it!</p>
+    <span class="round-label" id="roundLabel">Puzzle 1</span>
+  </header>
+
+  <main>
+    <div class="grid" id="grid" role="group" aria-label="Four pictures. Tap the odd one out."></div>
+
+    <section class="feedback idle" id="feedback" aria-live="polite">
+      <p class="hint" id="feedbackHint">Look at all four pictures. Three go together. One is different!</p>
+    </section>
+  </main>
+</div>
+
+<div class="burst" id="burst" aria-hidden="true"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  // Each set: 3 that belong + 1 odd one.
+  // group = what the 3 share, oddKind = what the odd one is.
+  var SETS = [
+    { items:[
+      {e:"🐶", w:"Dog"}, {e:"🐱", w:"Cat"}, {e:"🐰", w:"Bunny"}, {e:"🚗", w:"Car"}
+    ], odd:"Car", group:"animals", oddKind:"a vehicle" },
+
+    { items:[
+      {e:"🍎", w:"Apple"}, {e:"🍌", w:"Banana"}, {e:"🍇", w:"Grapes"}, {e:"🥕", w:"Carrot"}
+    ], odd:"Carrot", group:"fruits", oddKind:"a vegetable" },
+
+    { items:[
+      {e:"🚌", w:"Bus"}, {e:"🚂", w:"Train"}, {e:"✈️", w:"Airplane"}, {e:"🌻", w:"Flower"}
+    ], odd:"Flower", group:"vehicles", oddKind:"a plant" },
+
+    { items:[
+      {e:"👕", w:"Shirt"}, {e:"👖", w:"Pants"}, {e:"🧦", w:"Socks"}, {e:"🍕", w:"Pizza"}
+    ], odd:"Pizza", group:"clothes", oddKind:"a food" },
+
+    { items:[
+      {e:"🐟", w:"Fish"}, {e:"🐙", w:"Octopus"}, {e:"🐳", w:"Whale"}, {e:"🦁", w:"Lion"}
+    ], odd:"Lion", group:"animals that live in the ocean", oddKind:"an animal that lives on land" },
+
+    { items:[
+      {e:"⚽", w:"Soccer Ball"}, {e:"🏀", w:"Basketball"}, {e:"🎾", w:"Tennis Ball"}, {e:"📚", w:"Book"}
+    ], odd:"Book", group:"balls for sports", oddKind:"something to read" },
+
+    { items:[
+      {e:"🌳", w:"Tree"}, {e:"🌷", w:"Tulip"}, {e:"🌲", w:"Pine Tree"}, {e:"🐝", w:"Bee"}
+    ], odd:"Bee", group:"plants", oddKind:"an insect" },
+
+    { items:[
+      {e:"🥄", w:"Spoon"}, {e:"🍴", w:"Fork"}, {e:"🔪", w:"Knife"}, {e:"✏️", w:"Pencil"}
+    ], odd:"Pencil", group:"things we use for eating", oddKind:"something we use for writing" },
+
+    { items:[
+      {e:"🎸", w:"Guitar"}, {e:"🎺", w:"Trumpet"}, {e:"🥁", w:"Drum"}, {e:"🚲", w:"Bike"}
+    ], odd:"Bike", group:"musical instruments", oddKind:"a vehicle" },
+
+    { items:[
+      {e:"🍓", w:"Strawberry"}, {e:"🍒", w:"Cherries"}, {e:"🍉", w:"Watermelon"}, {e:"🍞", w:"Bread"}
+    ], odd:"Bread", group:"fruits", oddKind:"a baked food, not a fruit" },
+
+    { items:[
+      {e:"🦋", w:"Butterfly"}, {e:"🐞", w:"Ladybug"}, {e:"🐝", w:"Bee"}, {e:"🐦", w:"Bird"}
+    ], odd:"Bird", group:"bugs", oddKind:"a bird, not a bug" },
+
+    { items:[
+      {e:"❄️", w:"Snowflake"}, {e:"☃️", w:"Snowman"}, {e:"🧊", w:"Ice Cube"}, {e:"☀️", w:"Sun"}
+    ], odd:"Sun", group:"cold, winter things", oddKind:"hot" },
+
+    { items:[
+      {e:"🐴", w:"Horse"}, {e:"🐷", w:"Pig"}, {e:"🐔", w:"Chicken"}, {e:"🦁", w:"Lion"}
+    ], odd:"Lion", group:"farm animals", oddKind:"a wild animal" },
+
+    { items:[
+      {e:"🔴", w:"Red Circle"}, {e:"🔵", w:"Blue Circle"}, {e:"🟢", w:"Green Circle"}, {e:"🟨", w:"Yellow Square"}
+    ], odd:"Yellow Square", group:"circles", oddKind:"a square" },
+
+    { items:[
+      {e:"🚗", w:"Car"}, {e:"🚌", w:"Bus"}, {e:"🚲", w:"Bike"}, {e:"✈️", w:"Airplane"}
+    ], odd:"Airplane", group:"things that travel on the ground", oddKind:"something that flies in the sky" },
+
+    { items:[
+      {e:"🍦", w:"Ice Cream"}, {e:"🍰", w:"Cake"}, {e:"🍪", w:"Cookie"}, {e:"🍎", w:"Apple"}
+    ], odd:"Apple", group:"sweet treats and desserts", oddKind:"a fruit" },
+
+    { items:[
+      {e:"👀", w:"Eyes"}, {e:"👂", w:"Ear"}, {e:"👃", w:"Nose"}, {e:"👟", w:"Shoe"}
+    ], odd:"Shoe", group:"parts of our body", oddKind:"something we wear on our feet" },
+
+    { items:[
+      {e:"1️⃣", w:"One"}, {e:"2️⃣", w:"Two"}, {e:"3️⃣", w:"Three"}, {e:"🅰️", w:"Letter A"}
+    ], odd:"Letter A", group:"numbers", oddKind:"a letter" },
+
+    { items:[
+      {e:"🐢", w:"Turtle"}, {e:"🐌", w:"Snail"}, {e:"🦥", w:"Sloth"}, {e:"🐆", w:"Cheetah"}
+    ], odd:"Cheetah", group:"slow animals", oddKind:"a very fast animal" },
+
+    { items:[
+      {e:"🔺", w:"Triangle"}, {e:"🟦", w:"Square"}, {e:"⭕", w:"Circle"}, {e:"🍩", w:"Donut"}
+    ], odd:"Donut", group:"shapes", oddKind:"a food" }
+  ];
+
+  var grid = document.getElementById("grid");
+  var feedback = document.getElementById("feedback");
+  var starCountEl = document.getElementById("starCount");
+  var starsBox = document.getElementById("starsBox");
+  var roundLabel = document.getElementById("roundLabel");
+  var soundBtn = document.getElementById("soundBtn");
+  var newBtn = document.getElementById("newBtn");
+  var burst = document.getElementById("burst");
+
+  var stars = 0;
+  var soundOn = true;
+  var order = [];
+  var round = 0;         // index into order
+  var current = null;    // current set
+  var solved = false;
+  var advanceTimer = null;
+  var audioCtx = null;
+
+  function shuffle(arr){
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--){
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  /* ---------- Sound (Web Audio, in-browser only) ---------- */
+  function ensureAudio(){
+    if (!audioCtx){
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) audioCtx = new AC();
+    }
+    if (audioCtx && audioCtx.state === "suspended") audioCtx.resume();
+    return audioCtx;
+  }
+  function tone(freq, start, dur, type, vol){
+    if (!soundOn) return;
+    var ctx = ensureAudio(); if (!ctx) return;
+    var t = ctx.currentTime + start;
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.type = type || "sine";
+    osc.frequency.setValueAtTime(freq, t);
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.exponentialRampToValueAtTime(vol || 0.18, t + 0.03);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(t); osc.stop(t + dur + 0.05);
+  }
+  function happySound(){
+    // cheerful rising arpeggio: C E G C
+    tone(523.25, 0,    0.22, "triangle", 0.22);
+    tone(659.25, 0.09, 0.22, "triangle", 0.22);
+    tone(783.99, 0.18, 0.24, "triangle", 0.22);
+    tone(1046.5, 0.27, 0.38, "triangle", 0.24);
+  }
+  function gentleSound(){
+    // soft, friendly "try again" — two gentle low notes, nothing harsh
+    tone(329.63, 0,    0.20, "sine", 0.14);
+    tone(293.66, 0.14, 0.26, "sine", 0.14);
+  }
+
+  /* ---------- Speech ---------- */
+  function speak(text){
+    if (!soundOn) return;
+    if (!("speechSynthesis" in window)) return;
+    try{
+      window.speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      u.rate = 0.92;
+      u.pitch = 1.05;
+      window.speechSynthesis.speak(u);
+    }catch(e){ /* speech unavailable — text reason is still on screen */ }
+  }
+
+  function reasonText(set){
+    return "The others are " + set.group + ". The " + set.odd.toLowerCase() + " is " + set.oddKind + "!";
+  }
+
+  /* ---------- Feedback ---------- */
+  function setFeedback(kind, html){
+    feedback.className = "feedback " + kind;
+    feedback.innerHTML = html;
+  }
+  function idleFeedback(){
+    setFeedback("idle", '<p class="hint">Look at all four pictures. Three go together. One is different!</p>');
+  }
+  function tryFeedback(word){
+    setFeedback("try",
+      '<p class="msg">Good try! 😊</p>' +
+      '<p class="reason">The ' + escapeHtml(word) + ' belongs with the others. Look again — which one is different?</p>');
+  }
+  function winFeedback(set){
+    var reason = reasonText(set);
+    setFeedback("win",
+      '<p class="msg">⭐ You found it! Great job!</p>' +
+      '<p class="reason">' + escapeHtml(reason) + '</p>' +
+      '<div class="feedback-actions">' +
+        '<button class="btn btn-hear" id="hearBtn" type="button">🔊 Hear It</button>' +
+        '<button class="btn btn-next" id="nextBtn" type="button">Next ▶</button>' +
+      '</div>');
+    var hear = document.getElementById("hearBtn");
+    var next = document.getElementById("nextBtn");
+    if (hear) hear.addEventListener("click", function(){ speak(reason); });
+    if (next) next.addEventListener("click", function(){ clearAdvance(); nextRound(); });
+  }
+  function escapeHtml(s){
+    return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  }
+
+  /* ---------- Burst ---------- */
+  function starBurst(x, y){
+    var glyphs = ["⭐","🌟","✨","⭐","🌟"];
+    for (var i = 0; i < 10; i++){
+      var s = document.createElement("span");
+      s.textContent = glyphs[i % glyphs.length];
+      var angle = (Math.PI * 2 * i) / 10 + Math.random() * 0.4;
+      var dist = 90 + Math.random() * 90;
+      s.style.left = x + "px";
+      s.style.top = y + "px";
+      s.style.setProperty("--dx", Math.cos(angle) * dist + "px");
+      s.style.setProperty("--dy", (Math.sin(angle) * dist - 30) + "px");
+      burst.appendChild(s);
+      (function(el){ setTimeout(function(){ el.remove(); }, 950); })(s);
+    }
+  }
+
+  /* ---------- Game flow ---------- */
+  function clearAdvance(){
+    if (advanceTimer){ clearTimeout(advanceTimer); advanceTimer = null; }
+  }
+
+  function renderRound(){
+    clearAdvance();
+    solved = false;
+    current = SETS[order[round]];
+    roundLabel.textContent = "Puzzle " + (round + 1) + " of " + order.length;
+    idleFeedback();
+    grid.innerHTML = "";
+
+    var shuffledItems = shuffle(current.items);
+    shuffledItems.forEach(function(item){
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "card";
+      btn.setAttribute("aria-label", item.w);
+      btn.innerHTML = '<span class="pic" aria-hidden="true">' + item.e + '</span>' +
+                      '<span class="word">' + escapeHtml(item.w) + '</span>';
+      btn.addEventListener("click", function(ev){ onPick(btn, item, ev); });
+      grid.appendChild(btn);
+    });
+  }
+
+  function onPick(btn, item, ev){
+    if (solved) return;
+    ensureAudio();
+    if (item.w === current.odd){
+      solved = true;
+      stars++;
+      starCountEl.textContent = stars;
+      starsBox.classList.remove("pop");
+      void starsBox.offsetWidth;
+      starsBox.classList.add("pop");
+
+      var cards = grid.querySelectorAll(".card");
+      cards.forEach(function(c){
+        c.disabled = true;
+        if (c !== btn) c.classList.add("dim");
+      });
+      btn.classList.remove("tried");
+      btn.classList.add("correct");
+
+      happySound();
+      var r = btn.getBoundingClientRect();
+      starBurst(r.left + r.width / 2, r.top + r.height / 2);
+      winFeedback(current);
+
+      // Move to the next set shortly — teacher can also tap Next.
+      advanceTimer = setTimeout(nextRound, 6000);
+    } else {
+      gentleSound();
+      btn.classList.remove("wrong");
+      void btn.offsetWidth;
+      btn.classList.add("wrong");
+      btn.classList.add("tried");
+      setTimeout(function(){ btn.classList.remove("wrong"); }, 480);
+      tryFeedback(item.w);
+    }
+  }
+
+  function nextRound(){
+    clearAdvance();
+    round++;
+    if (round >= order.length){
+      // reshuffle and keep going — endless play
+      order = shuffle(SETS.map(function(_, i){ return i; }));
+      round = 0;
+    }
+    renderRound();
+  }
+
+  function newGame(){
+    clearAdvance();
+    stars = 0;
+    starCountEl.textContent = "0";
+    order = shuffle(SETS.map(function(_, i){ return i; }));
+    round = 0;
+    if ("speechSynthesis" in window) { try{ window.speechSynthesis.cancel(); }catch(e){} }
+    renderRound();
+  }
+
+  /* ---------- Controls ---------- */
+  soundBtn.addEventListener("click", function(){
+    soundOn = !soundOn;
+    soundBtn.textContent = soundOn ? "🔊 Sound: On" : "🔇 Sound: Off";
+    soundBtn.setAttribute("aria-pressed", soundOn ? "true" : "false");
+    if (!soundOn && "speechSynthesis" in window){
+      try{ window.speechSynthesis.cancel(); }catch(e){}
+    }
+    if (soundOn){ ensureAudio(); tone(659.25, 0, 0.15, "triangle", 0.18); }
+  });
+  newBtn.addEventListener("click", newGame);
+
+  // Keyboard: numbers 1–4 pick a card (handy for teachers on a projector)
+  document.addEventListener("keydown", function(e){
+    var n = parseInt(e.key, 10);
+    if (n >= 1 && n <= 4){
+      var cards = grid.querySelectorAll(".card");
+      if (cards[n - 1] && !cards[n - 1].disabled) cards[n - 1].click();
+    }
+  });
+
+  newGame();
+})();
+</script>
+</body>
+</html>

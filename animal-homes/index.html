@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:," />
+<title>Animal Homes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#e9f5e4;
+  --bg2:#d9eeda;
+  --card:#ffffff;
+  --card-border:#bcd8b6;
+  --ink:#1d3320;
+  --ink-soft:#44604a;
+  --green:#2f7d32;
+  --green-dark:#226127;
+  --green-soft:#e2f3df;
+  --amber:#b26a00;
+  --amber-soft:#fdf0d3;
+  --gold:#f2b01e;
+  --gold-soft:#fff3cf;
+  --wrong:#c2571b;
+  --shadow:0 10px 24px rgba(29,51,32,.14);
+  --radius:22px;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#122016;
+    --bg2:#0d1810;
+    --card:#1c2f20;
+    --card-border:#33513a;
+    --ink:#eef7ec;
+    --ink-soft:#b8d2ba;
+    --green:#6fc76f;
+    --green-dark:#8fd98f;
+    --green-soft:#23402a;
+    --amber:#f2b45c;
+    --amber-soft:#3d2f16;
+    --gold:#ffd34d;
+    --gold-soft:#3a3010;
+    --wrong:#f09a6a;
+    --shadow:0 10px 24px rgba(0,0,0,.45);
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:"Nunito",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%);
+  color:var(--ink);
+  min-height:100vh;
+}
+.wrap{max-width:1060px;margin:0 auto;padding:16px 16px 28px}
+header.top{
+  display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;
+  margin-bottom:12px;
+}
+h1{
+  font-family:"Fredoka","Nunito",sans-serif;font-weight:700;
+  font-size:clamp(30px,5vw,46px);line-height:1;margin:0;letter-spacing:.2px;
+}
+h1 .leaf{color:var(--green)}
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.pill{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--gold-soft);border:3px solid var(--gold);color:var(--ink);
+  font-family:"Fredoka",sans-serif;font-weight:700;font-size:22px;
+  padding:8px 16px;border-radius:999px;min-height:52px;
+}
+.pill svg{width:26px;height:26px;flex:none}
+.btn{
+  font-family:"Fredoka",sans-serif;font-weight:600;
+  font-size:19px;line-height:1;
+  border-radius:999px;border:3px solid transparent;
+  padding:12px 18px;min-height:52px;cursor:pointer;
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--card);color:var(--ink);border-color:var(--card-border);
+  box-shadow:0 3px 0 rgba(0,0,0,.08);
+}
+.btn svg{width:22px;height:22px;flex:none}
+.btn:active{transform:translateY(2px);box-shadow:none}
+.btn.primary{background:var(--green);border-color:var(--green-dark);color:#fff}
+@media (prefers-color-scheme: dark){ .btn.primary{color:#10240f} }
+.btn:focus-visible,.choice:focus-visible{outline:4px solid var(--gold);outline-offset:2px}
+
+.progress{
+  text-align:center;font-family:"Fredoka",sans-serif;font-weight:600;
+  font-size:19px;color:var(--ink-soft);margin:2px 0 10px;
+}
+.dots{display:flex;gap:6px;justify-content:center;margin-top:6px}
+.dot{width:14px;height:14px;border-radius:50%;background:var(--card);border:2px solid var(--card-border)}
+.dot.done{background:var(--gold);border-color:var(--gold)}
+.dot.now{border-color:var(--green);border-width:3px}
+
+.animal-card{
+  background:var(--card);border:3px solid var(--card-border);border-radius:28px;
+  box-shadow:var(--shadow);
+  padding:18px 16px 14px;text-align:center;margin-bottom:14px;
+  position:relative;overflow:hidden;
+}
+.animal-emoji{font-size:clamp(96px,18vw,150px);line-height:1.05;display:block}
+.animal-name{
+  font-family:"Fredoka",sans-serif;font-weight:700;
+  font-size:clamp(34px,6vw,52px);line-height:1.05;margin:2px 0 2px;text-transform:capitalize;
+}
+.question{
+  font-size:clamp(21px,3.4vw,28px);font-weight:800;color:var(--ink-soft);margin:0;
+}
+
+.feedback{
+  min-height:44px;display:flex;align-items:center;justify-content:center;
+  text-align:center;font-family:"Fredoka",sans-serif;font-weight:600;
+  font-size:clamp(21px,3.6vw,28px);margin:4px 0 12px;padding:0 8px;
+}
+.feedback.good{color:var(--green)}
+.feedback.try{color:var(--wrong)}
+
+.choices{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:14px;
+}
+.choice{
+  background:var(--card);border:4px solid var(--card-border);border-radius:var(--radius);
+  box-shadow:var(--shadow);cursor:pointer;
+  padding:18px 8px 14px;text-align:center;color:var(--ink);
+  font-family:inherit;min-height:172px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  transition:transform .12s ease, border-color .12s ease, background .12s ease;
+}
+.choice:hover{transform:translateY(-3px);border-color:var(--green)}
+.choice .home-emoji{font-size:clamp(60px,10vw,84px);line-height:1.1}
+.choice .home-name{
+  font-family:"Fredoka",sans-serif;font-weight:700;
+  font-size:clamp(24px,4vw,34px);line-height:1.1;text-transform:capitalize;
+}
+.choice.correct{background:var(--green-soft);border-color:var(--green)}
+.choice.wrong{opacity:.45;border-color:var(--card-border);cursor:default}
+.choice:disabled{cursor:default}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+.choice.shake{animation:shake .45s ease}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.07)}100%{transform:scale(1)}}
+.choice.correct{animation:pop .4s ease}
+
+.finish{
+  display:none;background:var(--card);border:3px solid var(--gold);border-radius:28px;
+  box-shadow:var(--shadow);text-align:center;padding:30px 20px 26px;
+}
+.finish.show{display:block}
+.finish .big{font-size:84px;line-height:1}
+.finish h2{font-family:"Fredoka",sans-serif;font-weight:700;font-size:clamp(32px,6vw,46px);margin:8px 0 6px}
+.finish p{font-size:21px;font-weight:800;color:var(--ink-soft);margin:0 0 18px}
+
+.confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:50}
+.confetti i{position:absolute;top:-16px;width:12px;height:18px;border-radius:3px;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(640deg)}}
+@media (prefers-reduced-motion: reduce){
+  .choice.shake,.choice.correct{animation:none}
+  .confetti{display:none}
+}
+
+@media (max-width:640px){
+  .wrap{padding:12px 12px 24px}
+  .choices{grid-template-columns:1fr;gap:10px}
+  .choice{min-height:112px;flex-direction:row;gap:14px;padding:12px 18px;justify-content:flex-start;text-align:left}
+  .choice .home-emoji{font-size:56px}
+  header.top{justify-content:center;text-align:center}
+  .controls{justify-content:center}
+  h1{width:100%;text-align:center}
+}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <header class="top">
+    <h1><span class="leaf">Animal</span> Homes</h1>
+    <div class="controls">
+      <a class="btn primary" href="https://scaemrfung.github.io/mr-fung-webgames/" style="text-decoration:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 3l9 8.5"/><path d="M5.5 10v10h13V10"/><path d="M9.5 20v-6h5v6"/></svg>
+        Home
+      </a>
+      <span class="pill" aria-label="Stars earned">
+        <svg viewBox="0 0 24 24" fill="#f2b01e" stroke="#b57f00" stroke-width="1.2" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z"/></svg>
+        <span id="stars">0</span>
+      </span>
+      <button class="btn" id="hearBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor" stroke="none"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.4 5.6a9 9 0 0 1 0 12.8"/></svg>
+        Hear It
+      </button>
+      <button class="btn" id="soundBtn" type="button" aria-pressed="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor" stroke="none"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.4 5.6a9 9 0 0 1 0 12.8"/></svg>
+        <span id="soundLabel">Sound On</span>
+      </button>
+      <button class="btn primary" id="newBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></svg>
+        New Game
+      </button>
+    </div>
+  </header>
+
+  <p class="progress"><span id="progressText">Animal 1 of 10</span><span class="dots" id="dots" aria-hidden="true"></span></p>
+
+  <main id="gameArea">
+    <section class="animal-card" aria-label="Animal">
+      <span class="animal-emoji" id="animalEmoji" role="img" aria-label="Animal picture">🐦</span>
+      <div class="animal-name" id="animalName">Bird</div>
+      <p class="question" id="question">Where does the bird live?</p>
+    </section>
+
+    <div class="feedback" id="feedback" aria-live="polite">Tap the bird's home!</div>
+
+    <section class="choices" id="choices" aria-label="Home choices"></section>
+  </main>
+
+  <section class="finish" id="finish" aria-live="polite">
+    <div class="big" aria-hidden="true">🏆</div>
+    <h2>Great Job!</h2>
+    <p id="finishText">You found every animal's home!</p>
+    <button class="btn primary" id="againBtn" type="button" style="font-size:22px;padding:14px 26px;">Play Again</button>
+  </section>
+</div>
+<div class="confetti" id="confetti" aria-hidden="true"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  var ROUNDS = [
+    { animal:"Bird",   emoji:"🐦", home:"Nest",     homeEmoji:"🪺" },
+    { animal:"Bear",   emoji:"🐻", home:"Den",      homeEmoji:"🕳️" },
+    { animal:"Bee",    emoji:"🐝", home:"Hive",     homeEmoji:"🐝" },
+    { animal:"Dog",    emoji:"🐶", home:"Kennel",   homeEmoji:"🏠" },
+    { animal:"Fish",   emoji:"🐠", home:"Fish Bowl",homeEmoji:"🐟" },
+    { animal:"Rabbit", emoji:"🐰", home:"Burrow",   homeEmoji:"🕳️" },
+    { animal:"Spider", emoji:"🕷️", home:"Web",      homeEmoji:"🕸️" },
+    { animal:"Frog",   emoji:"🐸", home:"Pond",     homeEmoji:"💧" },
+    { animal:"Horse",  emoji:"🐴", home:"Barn",     homeEmoji:"🏚️" },
+    { animal:"Owl",    emoji:"🦉", home:"Tree",     homeEmoji:"🌳" }
+  ];
+  // Bee's home picture: a drawn beehive (skep), not a honey pot or a second bee:
+  ROUNDS[2].homeSvg = '<svg viewBox="0 0 100 100" width="84" height="84" aria-hidden="true"><path d="M50 10 a36 40 0 0 1 36 40 v22 a6 6 0 0 1 -6 6 H20 a6 6 0 0 1 -6 -6 V50 a36 40 0 0 1 36 -40 Z" fill="#f2b93b" stroke="#c07f16" stroke-width="4"/><path d="M17 44 H83 M14.5 58 H85.5 M15 72 H85" stroke="#c07f16" stroke-width="4" fill="none"/><path d="M40 78 a10 9 0 0 1 20 0 Z" fill="#6b4210"/></svg>';
+  // Kennel: a dog house (drawn, so it doesn't read as a people's house):
+  ROUNDS[3].homeSvg = '<svg viewBox="0 0 100 100" width="84" height="84" aria-hidden="true"><path d="M14 48 L50 16 L86 48 L78 48 L78 86 L22 86 L22 48 Z" fill="#b07a45" stroke="#7c4f24" stroke-width="4" stroke-linejoin="round"/><path d="M8 50 L50 12 L92 50 L84 50 L50 20 L16 50 Z" fill="#c0392b"/><path d="M38 86 L38 62 a12 12 0 0 1 24 0 L62 86 Z" fill="#4a2f16"/></svg>';
+  // Fish Bowl: a round bowl with water and a fish inside (drawn, not just a fish):
+  ROUNDS[4].homeSvg = '<svg viewBox="0 0 100 100" width="84" height="84" aria-hidden="true"><path d="M20 30 a34 34 0 1 0 60 0 Z" fill="#bfe6f7" stroke="#5b8fa8" stroke-width="4"/><path d="M20 30 a34 20 0 0 0 60 0 a34 10 0 0 1 -60 0" fill="#7ec8ea"/><ellipse cx="48" cy="52" rx="11" ry="7" fill="#f28c28"/><path d="M58 52 l10 -6 v12 Z" fill="#f28c28"/><circle cx="44" cy="50" r="1.8" fill="#20303a"/><rect x="38" y="84" width="24" height="5" rx="2" fill="#5b8fa8"/></svg>';
+  // Distinct pictures where two homes shared one:
+  ROUNDS[1].homeEmoji = "⛰️";   // den — rocky cave opening
+  ROUNDS[5].homeEmoji = "🌿";   // burrow — hole in the grass (shown with label)
+
+  var ALL_HOMES = ROUNDS.map(function(r){ return { name:r.home, emoji:r.homeEmoji, svg:r.homeSvg || null }; });
+
+  var starsEl = document.getElementById('stars');
+  var progressEl = document.getElementById('progressText');
+  var dotsEl = document.getElementById('dots');
+  var emojiEl = document.getElementById('animalEmoji');
+  var nameEl = document.getElementById('animalName');
+  var questionEl = document.getElementById('question');
+  var feedbackEl = document.getElementById('feedback');
+  var choicesEl = document.getElementById('choices');
+  var gameArea = document.getElementById('gameArea');
+  var finishEl = document.getElementById('finish');
+  var finishText = document.getElementById('finishText');
+  var confettiEl = document.getElementById('confetti');
+  var soundBtn = document.getElementById('soundBtn');
+  var soundLabel = document.getElementById('soundLabel');
+
+  var order = [], idx = 0, stars = 0, locked = false, soundOn = true, audioCtx = null;
+
+  function shuffle(a){
+    a = a.slice();
+    for (var i = a.length - 1; i > 0; i--){
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  function ensureAudio(){
+    if (!audioCtx){
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) audioCtx = new AC();
+    }
+    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    return audioCtx;
+  }
+  function tone(freq, start, dur, type){
+    if (!soundOn) return;
+    var ctx = ensureAudio(); if (!ctx) return;
+    var o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type || 'sine'; o.frequency.value = freq;
+    var t = ctx.currentTime + start;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.22, t + 0.03);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(t); o.stop(t + dur + 0.05);
+  }
+  function happySound(){ tone(523.25,0,0.18); tone(659.25,0.12,0.18); tone(783.99,0.24,0.32); }
+  function trySound(){ tone(330,0,0.16,'triangle'); tone(262,0.14,0.22,'triangle'); }
+  function winSound(){ tone(523.25,0,0.2); tone(659.25,0.14,0.2); tone(783.99,0.28,0.2); tone(1046.5,0.42,0.45); }
+
+  function speak(text){
+    try{
+      if (!('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      u.rate = 0.92; u.pitch = 1.05;
+      window.speechSynthesis.speak(u);
+    }catch(e){}
+  }
+
+  function confetti(n){
+    var colors = ['#f2b01e','#2f7d32','#e2571b','#2b7bbb','#d6457a'];
+    for (var i = 0; i < (n || 26); i++){
+      var p = document.createElement('i');
+      p.style.left = (Math.random() * 100) + 'vw';
+      p.style.background = colors[i % colors.length];
+      p.style.animationDuration = (0.9 + Math.random() * 0.9) + 's';
+      p.style.animationDelay = (Math.random() * 0.25) + 's';
+      confettiEl.appendChild(p);
+      (function(el){ setTimeout(function(){ el.remove(); }, 2400); })(p);
+    }
+  }
+
+  function articleFor(home){
+    return /^[AEIOU]/i.test(home) ? 'an' : 'a';
+  }
+  function sentence(r){
+    return 'The ' + r.animal.toLowerCase() + ' lives in ' + articleFor(r.home) + ' ' + r.home.toLowerCase() + '.';
+  }
+
+  function renderDots(){
+    dotsEl.innerHTML = '';
+    for (var i = 0; i < order.length; i++){
+      var d = document.createElement('span');
+      d.className = 'dot' + (i < idx ? ' done' : (i === idx ? ' now' : ''));
+      dotsEl.appendChild(d);
+    }
+  }
+
+  function render(){
+    locked = false;
+    var r = order[idx];
+    progressEl.textContent = 'Animal ' + (idx + 1) + ' of ' + order.length;
+    renderDots();
+    emojiEl.textContent = r.emoji;
+    emojiEl.setAttribute('aria-label', r.animal + ' picture');
+    nameEl.textContent = r.animal;
+    questionEl.textContent = 'Where does the ' + r.animal.toLowerCase() + ' live?';
+    feedbackEl.className = 'feedback';
+    feedbackEl.textContent = 'Tap the ' + r.animal.toLowerCase() + "'s home!";
+
+    var others = shuffle(ALL_HOMES.filter(function(h){ return h.name !== r.home; })).slice(0, 2);
+    var options = shuffle([{ name:r.home, emoji:r.homeEmoji, svg:r.homeSvg || null }].concat(others));
+
+    choicesEl.innerHTML = '';
+    options.forEach(function(opt){
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'choice';
+      b.setAttribute('aria-label', opt.name);
+      var e = document.createElement('span');
+      e.className = 'home-emoji'; e.setAttribute('aria-hidden','true');
+      if (opt.svg) { e.innerHTML = opt.svg; } else { e.textContent = opt.emoji; }
+      var n = document.createElement('span');
+      n.className = 'home-name'; n.textContent = opt.name;
+      b.appendChild(e); b.appendChild(n);
+      b.addEventListener('click', function(){ pick(b, opt, r); });
+      choicesEl.appendChild(b);
+    });
+  }
+
+  function pick(btn, opt, r){
+    if (locked || btn.disabled) return;
+    if (opt.name === r.home){
+      locked = true;
+      btn.classList.add('correct');
+      var all = choicesEl.querySelectorAll('.choice');
+      for (var i = 0; i < all.length; i++) all[i].disabled = true;
+      stars++;
+      starsEl.textContent = stars;
+      feedbackEl.className = 'feedback good';
+      feedbackEl.textContent = 'Yes! ' + sentence(r);
+      happySound();
+      confetti(22);
+      setTimeout(next, 1700);
+    } else {
+      btn.disabled = true;
+      btn.classList.add('wrong');
+      btn.classList.add('shake');
+      feedbackEl.className = 'feedback try';
+      feedbackEl.textContent = 'Good try! That is not the ' + r.animal.toLowerCase() + "'s home. Try again!";
+      trySound();
+      setTimeout(function(){ btn.classList.remove('shake'); }, 500);
+    }
+  }
+
+  function next(){
+    idx++;
+    if (idx >= order.length){
+      gameArea.style.display = 'none';
+      finishText.textContent = 'You found every animal\u2019s home and earned ' + stars + (stars === 1 ? ' star!' : ' stars!');
+      finishEl.classList.add('show');
+      progressEl.textContent = 'All done!';
+      dotsEl.innerHTML = '';
+      winSound();
+      confetti(60);
+    } else {
+      render();
+    }
+  }
+
+  function newGame(){
+    order = shuffle(ROUNDS);
+    idx = 0; stars = 0;
+    starsEl.textContent = '0';
+    finishEl.classList.remove('show');
+    gameArea.style.display = '';
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    render();
+  }
+
+  document.getElementById('newBtn').addEventListener('click', newGame);
+  document.getElementById('againBtn').addEventListener('click', newGame);
+  soundBtn.addEventListener('click', function(){
+    soundOn = !soundOn;
+    soundLabel.textContent = soundOn ? 'Sound On' : 'Sound Off';
+    soundBtn.setAttribute('aria-pressed', soundOn ? 'true' : 'false');
+    if (soundOn) happySound();
+  });
+  document.getElementById('hearBtn').addEventListener('click', function(){
+    if (finishEl.classList.contains('show')){
+      speak('Great job! You found every animal\u2019s home!');
+      return;
+    }
+    var r = order[idx];
+    speak(sentence(r) + ' Where does the ' + r.animal.toLowerCase() + ' live?');
+  });
+
+  newGame();
+})();
+</script>
+</body>
+</html>

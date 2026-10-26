@@ -1,0 +1,669 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:," />
+<title>Money Shop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FFF6DE;
+    --card:#FFFFFF;
+    --card2:#FFFBEC;
+    --ink:#1E2A26;
+    --muted:#5A6B64;
+    --line:#EAD9A8;
+    --teal:#0E7C6B;
+    --teal-dark:#0A5E51;
+    --teal-soft:#DDF3EC;
+    --amber:#E9A426;
+    --amber-soft:#FDEFC2;
+    --red-soft:#FDE8E0;
+    --good:#178A4C;
+    --good-bg:#DFF5E3;
+    --warn:#B85C00;
+    --warn-bg:#FFF0D6;
+    --shadow:0 6px 0 rgba(30,42,38,.12);
+    --btn-shadow:0 5px 0 rgba(0,0,0,.18);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#131A17;
+      --card:#1E2A25;
+      --card2:#24332C;
+      --ink:#F2F5F0;
+      --muted:#B9C6BE;
+      --line:#3A4A42;
+      --teal:#2CB59B;
+      --teal-dark:#1F8A74;
+      --teal-soft:#1C3A33;
+      --amber:#F2B84B;
+      --amber-soft:#3A3118;
+      --good-bg:#173D26;
+      --warn-bg:#3D2E14;
+      --shadow:0 6px 0 rgba(0,0,0,.35);
+    }
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:"Nunito",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    min-height:100dvh;
+  }
+  button{font-family:inherit; cursor:pointer; -webkit-tap-highlight-color:transparent}
+  button:focus-visible{outline:4px solid var(--amber); outline-offset:2px}
+
+  .topbar{
+    max-width:1180px;margin:0 auto;padding:12px 16px 4px;
+    display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  }
+  .stars{
+    display:flex;align-items:center;gap:8px;background:var(--card);border:3px solid var(--line);
+    border-radius:999px;padding:8px 16px 8px 12px;font-family:"Fredoka",sans-serif;font-weight:700;font-size:1.35rem;
+    box-shadow:var(--shadow);
+  }
+  .stars .star-ico{font-size:1.6rem;line-height:1}
+  .top-actions{display:flex;gap:10px;flex-wrap:wrap}
+  .top-btn{
+    border:3px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;
+    padding:10px 18px;font-weight:900;font-size:1.02rem;box-shadow:var(--shadow);min-height:52px;
+  }
+  .top-btn:active{transform:translateY(2px);box-shadow:none}
+  .top-btn.primary{background:var(--teal);border-color:var(--teal-dark);color:#fff}
+
+  .wrap{max-width:1180px;margin:0 auto;padding:10px 16px 28px}
+  h1{
+    font-family:"Fredoka",sans-serif;font-weight:700;text-align:center;margin:2px 0 4px;
+    font-size:clamp(2rem,4.5vw,3.2rem);letter-spacing:.2px;line-height:1.05;
+  }
+  .subtitle{text-align:center;color:var(--muted);font-weight:800;font-size:clamp(1rem,2vw,1.2rem);margin:0 0 14px}
+
+  .layout{display:grid;grid-template-columns: 380px 1fr;gap:18px;align-items:start}
+  @media (max-width:820px){ .layout{grid-template-columns:1fr} }
+
+  .item-card{
+    background:var(--card);border:3px solid var(--line);border-radius:24px;box-shadow:var(--shadow);
+    padding:20px 18px 18px;text-align:center;position:relative;overflow:hidden;
+  }
+  .shop-sign{
+    display:inline-block;background:var(--amber);color:#3A2700;font-family:"Fredoka",sans-serif;font-weight:700;
+    padding:6px 16px;border-radius:999px;font-size:.95rem;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;
+  }
+  .item-emoji{font-size:clamp(5.2rem,14vw,7.5rem);line-height:1.05;display:block}
+  .item-name{font-family:"Fredoka",sans-serif;font-weight:700;font-size:clamp(1.7rem,3.5vw,2.3rem);margin:6px 0 2px;line-height:1.1}
+  .price-label{color:var(--muted);font-weight:900;letter-spacing:.06em;text-transform:uppercase;font-size:.9rem}
+  .price{font-family:"Fredoka",sans-serif;font-weight:700;font-size:clamp(3rem,7vw,4.4rem);line-height:1;color:var(--teal);margin:2px 0 10px}
+  .hear-btn{
+    width:100%;background:var(--teal-soft);border:3px solid var(--teal);color:var(--ink);
+    border-radius:16px;padding:14px;font-weight:900;font-size:1.2rem;min-height:60px;
+  }
+  .hear-btn:active{transform:scale(.98)}
+
+  .play{
+    background:var(--card);border:3px solid var(--line);border-radius:24px;box-shadow:var(--shadow);
+    padding:18px;
+  }
+  .steps{display:flex;gap:8px;margin-bottom:14px}
+  .step{
+    flex:1;text-align:center;padding:10px 6px;border-radius:14px;border:3px solid var(--line);
+    font-family:"Fredoka",sans-serif;font-weight:600;font-size:1.05rem;background:var(--card2);color:var(--muted);
+  }
+  .step.active{background:var(--teal);border-color:var(--teal-dark);color:#fff}
+  .step.done{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+
+  .message{
+    min-height:64px;display:flex;align-items:center;justify-content:center;text-align:center;
+    border-radius:16px;padding:12px 14px;font-weight:900;font-size:clamp(1.08rem,2.4vw,1.35rem);line-height:1.3;
+    background:var(--card2);border:2px dashed var(--line);margin-bottom:14px;
+  }
+  .message.good{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+  .message.warn{background:var(--warn-bg);border-color:var(--amber);color:var(--warn)}
+  @media (prefers-color-scheme: dark){ .message.warn{color:#F6C87A} .message.good{color:#7ED99A} }
+
+  .tray-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+  .tray-title{font-family:"Fredoka",sans-serif;font-weight:600;font-size:1.25rem}
+  .tray-total{font-family:"Fredoka",sans-serif;font-weight:700;font-size:1.9rem;color:var(--teal)}
+  .tray-total.over{color:#C0392B}
+  .tray{
+    min-height:84px;border:3px solid var(--line);border-radius:16px;background:var(--card2);
+    padding:10px;display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start;align-items:center;margin-bottom:6px;
+  }
+  .tray-empty{color:var(--muted);font-weight:800;font-size:1.05rem;width:100%;text-align:center;padding:14px 0}
+  .hint{text-align:center;font-weight:900;color:var(--muted);font-size:1.08rem;min-height:28px;margin-bottom:10px}
+  .hint b{color:var(--ink)}
+
+  .mini-coin{
+    border-radius:50%;border:2px solid rgba(0,0,0,.22);display:flex;align-items:center;justify-content:center;
+    font-family:"Fredoka",sans-serif;font-weight:700;flex:0 0 auto;padding:0;position:relative;
+  }
+  .mini-coin:active{transform:scale(.92)}
+
+  .coins-label{font-family:"Fredoka",sans-serif;font-weight:600;font-size:1.2rem;margin:8px 0 10px;text-align:center}
+  .coins{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+  .coin-btn{
+    background:none;border:none;padding:4px 2px 2px;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:104px;
+  }
+  .coin-btn:active .coin-face{transform:scale(.92)}
+  .coin-face{
+    border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column;
+    font-family:"Fredoka",sans-serif;font-weight:700;border:3px solid rgba(0,0,0,.25);
+    box-shadow: inset 0 -6px 0 rgba(0,0,0,.12), 0 4px 0 rgba(0,0,0,.15); transition:transform .08s; position:relative; line-height:1;
+  }
+  .coin-face .val{line-height:1}
+  .coin-face .leaf{font-size:.95rem;line-height:1}
+  .coin-name{font-weight:900;font-size:1rem;line-height:1}
+  .coin-sub{font-weight:900;font-size:.92rem;color:var(--muted);line-height:1}
+
+  /* Coin sizes & colours — roughly like real Canadian coins */
+  .c-nickel .coin-face{width:92px;height:92px;background:#D9DEE2;color:#2B3438;font-size:1.55rem}
+  .c-dime .coin-face{width:76px;height:76px;background:#D9DEE2;color:#2B3438;font-size:1.3rem}
+  .c-quarter .coin-face{width:100px;height:100px;background:#D9DEE2;color:#2B3438;font-size:1.65rem}
+  .c-loonie .coin-face{width:96px;height:96px;background:#E7B93C;color:#4A3200;font-size:1.5rem;border-color:#9A7414}
+  .c-toonie .coin-face{width:104px;height:104px;background:#C9CFD4;color:#2B3438;font-size:1.55rem}
+  .c-toonie .coin-face::after{content:"";position:absolute;inset:16px;border-radius:50%;background:#E7B93C;border:2px solid #9A7414;z-index:0}
+  .c-toonie .coin-face .val,.c-toonie .coin-face .leaf{position:relative;z-index:1}
+
+  .m-nickel{width:52px;height:52px;background:#D9DEE2;color:#2B3438;font-size:.95rem}
+  .m-dime{width:44px;height:44px;background:#D9DEE2;color:#2B3438;font-size:.82rem}
+  .m-quarter{width:56px;height:56px;background:#D9DEE2;color:#2B3438;font-size:1rem}
+  .m-loonie{width:54px;height:54px;background:#E7B93C;color:#4A3200;font-size:.92rem;border-color:#9A7414}
+  .m-toonie{width:58px;height:58px;background:#C9CFD4;color:#2B3438;font-size:.92rem}
+  .m-toonie::after{content:"";position:absolute;inset:9px;border-radius:50%;background:#E7B93C;border:2px solid #9A7414}
+  .m-toonie span{position:relative;z-index:1}
+
+  @media (max-width:520px){
+    .coin-btn{min-width:88px}
+    .c-nickel .coin-face{width:80px;height:80px}
+    .c-dime .coin-face{width:66px;height:66px}
+    .c-quarter .coin-face{width:86px;height:86px}
+    .c-loonie .coin-face{width:82px;height:82px}
+    .c-toonie .coin-face{width:90px;height:90px}
+  }
+
+  .actions{display:grid;grid-template-columns:1fr 1.6fr;gap:12px}
+  @media (max-width:520px){ .actions{grid-template-columns:1fr} }
+  .clear-btn{
+    background:var(--card);border:3px solid var(--line);color:var(--ink);border-radius:16px;
+    padding:16px;font-weight:900;font-size:1.25rem;min-height:68px;box-shadow:var(--btn-shadow);
+  }
+  .check-btn{
+    background:var(--teal);border:3px solid var(--teal-dark);color:#fff;border-radius:16px;
+    padding:16px;font-weight:900;font-size:1.35rem;min-height:68px;box-shadow:var(--btn-shadow);
+    font-family:"Fredoka",sans-serif;letter-spacing:.02em;
+  }
+  .clear-btn:active,.check-btn:active{transform:translateY(3px);box-shadow:none}
+  .check-btn:disabled{opacity:.55}
+
+  .summary{
+    display:none;margin-bottom:14px;background:var(--card2);border:2px solid var(--line);border-radius:14px;padding:12px 14px;
+    font-weight:900;font-size:1.08rem;line-height:1.5;text-align:center;
+  }
+  .summary.show{display:block}
+  .summary b{color:var(--teal)}
+
+  .confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:50}
+  .confetti i{position:absolute;top:-16px;display:block;border-radius:3px;animation:fall linear forwards}
+  @keyframes fall{to{transform:translateY(105vh) rotate(640deg)}}
+  .shake{animation:shake .35s}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+  @media (prefers-reduced-motion: reduce){ .shake,.confetti i{animation:none} }
+</style>
+</head>
+<body>
+  <div class="confetti" id="confetti" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <a href="https://scaemrfung.github.io/mr-fung-webgames/" style="display:inline-flex;align-items:center;gap:8px;background:var(--teal);border:3px solid var(--teal-dark);color:#fff;border-radius:999px;padding:10px 20px;font-weight:900;font-size:1.05rem;text-decoration:none;box-shadow:var(--shadow);min-height:52px" aria-label="Home — back to all games">🏠 Home</a>
+      <div class="stars" aria-live="polite"><span class="star-ico" aria-hidden="true">⭐</span> Stars: <span id="starCount">0</span></div>
+    </div>
+    <div class="top-actions">
+      <button class="top-btn" id="soundBtn" type="button" aria-pressed="true">🔊 Sound On</button>
+      <button class="top-btn primary" id="newGameBtn" type="button">↻ New Game</button>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <h1>🛒 Money Shop</h1>
+    <p class="subtitle">Pay for the item with Canadian coins — then make your change!</p>
+
+    <div class="layout">
+      <section class="item-card" aria-label="Shop item">
+        <span class="shop-sign">For Sale</span>
+        <span class="item-emoji" id="itemEmoji" aria-hidden="true">✏️</span>
+        <div class="item-name" id="itemName">Pencil</div>
+        <div class="price-label">Price</div>
+        <div class="price" id="priceText">$1.25</div>
+        <button class="hear-btn" id="hearBtn" type="button">🔊 Hear It</button>
+      </section>
+
+      <section class="play" aria-label="Pay here">
+        <div class="steps" aria-hidden="true">
+          <div class="step active" id="step1">1 &nbsp;💰 Pay</div>
+          <div class="step" id="step2">2 &nbsp;🪙 Check Change</div>
+        </div>
+
+        <div class="message" id="message" role="status" aria-live="polite">Tap coins to pay for your item!</div>
+
+        <div class="summary" id="summary"></div>
+
+        <div class="tray-head">
+          <div class="tray-title" id="trayTitle">Your Payment</div>
+          <div class="tray-total" id="trayTotal">$0.00</div>
+        </div>
+        <div class="tray" id="tray"></div>
+        <div class="hint" id="hint"></div>
+
+        <div class="coins-label" id="coinsLabel">Tap a coin to add it</div>
+        <div class="coins" id="coins"></div>
+
+        <div class="actions">
+          <button class="clear-btn" id="clearBtn" type="button">✕ Clear</button>
+          <button class="check-btn" id="checkBtn" type="button">Pay Now →</button>
+        </div>
+      </section>
+    </div>
+  </div>
+
+<script>
+(function(){
+  "use strict";
+
+  var COINS = [
+    { id:"nickel",  cents:5,   name:"Nickel",  sub:"5 cents",  face:"5¢",  cls:"c-nickel",  mcls:"m-nickel" },
+    { id:"dime",    cents:10,  name:"Dime",    sub:"10 cents", face:"10¢", cls:"c-dime",    mcls:"m-dime" },
+    { id:"quarter", cents:25,  name:"Quarter", sub:"25 cents", face:"25¢", cls:"c-quarter", mcls:"m-quarter" },
+    { id:"loonie",  cents:100, name:"Loonie",  sub:"$1",       face:"$1",  cls:"c-loonie",  mcls:"m-loonie" },
+    { id:"toonie",  cents:200, name:"Toonie",  sub:"$2",       face:"$2",  cls:"c-toonie",  mcls:"m-toonie" }
+  ];
+
+  var ITEMS = [
+    { name:"Pencil", emoji:"✏️" },
+    { name:"Apple", emoji:"🍎" },
+    { name:"Banana", emoji:"🍌" },
+    { name:"Story Book", emoji:"📕" },
+    { name:"Crayons", emoji:"🖍️" },
+    { name:"Orange", emoji:"🍊" },
+    { name:"Cookie", emoji:"🍪" },
+    { name:"Juice Box", emoji:"🧃" },
+    { name:"Notebook", emoji:"📓" },
+    { name:"Ruler", emoji:"📏" },
+    { name:"Toy Car", emoji:"🚗" },
+    { name:"Balloon", emoji:"🎈" },
+    { name:"Cupcake", emoji:"🧁" },
+    { name:"Teddy Bear", emoji:"🧸" },
+    { name:"Soccer Ball", emoji:"⚽" },
+    { name:"Paint Set", emoji:"🎨" },
+    { name:"Banana Bread", emoji:"🍞" },
+    { name:"Milk", emoji:"🥛" }
+  ];
+
+  var stars = 0;
+  var soundOn = true;
+  var phase = "pay"; // "pay" | "change" | "done"
+  var item = null;
+  var lastItemIdx = -1;
+  var payCoins = [];
+  var changeCoins = [];
+  var paidCents = 0;
+  var busy = false;
+
+  var el = {
+    starCount: document.getElementById("starCount"),
+    soundBtn: document.getElementById("soundBtn"),
+    newGameBtn: document.getElementById("newGameBtn"),
+    itemEmoji: document.getElementById("itemEmoji"),
+    itemName: document.getElementById("itemName"),
+    priceText: document.getElementById("priceText"),
+    hearBtn: document.getElementById("hearBtn"),
+    step1: document.getElementById("step1"),
+    step2: document.getElementById("step2"),
+    message: document.getElementById("message"),
+    summary: document.getElementById("summary"),
+    trayTitle: document.getElementById("trayTitle"),
+    trayTotal: document.getElementById("trayTotal"),
+    tray: document.getElementById("tray"),
+    hint: document.getElementById("hint"),
+    coinsLabel: document.getElementById("coinsLabel"),
+    coins: document.getElementById("coins"),
+    clearBtn: document.getElementById("clearBtn"),
+    checkBtn: document.getElementById("checkBtn"),
+    confetti: document.getElementById("confetti")
+  };
+
+  /* ---------- money helpers ---------- */
+  function fmt(cents){
+    if (cents < 100) return cents + "¢";
+    var d = Math.floor(cents/100), c = cents % 100;
+    return "$" + d + "." + (c < 10 ? "0" + c : "" + c);
+  }
+  function fmtFull(cents){
+    // Always dollars for the big total readout
+    var d = Math.floor(cents/100), c = cents % 100;
+    if (cents < 100) return cents + "¢";
+    return "$" + d + "." + (c < 10 ? "0" + c : "" + c);
+  }
+  var ONES = ["zero","one","two","three","four","five","six","seven","eight","nine","ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen"];
+  var TENS = ["","","twenty","thirty","forty","fifty","sixty","seventy","eighty","ninety"];
+  function numWords(n){
+    if (n < 20) return ONES[n];
+    var t = Math.floor(n/10), r = n % 10;
+    return TENS[t] + (r ? "-" + ONES[r] : "");
+  }
+  function speakMoney(cents){
+    var d = Math.floor(cents/100), c = cents % 100;
+    var parts = [];
+    if (d > 0) parts.push(numWords(d) + (d === 1 ? " dollar" : " dollars"));
+    if (c > 0) parts.push(numWords(c) + (c === 1 ? " cent" : " cents"));
+    if (!parts.length) return "zero cents";
+    return parts.join(" and ");
+  }
+  function sum(arr){ var t=0; for (var i=0;i<arr.length;i++) t += arr[i].cents; return t; }
+
+  /* ---------- sound (Web Audio, in-browser only) ---------- */
+  var actx = null;
+  function ac(){
+    if (!actx){
+      try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e){ actx = null; }
+    }
+    if (actx && actx.state === "suspended") actx.resume();
+    return actx;
+  }
+  function tone(freq, start, dur, type, vol){
+    if (!soundOn) return;
+    var ctx = ac(); if (!ctx) return;
+    var o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type || "sine"; o.frequency.value = freq;
+    var t = ctx.currentTime + start;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol || 0.18, t + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(t); o.stop(t + dur + 0.05);
+  }
+  function coinSound(){ tone(1320, 0, 0.09, "triangle", 0.14); tone(1760, 0.05, 0.1, "triangle", 0.1); }
+  function happySound(){ tone(523.25,0,0.16,"triangle",0.2); tone(659.25,0.11,0.16,"triangle",0.2); tone(783.99,0.22,0.16,"triangle",0.2); tone(1046.5,0.33,0.32,"triangle",0.22); }
+  function gentleSound(){ tone(330,0,0.16,"sine",0.12); tone(262,0.14,0.2,"sine",0.1); }
+
+  function speak(text){
+    try{
+      if (!("speechSynthesis" in window)) return;
+      window.speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      u.rate = 0.92; u.pitch = 1.05; u.lang = "en-CA";
+      window.speechSynthesis.speak(u);
+    }catch(e){}
+  }
+
+  /* ---------- confetti ---------- */
+  function confettiBurst(){
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var colors = ["#0E7C6B","#E9A426","#E4572E","#2E86DE","#F368E0","#178A4C"];
+    for (var i=0;i<42;i++){
+      var p = document.createElement("i");
+      var s = 7 + Math.random()*8;
+      p.style.left = (Math.random()*100) + "vw";
+      p.style.width = s + "px"; p.style.height = (s*0.6) + "px";
+      p.style.background = colors[i % colors.length];
+      p.style.animationDuration = (0.9 + Math.random()*0.9) + "s";
+      p.style.animationDelay = (Math.random()*0.25) + "s";
+      el.confetti.appendChild(p);
+      (function(node){ setTimeout(function(){ if(node.parentNode) node.parentNode.removeChild(node); }, 2400); })(p);
+    }
+  }
+
+  /* ---------- build coin palette ---------- */
+  COINS.forEach(function(coin){
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "coin-btn " + coin.cls;
+    b.setAttribute("aria-label", "Add " + coin.name + ", " + coin.sub);
+    b.innerHTML = '<span class="coin-face"><span class="val">' + coin.face + '</span><span class="leaf" aria-hidden="true">🍁</span></span>' +
+                  '<span class="coin-name">' + coin.name + '</span><span class="coin-sub">' + coin.sub + '</span>';
+    b.addEventListener("click", function(){ addCoin(coin); });
+    el.coins.appendChild(b);
+  });
+
+  /* ---------- game flow ---------- */
+  function randomPrice(){
+    // 15¢ to $3.85, always a multiple of 5¢ (no pennies in Canada)
+    var steps = 3 + Math.floor(Math.random()*74); // 3..76 steps of 5¢
+    return steps * 5;
+  }
+  function newItem(){
+    var idx;
+    do { idx = Math.floor(Math.random()*ITEMS.length); } while (idx === lastItemIdx);
+    lastItemIdx = idx;
+    var base = ITEMS[idx];
+    item = { name: base.name, emoji: base.emoji, price: randomPrice() };
+    phase = "pay";
+    payCoins = []; changeCoins = []; paidCents = 0; busy = false;
+    render();
+    setMessage("Tap coins to pay for the " + item.name + "!", "");
+    speak(""); // stop any prior speech
+    if ("speechSynthesis" in window) try{ window.speechSynthesis.cancel(); }catch(e){}
+  }
+  function newGame(){
+    stars = 0;
+    el.starCount.textContent = "0";
+    newItem();
+  }
+
+  function currentTray(){ return (phase === "change" || phase === "done") ? changeCoins : payCoins; }
+  function currentTotal(){
+    if (phase === "change") return sum(changeCoins);
+    if (phase === "done") return paidCents;
+    return sum(payCoins);
+  }
+  function changeDue(){ return paidCents - item.price; }
+
+  function addCoin(coin){
+    if (busy || phase === "done") return;
+    coinSound();
+    currentTray().push(coin);
+    render();
+    updateFeedback();
+  }
+  function removeCoin(idx){
+    if (busy || phase === "done") return;
+    currentTray().splice(idx,1);
+    coinSound();
+    render();
+    updateFeedback();
+  }
+
+  function setMessage(text, kind){
+    el.message.textContent = text;
+    el.message.className = "message" + (kind ? " " + kind : "");
+  }
+
+  function updateFeedback(){
+    if (phase === "pay"){
+      var total = sum(payCoins);
+      if (total === 0){ setMessage("Tap coins to pay for the " + item.name + "!", ""); }
+      else if (total < item.price){ setMessage("Keep going — you need " + fmt(item.price - total) + " more!", ""); }
+      else if (total === item.price){ setMessage("Perfect! That's the exact money! Tap Pay Now.", "good"); }
+      else { setMessage("You paid extra — you'll get change back! Tap Pay Now.", ""); }
+    } else if (phase === "change"){
+      var due = changeDue(), got = sum(changeCoins);
+      if (due === 0){ setMessage("You paid the exact money — there is NO change! Tap the green button.", "good"); }
+      else if (got === 0){ setMessage("Now make your change: " + fmt(due) + ". Tap coins!", ""); }
+      else if (got < due){ setMessage("Keep going — you need " + fmt(due - got) + " more change!", ""); }
+      else if (got === due){ setMessage("That looks right! Tap Check My Change.", "good"); }
+      else { setMessage("That's too much change — tap a coin in the tray to take it back, or Clear.", "warn"); }
+    }
+    renderHint();
+  }
+
+  function renderHint(){
+    if (phase === "pay"){
+      var total = sum(payCoins);
+      if (total < item.price) el.hint.innerHTML = "Price is <b>" + fmt(item.price) + "</b> · You still need <b>" + fmt(item.price - total) + "</b>";
+      else if (total === item.price) el.hint.innerHTML = "Price is <b>" + fmt(item.price) + "</b> · <b>Exact!</b> 🎉";
+      else el.hint.innerHTML = "Price is <b>" + fmt(item.price) + "</b> · Extra paid: <b>" + fmt(total - item.price) + "</b>";
+    } else if (phase === "change"){
+      var due = changeDue();
+      if (due === 0) el.hint.innerHTML = "Change owing: <b>0¢ — no change!</b>";
+      else el.hint.innerHTML = "Change owing: <b>" + fmt(due) + "</b> · In the tray: <b>" + fmt(sum(changeCoins)) + "</b>";
+    } else {
+      el.hint.textContent = "";
+    }
+  }
+
+  function render(){
+    el.itemEmoji.textContent = item.emoji;
+    el.itemName.textContent = item.name;
+    el.priceText.textContent = fmt(item.price);
+    el.starCount.textContent = "" + stars;
+
+    el.step1.className = "step" + (phase === "pay" ? " active" : " done");
+    el.step2.className = "step" + (phase === "change" ? " active" : (phase === "done" ? " done" : ""));
+
+    if (phase === "pay"){
+      el.trayTitle.textContent = "Your Payment";
+      el.coinsLabel.textContent = "Tap a coin to pay";
+      el.checkBtn.textContent = "Pay Now →";
+      el.summary.className = "summary";
+      el.summary.innerHTML = "";
+    } else {
+      el.trayTitle.textContent = phase === "change" ? "Your Change" : "Your Change";
+      el.coinsLabel.textContent = phase === "change" ? "Tap a coin to make change" : "Great shopping!";
+      el.checkBtn.textContent = changeDue() === 0 ? "✓ No Change — Check!" : "✓ Check My Change";
+      el.summary.className = "summary show";
+      el.summary.innerHTML = "You paid <b>" + fmt(paidCents) + "</b> · Price was <b>" + fmt(item.price) + "</b> · Change owing: <b>" + fmt(changeDue()) + "</b>";
+    }
+
+    var tray = currentTray();
+    var total = currentTotal();
+    el.trayTotal.textContent = phase === "done" ? fmt(sum(changeCoins)) : fmtFull(total);
+    var over = (phase === "pay" && total > item.price) || (phase === "change" && changeDue() >= 0 && sum(changeCoins) > changeDue());
+    el.trayTotal.className = "tray-total" + (phase === "change" && sum(changeCoins) > changeDue() ? " over" : "");
+
+    el.tray.innerHTML = "";
+    if (!tray.length){
+      var empty = document.createElement("div");
+      empty.className = "tray-empty";
+      empty.textContent = phase === "change" ? (changeDue() === 0 ? "No coins needed — the change is 0¢!" : "Your change tray is empty — tap coins below!") : "Your tray is empty — tap coins below!";
+      el.tray.appendChild(empty);
+    } else {
+      tray.forEach(function(coin, i){
+        var m = document.createElement("button");
+        m.type = "button";
+        m.className = "mini-coin " + coin.mcls;
+        m.setAttribute("aria-label", "Remove " + coin.name);
+        m.title = "Tap to take back";
+        m.innerHTML = "<span>" + coin.face + "</span>";
+        (function(idx){ m.addEventListener("click", function(){ removeCoin(idx); }); })(i);
+        el.tray.appendChild(m);
+      });
+    }
+    renderHint();
+  }
+
+  function shakeTray(){
+    el.tray.classList.remove("shake");
+    void el.tray.offsetWidth;
+    el.tray.classList.add("shake");
+  }
+
+  el.clearBtn.addEventListener("click", function(){
+    if (busy || phase === "done") return;
+    if (phase === "change") changeCoins = []; else payCoins = [];
+    coinSound();
+    render();
+    updateFeedback();
+  });
+
+  el.checkBtn.addEventListener("click", function(){
+    if (busy) return;
+    if (phase === "pay"){
+      var total = sum(payCoins);
+      if (total === 0){
+        gentleSound(); shakeTray();
+        setMessage("Tap some coins first to pay for the " + item.name + "!", "warn");
+        return;
+      }
+      if (total < item.price){
+        gentleSound(); shakeTray();
+        setMessage("Good try! That's not enough yet — you need " + fmt(item.price - total) + " more.", "warn");
+        return;
+      }
+      // Paid enough — move to change step
+      paidCents = total;
+      phase = "change";
+      changeCoins = [];
+      coinSound();
+      render();
+      if (changeDue() === 0){
+        setMessage("You paid the exact money! There is NO change. Tap the green button to check!", "good");
+      } else {
+        setMessage("You paid " + fmt(paidCents) + ". Now make your change: " + fmt(changeDue()) + "!", "");
+      }
+      speak("You paid " + speakMoney(paidCents) + ". The change is " + speakMoney(changeDue()) + ".");
+    } else if (phase === "change"){
+      var due = changeDue(), got = sum(changeCoins);
+      if (got === due){
+        // Correct!
+        busy = true;
+        phase = "done";
+        stars++;
+        el.starCount.textContent = "" + stars;
+        render();
+        happySound();
+        confettiBurst();
+        if (due === 0){
+          setMessage("⭐ Great job! Exact money — no change! You earned a star!", "good");
+          speak("Great job! Exact money, no change!");
+        } else {
+          setMessage("⭐ Great job! Your change is " + fmt(due) + " — that's right! You earned a star!", "good");
+          speak("Great job! Your change is " + speakMoney(due) + "!");
+        }
+        el.checkBtn.textContent = "Next Item →";
+        busy = false;
+        // Auto-advance after a celebration pause; button also works
+        setTimeout(function(){ if (phase === "done") newItem(); }, 2600);
+      } else if (got < due){
+        gentleSound(); shakeTray();
+        setMessage("Good try! You need " + fmt(due - got) + " more change. Keep tapping coins!", "warn");
+      } else {
+        gentleSound(); shakeTray();
+        setMessage("Good try! That's too much change. Tap a coin in the tray to take one back, or press Clear.", "warn");
+      }
+    } else if (phase === "done"){
+      newItem();
+    }
+  });
+
+  el.hearBtn.addEventListener("click", function(){
+    ac();
+    if (phase === "change"){
+      speak("The " + item.name + " costs " + speakMoney(item.price) + ". You paid " + speakMoney(paidCents) + ". Your change is " + speakMoney(changeDue()) + ".");
+    } else {
+      speak("The " + item.name + " costs " + speakMoney(item.price) + ".");
+    }
+  });
+
+  el.soundBtn.addEventListener("click", function(){
+    soundOn = !soundOn;
+    el.soundBtn.textContent = soundOn ? "🔊 Sound On" : "🔇 Sound Off";
+    el.soundBtn.setAttribute("aria-pressed", soundOn ? "true" : "false");
+    if (soundOn) coinSound();
+    if (!soundOn && "speechSynthesis" in window) try{ window.speechSynthesis.cancel(); }catch(e){}
+  });
+
+  el.newGameBtn.addEventListener("click", function(){
+    coinSound();
+    newGame();
+  });
+
+  newGame();
+})();
+</script>
+</body>
+</html>

@@ -80,8 +80,30 @@
         position: absolute; width: 1px; height: 1px; margin: -1px;
         padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
       }
-      .app { min-height: 100dvh; display: flex; flex-direction: column; }
-      body.is-play .app { height: 100dvh; }
+      :root { --home-h: 60px; }
+      .home-bar {
+        position: sticky; top: 0; z-index: 90;
+        background: var(--paper);
+        min-height: var(--home-h); flex: none;
+        display: flex; align-items: center;
+        padding: calc(0.45rem + var(--safe-top)) clamp(1rem, 4vw, 2.5rem) 0.45rem;
+      }
+      .home-btn {
+        display: inline-flex; align-items: center; gap: 0.5rem;
+        background: linear-gradient(180deg, #ffc928, var(--gold));
+        color: #1c2430; text-decoration: none;
+        font-family: var(--display); font-weight: 800; font-size: 1.05rem; line-height: 1;
+        padding: 0.6rem 1.15rem; border-radius: 999px;
+        border: 2px solid var(--gold-deep);
+        box-shadow: 0 4px 0 var(--gold-deep), var(--shadow-sm);
+        transition: transform 0.12s ease, filter 0.12s ease;
+      }
+      .home-btn:hover { filter: brightness(1.05); transform: translateY(-1px); }
+      .home-btn:active { transform: translateY(2px); }
+      .home-btn:focus-visible { outline: 4px solid var(--gold-deep); outline-offset: 2px; }
+      .home-btn svg { width: 20px; height: 20px; flex: none; }
+      .app { min-height: calc(100dvh - var(--home-h)); display: flex; flex-direction: column; }
+      body.is-play .app { height: calc(100dvh - var(--home-h)); }
       h1, h2 { font-family: var(--display); margin: 0; }
       .eyebrow {
         margin: 0; font-family: var(--display); font-weight: 700;
@@ -548,7 +570,7 @@
         /* On a phone the whole play screen scrolls as one page instead of
            squeezing the felt; nothing can overlap the dock. */
         body.is-play { overflow: auto; }
-        body.is-play .app { height: auto; min-height: 100dvh; }
+        body.is-play .app { height: auto; min-height: calc(100dvh - var(--home-h)); }
         .play { gap: 0.5rem; padding: calc(0.5rem + var(--safe-top)) 0.55rem calc(0.6rem + var(--safe-bottom)); }
         .topbar { gap: 0.4rem; }
         .brand { gap: 0.5rem; }
@@ -589,6 +611,12 @@
     </style>
   </head>
   <body>
+    <nav class="home-bar" aria-label="Site navigation">
+      <a class="home-btn" href="https://scaemrfung.github.io/mr-fung-webgames/">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M12 3.1 2.7 10.6c-.4.3-.4 1 .1 1.3.3.2.8.2 1.1-.1L5 10.9V20a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-5h2v5a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-9.1l1.1.9c.3.3.8.3 1.1.1.5-.3.5-1 .1-1.3L12 3.1z"/></svg>
+        Home
+      </a>
+    </nav>
     <div id="app" class="app"></div>
     <div id="live" class="sr-only" aria-live="polite"></div>
     <noscript>

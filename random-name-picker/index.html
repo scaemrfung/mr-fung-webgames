@@ -1,0 +1,815 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>Random Name Picker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet" />
+    <style>
+      :root{
+        --bg:#eaf2f8;
+        --panel:#ffffff;
+        --panel-border:#d7e3ee;
+        --ink:#142233;
+        --muted:#5a6d82;
+        --stage-bg:#0f3b4d;
+        --stage-bg2:#145266;
+        --stage-ink:#ffffff;
+        --stage-sub:#bfe6f2;
+        --accent:#e94f2b;
+        --accent-dark:#c93d1f;
+        --accent-ink:#ffffff;
+        --teal:#0e7c6b;
+        --teal-dark:#0a5f52;
+        --gold:#ffc93c;
+        --gold-ink:#3a2a00;
+        --chip-bg:#eef6f3;
+        --chip-border:#cfe6dd;
+        --input-bg:#fbfdff;
+        --shadow:0 10px 30px rgba(20,34,51,.10);
+        --danger-bg:#fff1ec;
+      }
+      @media (prefers-color-scheme: dark){
+        :root{
+          --bg:#0f1622;
+          --panel:#1a2636;
+          --panel-border:#2c3d55;
+          --ink:#f2f7fc;
+          --muted:#a8bdd1;
+          --stage-bg:#0b2e3d;
+          --stage-bg2:#103f52;
+          --stage-ink:#ffffff;
+          --stage-sub:#a9d8e8;
+          --accent:#ff6a43;
+          --accent-dark:#e94f2b;
+          --teal:#1aa78d;
+          --teal-dark:#12806b;
+          --chip-bg:#22344a;
+          --chip-border:#35506e;
+          --input-bg:#121e2e;
+          --shadow:0 10px 30px rgba(0,0,0,.35);
+          --danger-bg:#3a231c;
+        }
+      }
+      *{box-sizing:border-box}
+      html,body{height:100%}
+      body{
+        margin:0;
+        font-family:"Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+        background:var(--bg);
+        color:var(--ink);
+        -webkit-font-smoothing:antialiased;
+      }
+      button{font-family:inherit; cursor:pointer}
+      button:focus-visible, textarea:focus-visible, a:focus-visible, select:focus-visible{outline:3px solid var(--gold); outline-offset:2px}
+      .header-actions{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+      .home-btn{
+        border:2px solid var(--teal); background:var(--teal); color:#fff; text-decoration:none;
+        font-weight:900; font-size:1rem; padding:11px 18px; border-radius:999px;
+        display:inline-flex; align-items:center; gap:8px; box-shadow:var(--shadow); line-height:1;
+      }
+      .home-btn:hover{filter:brightness(1.07)}
+      .home-btn svg{width:20px;height:20px;flex:0 0 20px}
+
+      .app{
+        max-width:1180px;
+        margin:0 auto;
+        padding:18px 18px 28px;
+        min-height:100dvh;
+        display:flex;
+        flex-direction:column;
+        gap:16px;
+      }
+
+      /* Header */
+      header{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:12px;
+        flex-wrap:wrap;
+      }
+      .title{
+        display:flex; align-items:center; gap:12px; min-width:0;
+      }
+      .title-mark{
+        width:48px; height:48px; flex:0 0 48px;
+        background:var(--gold); color:var(--gold-ink);
+        border-radius:14px;
+        display:grid; place-items:center;
+        font-family:"Fredoka", sans-serif; font-weight:700; font-size:1.55rem;
+        box-shadow:var(--shadow);
+      }
+      h1{
+        font-family:"Fredoka", sans-serif;
+        font-weight:700;
+        font-size:clamp(1.6rem, 3.4vw, 2.3rem);
+        line-height:1; margin:0; letter-spacing:.01em;
+      }
+      .subtitle{margin:4px 0 0; color:var(--muted); font-weight:700; font-size:.98rem}
+      .sound-btn{
+        border:2px solid var(--panel-border);
+        background:var(--panel);
+        color:var(--ink);
+        font-weight:900; font-size:1rem;
+        padding:12px 18px; border-radius:999px;
+        display:inline-flex; align-items:center; gap:8px;
+        box-shadow:var(--shadow);
+      }
+      .sound-dot{width:10px;height:10px;border-radius:50%;background:var(--teal); flex:0 0 10px}
+      .sound-btn[aria-pressed="false"] .sound-dot{background:#9aa8b5}
+
+      /* Layout */
+      main{
+        display:grid;
+        grid-template-columns: 380px 1fr;
+        gap:16px;
+        align-items:start;
+        flex:1;
+      }
+
+      /* Stage */
+      .stage{
+        background:var(--stage-bg);
+        border-radius:26px;
+        padding:26px 22px 24px;
+        color:var(--stage-ink);
+        box-shadow:var(--shadow);
+        position:relative;
+        overflow:hidden;
+        min-height:520px;
+        display:flex; flex-direction:column;
+      }
+      .stage::before{
+        content:""; position:absolute; inset:auto -60px -90px auto;
+        width:260px;height:260px;border-radius:50%;
+        background:var(--stage-bg2); opacity:.7;
+      }
+      .stage-top{
+        position:relative; z-index:1;
+        display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;
+      }
+      .stage-label{
+        font-family:"Fredoka",sans-serif; font-weight:600;
+        letter-spacing:.14em; text-transform:uppercase; font-size:.92rem; color:var(--stage-sub);
+      }
+      .count-pill{
+        background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.22);
+        padding:7px 12px; border-radius:999px; font-weight:900; font-size:.92rem; white-space:nowrap;
+      }
+      .display-wrap{
+        position:relative; z-index:1;
+        flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+        text-align:center; padding:18px 6px 10px; min-height:230px;
+      }
+      #displayName{
+        font-family:"Fredoka",sans-serif; font-weight:700;
+        font-size:clamp(2.9rem, 8.5vw, 6.6rem);
+        line-height:.98; letter-spacing:.01em;
+        word-break:break-word; overflow-wrap:anywhere;
+        max-width:100%;
+      }
+      #displayName.is-placeholder{
+        font-size:clamp(1.7rem, 4.2vw, 2.6rem);
+        font-weight:600; color:var(--stage-sub); line-height:1.25; max-width:22ch;
+      }
+      #displayName.is-spinning{color:var(--gold)}
+      #displayName.pop{animation:pop .45s ease}
+      @keyframes pop{0%{transform:scale(.82)}55%{transform:scale(1.06)}100%{transform:scale(1)}}
+      @media (prefers-reduced-motion: reduce){ #displayName.pop{animation:none} }
+      #statusLine{
+        margin-top:14px; min-height:1.5em;
+        font-weight:800; font-size:1.08rem; color:var(--stage-sub);
+      }
+      #statusLine.win{color:var(--gold)}
+
+      .spin-btn{
+        position:relative; z-index:1;
+        width:100%;
+        border:none; border-radius:18px;
+        background:var(--accent); color:var(--accent-ink);
+        font-family:"Fredoka",sans-serif; font-weight:700;
+        font-size:clamp(1.5rem, 3vw, 2rem);
+        padding:20px 18px;
+        box-shadow:0 8px 0 var(--accent-dark), var(--shadow);
+        transition:transform .08s ease, filter .15s ease;
+      }
+      .spin-btn:hover{filter:brightness(1.04)}
+      .spin-btn:active{transform:translateY(4px); box-shadow:0 4px 0 var(--accent-dark)}
+      .spin-btn:disabled{opacity:.55; cursor:not-allowed; transform:none}
+
+      .winner-actions{
+        position:relative; z-index:1;
+        display:none; gap:10px; margin-top:14px; flex-wrap:wrap;
+      }
+      .winner-actions.show{display:flex}
+      .winner-actions button{
+        flex:1 1 160px;
+        border-radius:14px; padding:14px 12px;
+        font-weight:900; font-size:1rem; border:2px solid transparent;
+      }
+      .btn-keep{background:#ffffff; color:#142233; border-color:#ffffff}
+      .btn-remove-picked{background:transparent; color:#fff; border-color:rgba(255,255,255,.55)}
+      .btn-remove-picked:hover{border-color:#fff}
+
+      .history{
+        position:relative; z-index:1; margin-top:18px;
+      }
+      .history h2{font-size:.88rem; letter-spacing:.12em; text-transform:uppercase; color:var(--stage-sub); margin:0 0 8px; font-family:"Fredoka",sans-serif; font-weight:600}
+      .history-list{display:flex; flex-wrap:wrap; gap:8px}
+      .history-chip{
+        background:rgba(255,255,255,.13); border:1px solid rgba(255,255,255,.2);
+        padding:7px 11px; border-radius:999px; font-weight:800; font-size:.95rem;
+      }
+      .history-empty{color:var(--stage-sub); font-weight:700; font-size:.95rem}
+
+      /* Controls */
+      .controls{
+        background:var(--panel); border:1px solid var(--panel-border);
+        border-radius:22px; padding:20px; box-shadow:var(--shadow);
+      }
+      .controls label{
+        display:block; font-family:"Fredoka",sans-serif; font-weight:600; font-size:1.18rem; margin-bottom:6px;
+      }
+      .hint{color:var(--muted); font-weight:700; font-size:.95rem; margin:0 0 12px; line-height:1.45}
+      textarea{
+        width:100%; min-height:148px; resize:vertical;
+        border:2px solid var(--panel-border); border-radius:14px;
+        background:var(--input-bg); color:var(--ink);
+        padding:13px 14px; font-family:inherit; font-weight:700; font-size:1.08rem; line-height:1.5;
+      }
+      textarea::placeholder{color:var(--muted); font-weight:600}
+      .row{display:flex; gap:10px; margin-top:12px; flex-wrap:wrap}
+      .btn-add{
+        flex:1 1 150px; border:none; border-radius:14px;
+        background:var(--teal); color:#fff; font-weight:900; font-size:1.08rem; padding:15px 14px;
+        box-shadow:0 5px 0 var(--teal-dark);
+      }
+      .btn-add:active{transform:translateY(3px); box-shadow:0 2px 0 var(--teal-dark)}
+      .btn-clear{
+        flex:1 1 130px; border:2px solid var(--panel-border); border-radius:14px;
+        background:var(--danger-bg); color:var(--ink); font-weight:900; font-size:1.02rem; padding:14px 12px;
+      }
+      #addFeedback{min-height:1.4em; margin-top:10px; font-weight:800; color:var(--teal); font-size:.97rem}
+      @media (prefers-color-scheme: dark){ #addFeedback{color:#7ee0c8} }
+
+      .class-picker{
+        margin-top:18px; padding-top:16px; border-top:1px solid var(--panel-border);
+      }
+      .class-picker label{
+        display:block; font-family:"Fredoka",sans-serif; font-weight:600; font-size:1.18rem; margin-bottom:6px;
+      }
+      .class-select{
+        width:100%;
+        border:2px solid var(--panel-border); border-radius:14px;
+        background:var(--input-bg); color:var(--ink);
+        padding:13px 14px; font-family:inherit; font-weight:800; font-size:1.08rem; line-height:1.4;
+        appearance:auto;
+      }
+
+      .toggle-row{
+        margin-top:16px; padding:14px; border:1px solid var(--panel-border); border-radius:14px;
+        display:flex; align-items:center; justify-content:space-between; gap:12px;
+      }
+      .toggle-text{font-weight:900; font-size:1rem; line-height:1.3}
+      .toggle-sub{color:var(--muted); font-weight:700; font-size:.88rem; margin-top:2px}
+      .switch{
+        flex:0 0 62px; width:62px; height:36px; border-radius:999px; border:none;
+        background:#b8c6d4; position:relative; padding:0;
+      }
+      .switch::after{
+        content:""; position:absolute; top:4px; left:4px; width:28px; height:28px; border-radius:50%; background:#fff;
+        transition:left .18s ease; box-shadow:0 2px 6px rgba(0,0,0,.25);
+      }
+      .switch[aria-pressed="true"]{background:var(--teal)}
+      .switch[aria-pressed="true"]::after{left:30px}
+
+      .list-head{
+        display:flex; align-items:baseline; justify-content:space-between; gap:10px;
+        margin-top:20px; border-top:1px solid var(--panel-border); padding-top:16px;
+      }
+      .list-head h2{font-family:"Fredoka",sans-serif; font-size:1.18rem; margin:0; font-weight:600}
+      .list-head span{color:var(--muted); font-weight:900; font-size:.95rem; white-space:nowrap}
+      #nameList{
+        list-style:none; margin:12px 0 0; padding:0;
+        display:flex; flex-wrap:wrap; gap:8px;
+        max-height:300px; overflow:auto;
+      }
+      .name-chip{
+        display:inline-flex; align-items:center; gap:6px;
+        background:var(--chip-bg); border:1px solid var(--chip-border);
+        padding:8px 8px 8px 13px; border-radius:999px; font-weight:900; font-size:1rem;
+        max-width:100%;
+      }
+      .name-chip span{overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:180px}
+      .chip-x{
+        width:28px; height:28px; flex:0 0 28px; border-radius:50%; border:none;
+        background:var(--panel); color:var(--ink); font-weight:900; font-size:1rem; line-height:1;
+        display:grid; place-items:center; border:1px solid var(--panel-border);
+      }
+      .empty-list{
+        border:2px dashed var(--panel-border); border-radius:14px; padding:16px;
+        color:var(--muted); font-weight:700; line-height:1.5; width:100%;
+      }
+      .confetti-piece{position:absolute; top:-12px; border-radius:3px; pointer-events:none; z-index:2}
+      .app[hidden]{display:none !important}
+      .gate{
+        min-height:100dvh; display:grid; place-items:center; padding:20px;
+      }
+      .gate-card{
+        background:var(--panel); border:1px solid var(--panel-border); border-radius:22px;
+        padding:28px 24px 24px; box-shadow:var(--shadow); max-width:420px; width:100%; text-align:center;
+      }
+      .gate-mark{
+        width:52px; height:52px; margin:0 auto 14px; background:var(--gold); color:var(--gold-ink);
+        border-radius:14px; display:grid; place-items:center; box-shadow:var(--shadow);
+      }
+      .gate-mark svg{width:26px; height:26px}
+      .gate-card h2{
+        font-family:"Fredoka", sans-serif; font-weight:700; font-size:1.65rem; margin:0; line-height:1.1;
+      }
+      .gate-hint{color:var(--muted); font-weight:700; font-size:1rem; line-height:1.45; margin:8px 0 18px}
+      .gate-form{display:flex; flex-direction:column; gap:12px}
+      .gate-input{
+        width:100%; text-align:center; letter-spacing:.18em;
+        border:2px solid var(--panel-border); border-radius:14px;
+        background:var(--input-bg); color:var(--ink);
+        padding:14px; font-family:inherit; font-weight:900; font-size:1.3rem;
+      }
+      .gate-input::placeholder{letter-spacing:normal; color:var(--muted); font-weight:700; font-size:1.05rem}
+      .gate-btn{
+        border:none; border-radius:14px; background:var(--teal); color:#fff;
+        font-weight:900; font-size:1.08rem; padding:15px 14px; box-shadow:0 5px 0 var(--teal-dark);
+      }
+      .gate-btn:active{transform:translateY(3px); box-shadow:0 2px 0 var(--teal-dark)}
+      #passcodeFeedback{min-height:1.4em; margin-top:12px; font-weight:800; color:var(--accent-dark); font-size:.98rem}
+      @media (prefers-color-scheme: dark){ #passcodeFeedback{color:#ffb09a} }
+
+      @media (max-width: 860px){
+        .app{padding:14px 12px 22px}
+        main{grid-template-columns:1fr}
+        .stage{order:-1; min-height:0; padding:20px 16px}
+        .display-wrap{min-height:170px}
+        .controls{padding:16px}
+        #nameList{max-height:none}
+      }
+    </style>
+  </head>
+  <body>
+    <div class="gate" id="passcodeGate">
+      <div class="gate-card">
+        <div class="gate-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none"><rect x="5" y="10" width="14" height="10" rx="2.5" stroke="currentColor" stroke-width="2.2"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><circle cx="12" cy="15" r="1.6" fill="currentColor"/></svg>
+        </div>
+        <h2 id="gateTitle">Teacher Passcode</h2>
+        <p class="gate-hint" id="gateHint">Please enter the passcode to open the Random Name Picker.</p>
+        <form class="gate-form" id="passcodeForm" novalidate>
+          <label for="passcodeInput" class="gate-hint" style="margin:0; text-align:left; color:var(--ink)">Passcode</label>
+          <input class="gate-input" id="passcodeInput" type="password" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="Enter passcode" aria-describedby="gateHint passcodeFeedback" />
+          <button type="submit" class="gate-btn" id="passcodeBtn">Unlock</button>
+        </form>
+        <div id="passcodeFeedback" role="status" aria-live="polite"></div>
+      </div>
+    </div>
+    <div class="app" id="appRoot" hidden>
+      <header>
+        <div class="title">
+          <div class="title-mark" aria-hidden="true">?</div>
+          <div>
+            <h1>Random Name Picker</h1>
+            <p class="subtitle">For the projector &mdash; big, fair, and fast.</p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <a class="home-btn" href="https://scaemrfung.github.io/mr-fung-webgames/" aria-label="Home — back to all games">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 11.2 12 3l9 8.2" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 9.8V21h13V9.8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.5 21v-6h5v6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>Home</span>
+          </a>
+          <button type="button" class="sound-btn" id="soundBtn" aria-pressed="true">
+            <span class="sound-dot" aria-hidden="true"></span>
+            <span id="soundLabel">Sound: On</span>
+          </button>
+        </div>
+      </header>
+
+      <main>
+        <aside class="controls" aria-label="Name list controls">
+          <label for="nameInput">Add names</label>
+          <p class="hint">Type or paste names below &mdash; <strong>one name per line</strong> &mdash; then tap Add Names. Tap the &times; on any name to remove it.</p>
+          <textarea id="nameInput" placeholder="Type names here, one per line&hellip;" aria-label="Names, one per line"></textarea>
+          <div class="row">
+            <button type="button" class="btn-add" id="addBtn">+ Add Names</button>
+            <button type="button" class="btn-clear" id="clearBtn">Clear List</button>
+          </div>
+          <div id="addFeedback" role="status" aria-live="polite"></div>
+
+          <div class="class-picker">
+            <label for="classSelect">Choose a whole class</label>
+            <p class="hint">Pick a Grade 1 or Grade 2 class and <strong>all</strong> of its first names go into the hat at once. Picking a class replaces the names currently in the hat &mdash; you can still add extra names with the box above.</p>
+            <select id="classSelect" class="class-select" aria-label="Choose a whole Grade 1 or Grade 2 class to load into the hat">
+              <option value="" selected>Choose a class&hellip;</option>
+              <optgroup label="Grade 1">
+                <option value="1A">Class 1A &mdash; 21 names</option>
+                <option value="1B">Class 1B &mdash; 20 names</option>
+                <option value="1C">Class 1C &mdash; 20 names</option>
+                <option value="1D">Class 1D &mdash; 21 names</option>
+              </optgroup>
+              <optgroup label="Grade 2">
+                <option value="2A">Class 2A &mdash; 28 names</option>
+                <option value="2B">Class 2B &mdash; 28 names</option>
+                <option value="2C">Class 2C &mdash; 27 names</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-text">Remove picked names</div>
+              <div class="toggle-sub">A picked name won&rsquo;t be picked again.</div>
+            </div>
+            <button type="button" class="switch" id="autoRemoveBtn" aria-pressed="false" aria-label="Remove picked names automatically"></button>
+          </div>
+
+          <div class="list-head">
+            <h2>Names in the hat</h2>
+            <span id="listCount">0 names</span>
+          </div>
+          <ul id="nameList"></ul>
+          <div class="empty-list" id="emptyList">No names yet. Choose a whole class above, or add names with the box &mdash; try your reading group or table groups.</div>
+        </aside>
+
+        <section class="stage" aria-label="Picker">
+          <div class="stage-top">
+            <div class="stage-label">Next up is&hellip;</div>
+            <div class="count-pill" id="stageCount">0 names ready</div>
+          </div>
+
+          <div class="display-wrap">
+            <div id="displayName" class="is-placeholder">Add names, then press Spin!</div>
+            <div id="statusLine" aria-live="polite">Your picked name will appear here in big letters.</div>
+          </div>
+
+          <button type="button" class="spin-btn" id="spinBtn">SPIN &mdash; Pick a Name</button>
+
+          <div class="winner-actions" id="winnerActions">
+            <button type="button" class="btn-keep" id="keepBtn">Keep Name &amp; Spin Again</button>
+            <button type="button" class="btn-remove-picked" id="removePickedBtn">Remove This Name</button>
+          </div>
+
+          <div class="history">
+            <h2>Already picked</h2>
+            <div class="history-list" id="historyList"><span class="history-empty">No one picked yet.</span></div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      (function(){
+        var form = document.getElementById('passcodeForm');
+        var input = document.getElementById('passcodeInput');
+        var feedback = document.getElementById('passcodeFeedback');
+        var gate = document.getElementById('passcodeGate');
+        var app = document.getElementById('appRoot');
+        if(input) input.focus();
+        if(form){
+          form.addEventListener('submit', function(e){
+            e.preventDefault();
+            var entered = (input.value || '').trim();
+            if(entered === '4567'){
+              feedback.textContent = '';
+              gate.style.display = 'none';
+              app.hidden = false;
+              var first = document.getElementById('nameInput');
+              if(first) first.focus();
+            } else {
+              feedback.textContent = 'That passcode didn\u2019t work \u2014 please try again.';
+              input.value = '';
+              input.focus();
+            }
+          });
+        }
+      })();
+    </script>
+    <script>
+      (function(){
+        var names = [];
+        var pickedHistory = [];
+        var soundOn = true;
+        var autoRemove = false;
+        var spinning = false;
+        var lastWinner = null;
+        var audioCtx = null;
+
+        var els = {
+          input: document.getElementById('nameInput'),
+          classSelect: document.getElementById('classSelect'),
+          addBtn: document.getElementById('addBtn'),
+          clearBtn: document.getElementById('clearBtn'),
+          feedback: document.getElementById('addFeedback'),
+          list: document.getElementById('nameList'),
+          emptyList: document.getElementById('emptyList'),
+          listCount: document.getElementById('listCount'),
+          stageCount: document.getElementById('stageCount'),
+          display: document.getElementById('displayName'),
+          status: document.getElementById('statusLine'),
+          spinBtn: document.getElementById('spinBtn'),
+          soundBtn: document.getElementById('soundBtn'),
+          soundLabel: document.getElementById('soundLabel'),
+          autoBtn: document.getElementById('autoRemoveBtn'),
+          winnerActions: document.getElementById('winnerActions'),
+          keepBtn: document.getElementById('keepBtn'),
+          removePickedBtn: document.getElementById('removePickedBtn'),
+          historyList: document.getElementById('historyList'),
+          stage: document.querySelector('.stage')
+        };
+
+        /* ---------- Sound (Web Audio, in-browser only) ---------- */
+        function ensureAudio(){
+          if(!audioCtx){
+            var AC = window.AudioContext || window.webkitAudioContext;
+            if(AC) audioCtx = new AC();
+          }
+          if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+          return audioCtx;
+        }
+        function tone(freq, start, dur, type, vol){
+          if(!soundOn) return;
+          var ctx = ensureAudio(); if(!ctx) return;
+          var t = ctx.currentTime + start;
+          var osc = ctx.createOscillator();
+          var gain = ctx.createGain();
+          osc.type = type || 'triangle';
+          osc.frequency.setValueAtTime(freq, t);
+          gain.gain.setValueAtTime(0.0001, t);
+          gain.gain.exponentialRampToValueAtTime(vol || 0.18, t + 0.015);
+          gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.start(t); osc.stop(t + dur + 0.05);
+        }
+        function tickSound(){ tone(620 + Math.random()*80, 0, 0.05, 'square', 0.05); }
+        function winSound(){
+          tone(523.25, 0,    0.16, 'triangle', 0.22);
+          tone(659.25, 0.10, 0.16, 'triangle', 0.22);
+          tone(783.99, 0.20, 0.16, 'triangle', 0.22);
+          tone(1046.5, 0.30, 0.34, 'triangle', 0.24);
+          tone(1318.5, 0.42, 0.28, 'sine', 0.14);
+        }
+        function popSound(){ tone(440, 0, 0.08, 'sine', 0.12); }
+
+        /* ---------- Rendering ---------- */
+        function renderList(){
+          els.list.innerHTML = '';
+          names.forEach(function(name, idx){
+            var li = document.createElement('li');
+            li.className = 'name-chip';
+            var span = document.createElement('span');
+            span.textContent = name;
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'chip-x';
+            btn.textContent = '\u00D7';
+            btn.setAttribute('aria-label', 'Remove ' + name);
+            btn.addEventListener('click', function(){
+              names.splice(idx, 1);
+              if(lastWinner === name) hideWinnerActions();
+              renderAll();
+              popSound();
+            });
+            li.appendChild(span); li.appendChild(btn);
+            els.list.appendChild(li);
+          });
+          els.emptyList.style.display = names.length ? 'none' : 'block';
+          var label = names.length + (names.length === 1 ? ' name' : ' names');
+          els.listCount.textContent = label;
+          els.stageCount.textContent = label + ' ready';
+          els.spinBtn.disabled = spinning || names.length === 0;
+          els.spinBtn.textContent = names.length === 0 ? 'Add Names to Spin' : (spinning ? 'Spinning\u2026' : 'SPIN \u2014 Pick a Name');
+        }
+        function renderHistory(){
+          els.historyList.innerHTML = '';
+          if(!pickedHistory.length){
+            var s = document.createElement('span');
+            s.className = 'history-empty'; s.textContent = 'No one picked yet.';
+            els.historyList.appendChild(s); return;
+          }
+          pickedHistory.forEach(function(n){
+            var c = document.createElement('span');
+            c.className = 'history-chip'; c.textContent = n;
+            els.historyList.appendChild(c);
+          });
+        }
+        function renderAll(){ renderList(); renderHistory(); }
+
+        function setDisplay(text, mode){
+          els.display.textContent = text;
+          els.display.classList.toggle('is-placeholder', mode === 'placeholder');
+          els.display.classList.toggle('is-spinning', mode === 'spinning');
+        }
+        function hideWinnerActions(){
+          els.winnerActions.classList.remove('show');
+          lastWinner = null;
+        }
+        function showWinnerActions(name){
+          lastWinner = name;
+          els.removePickedBtn.textContent = 'Remove \u201C' + name + '\u201D from List';
+          els.winnerActions.classList.add('show');
+        }
+
+        /* ---------- Confetti ---------- */
+        function confetti(){
+          if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+          var colors = ['#ffc93c','#ff6a43','#2ec4a6','#4dabf7','#ffffff'];
+          for(var i=0;i<42;i++){
+            (function(i){
+              var p = document.createElement('div');
+              p.className = 'confetti-piece';
+              var size = 7 + Math.random()*7;
+              p.style.width = size + 'px'; p.style.height = size*0.6 + 'px';
+              p.style.left = (8 + Math.random()*84) + '%';
+              p.style.background = colors[i % colors.length];
+              els.stage.appendChild(p);
+              var fall = 340 + Math.random()*260;
+              var drift = (Math.random()*90 - 45);
+              var rot = Math.random()*540 - 270;
+              p.animate([
+                { transform:'translate(0,0) rotate(0deg)', opacity:1 },
+                { transform:'translate(' + drift + 'px,' + fall + 'px) rotate(' + rot + 'deg)', opacity:0.9 }
+              ], { duration: 1100 + Math.random()*700, easing:'cubic-bezier(.2,.7,.3,1)' }).onfinish = function(){ p.remove(); };
+            })(i);
+          }
+        }
+
+        /* ---------- Actions ---------- */
+        function addNames(){
+          var raw = els.input.value.split(/\r?\n/);
+          var added = 0, skipped = 0;
+          raw.forEach(function(line){
+            var n = line.trim();
+            if(!n) return;
+            var exists = names.some(function(x){ return x.toLowerCase() === n.toLowerCase(); });
+            if(exists){ skipped++; return; }
+            names.push(n); added++;
+          });
+          els.input.value = '';
+          if(added && names.length){
+            setDisplay('Ready! Press Spin!', 'placeholder');
+            els.status.textContent = names.length + (names.length===1 ? ' name is' : ' names are') + ' in the hat.';
+            els.status.classList.remove('win');
+            hideWinnerActions();
+          }
+          els.feedback.textContent = added
+            ? 'Added ' + added + (added===1?' name':' names') + (skipped ? ' \u00B7 ' + skipped + ' duplicate' + (skipped===1?'':'s') + ' skipped' : '') + '.'
+            : (skipped ? 'Those names are already in the list.' : 'Type at least one name first.');
+          renderAll();
+          els.input.focus();
+        }
+
+        var CLASS_ROSTERS = {
+          '1A': { label: 'Class 1A', names: ['Tiaraoluwa','Jelena','Skye','Hayden','Harper','Remi','Joey','Kora','Verity','Channing','Callum','Kennedy','Khanyisile','Daniel','Andrew','Wilder','Amelea','Maximus','Levi','Nicholas','Ava'] },
+          '1B': { label: 'Class 1B', names: ['Nathanael','Isaac','Thomas','Ava','Molly','Juliana','Joel','Josiah','Rhys','Toby','Evangeline','Raiya','Danica','Miller','Ariella','Hudson','Addisyn','Adelyn','Ida','Rosie'] },
+          '1C': { label: 'Class 1C', names: ['Violet','Bennett','Norah','Kai','Mariana','Haeden','Declan','Simone','Ethan','Julia','Marlee','Croia','Micah','Lauren','Madeleine','Erin','Juno','Hadley','Connor','Miles'] },
+          '1D': { label: 'Class 1D', names: ['Claire','Aarya','Luxton','Elaine','Hannah','Avery','Emma','Rose','Alex','David','Anya','Georgie','Haley','Cruz','Raphael','Joy','Foxx','Iris','Riverson','Ezra','Owen'] },
+          '2A': { label: 'Class 2A', names: ['Noah','Eli','Harmony','Sophie','Renee','Shiloh','Tiaraoluwa','Gabriel','Marlow','James','Parker','Charlie','Mabel','Aria','Sire','Oscar','Landon','Dianna','Aiden','Raymond','Kai','Mandy','Nova','Jake','Jordan','Arthur','Cruz','Hendrik'] },
+          '2B': { label: 'Class 2B', names: ['Taraoluwa','Holland','Clara','Miles','Brady','Jacob','Lincoln','Ezra','Lena','Belle','Natalie','Ashton','Maddie','Harlow','Bridger','Charlie','Casey','Eli','Harlan','Rozalia','Halia','Gracelynn','Keaton','Anthony','Everett','Mayelle','Oaklynn','Alice'] },
+          '2C': { label: 'Class 2C', names: ['Romeo','Nina','Jax','Colton','Pryor','Felicity','Linnea','Eli','Claire','Theo','Charlotte','Kezia','Brooks','Presley','Kaylee','Oakley','Lennon','Olson','Ingrid','Jack','Jake','Tallon','Casey','Clark','Ezekiel','Isabel','Bennett'] }
+        };
+
+        function loadWholeClass(){
+          var key = (els.classSelect.value || '').trim();
+          els.classSelect.value = '';
+          if(!key || spinning) return;
+          var roster = CLASS_ROSTERS[key];
+          if(!roster) return;
+          names = roster.names.slice();
+          pickedHistory = [];
+          lastWinner = null;
+          setDisplay('Ready! Press Spin!', 'placeholder');
+          els.status.textContent = roster.label + ' is ready \u2014 ' + names.length + (names.length===1 ? ' name is' : ' names are') + ' in the hat.';
+          els.status.classList.remove('win');
+          hideWinnerActions();
+          els.feedback.textContent = 'Loaded ' + roster.label + ' \u2014 ' + names.length + ' names in the hat.';
+          renderAll();
+          popSound();
+        }
+
+        function clearList(){
+          if(spinning) return;
+          names = []; pickedHistory = []; lastWinner = null;
+          els.input.value = '';
+          if(els.classSelect) els.classSelect.value = '';
+          setDisplay('Add names, then press Spin!', 'placeholder');
+          els.status.textContent = 'Your picked name will appear here in big letters.';
+          els.status.classList.remove('win');
+          els.winnerActions.classList.remove('show');
+          els.feedback.textContent = 'List cleared.';
+          renderAll(); popSound();
+        }
+
+        function removeName(name){
+          var i = names.indexOf(name);
+          if(i >= 0) names.splice(i, 1);
+        }
+
+        function spin(){
+          if(spinning || !names.length) return;
+          ensureAudio();
+          hideWinnerActions();
+          els.status.classList.remove('win');
+
+          if(names.length === 1){ finishPick(names[0]); return; }
+
+          spinning = true;
+          renderList();
+          els.spinBtn.disabled = true;
+          els.spinBtn.textContent = 'Spinning\u2026';
+          els.status.textContent = 'Spinning\u2026';
+
+          var winnerIdx = Math.floor(Math.random() * names.length);
+          var winner = names[winnerIdx];
+          var totalSteps = 26;
+          var stepCount = 0;
+          var lastShown = -1;
+
+          function step(){
+            stepCount++;
+            var progress = stepCount / totalSteps;
+            // ease-out: fast at first, slow at the end
+            var delay = 45 + Math.pow(progress, 2.2) * 240;
+
+            if(stepCount >= totalSteps){
+              spinning = false;
+              finishPick(winner);
+              return;
+            }
+            var idx;
+            do { idx = Math.floor(Math.random() * names.length); } while(idx === lastShown && names.length > 1);
+            lastShown = idx;
+            setDisplay(names[idx], 'spinning');
+            tickSound();
+            setTimeout(step, delay);
+          }
+          step();
+        }
+
+        function finishPick(winner){
+          spinning = false;
+          setDisplay(winner, 'winner');
+          els.display.classList.remove('pop'); void els.display.offsetWidth; els.display.classList.add('pop');
+          pickedHistory.push(winner);
+          winSound();
+          confetti();
+
+          var removed = false;
+          if(autoRemove){
+            removeName(winner);
+            removed = true;
+          }
+          els.status.textContent = removed
+            ? winner + ' was picked and removed from the list. ' + names.length + (names.length===1?' name':' names') + ' left.'
+            : 'Great pick! ' + winner + ' is up next.';
+          els.status.classList.add('win');
+
+          if(!removed && names.indexOf(winner) >= 0) showWinnerActions(winner);
+          else hideWinnerActionsSilent();
+
+          renderAll();
+        }
+        function hideWinnerActionsSilent(){ lastWinner = null; els.winnerActions.classList.remove('show'); }
+
+        /* ---------- Events ---------- */
+        els.addBtn.addEventListener('click', addNames);
+        if(els.classSelect) els.classSelect.addEventListener('change', loadWholeClass);
+        els.clearBtn.addEventListener('click', clearList);
+        els.spinBtn.addEventListener('click', spin);
+        els.input.addEventListener('keydown', function(e){
+          if((e.metaKey || e.ctrlKey) && e.key === 'Enter'){ e.preventDefault(); addNames(); }
+        });
+        els.keepBtn.addEventListener('click', function(){ spin(); });
+        els.removePickedBtn.addEventListener('click', function(){
+          if(lastWinner){ removeName(lastWinner); }
+          hideWinnerActions();
+          els.status.textContent = 'Removed. ' + names.length + (names.length===1?' name':' names') + ' left in the hat.';
+          renderAll(); popSound();
+        });
+        els.soundBtn.addEventListener('click', function(){
+          soundOn = !soundOn;
+          els.soundBtn.setAttribute('aria-pressed', String(soundOn));
+          els.soundLabel.textContent = soundOn ? 'Sound: On' : 'Sound: Off';
+          if(soundOn){ ensureAudio(); popSound(); }
+        });
+        els.autoBtn.addEventListener('click', function(){
+          autoRemove = !autoRemove;
+          els.autoBtn.setAttribute('aria-pressed', String(autoRemove));
+          popSound();
+        });
+
+        renderAll();
+      })();
+    </script>
+  </body>
+</html>

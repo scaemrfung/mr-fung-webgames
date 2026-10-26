@@ -85,6 +85,34 @@
         gap: 12px;
       }
 
+      /* ---------- home bar ---------- */
+      .homebar {
+        width: 100%;
+        display: flex;
+        justify-content: flex-start;
+      }
+      .home-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        font-family: "Fredoka", sans-serif;
+        font-weight: 600;
+        font-size: 1.2rem;
+        line-height: 1;
+        text-decoration: none;
+        background: var(--accent);
+        border: 3px solid var(--accent);
+        color: var(--accent-ink);
+        border-radius: 999px;
+        padding: 11px 22px 11px 16px;
+        box-shadow: var(--btn-shadow);
+        transition: transform 0.08s ease, background 0.15s ease;
+      }
+      .home-btn:hover { filter: brightness(1.07); }
+      .home-btn:active { transform: translateY(3px); box-shadow: none; }
+      .home-btn:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+      .home-btn svg { width: 24px; height: 24px; flex: 0 0 auto; }
+
       /* ---------- top bar ---------- */
       .topbar {
         width: 100%;
@@ -277,12 +305,18 @@
       .wiggle { animation: wiggle 0.3s ease 2; }
       @media (prefers-reduced-motion: reduce) {
         .burst.go span, .wiggle { animation: none; }
-        .choice, .tbtn, .hear { transition: none; }
+        .choice, .tbtn, .hear, .home-btn { transition: none; }
       }
     </style>
   </head>
   <body>
     <div class="wrap">
+      <div class="homebar">
+        <a class="home-btn" href="https://scaemrfung.github.io/mr-fung-webgames/" aria-label="Home — back to all games">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.8 12 3l9 7.8"/><path d="M5.2 9.6V21h13.6V9.6"/><path d="M9.6 21v-6.2h4.8V21"/></svg>
+          Home
+        </a>
+      </div>
       <div class="topbar">
         <div class="stars" aria-label="Stars earned">
           <span class="star-ico" aria-hidden="true">★</span>
