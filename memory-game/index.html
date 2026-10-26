@@ -1,0 +1,633 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:," />
+<title>Memory Game</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#eef7ff;
+    --bg2:#fff7e6;
+    --panel:#ffffff;
+    --panel-border:#dbeafe;
+    --text:#17233b;
+    --muted:#5b6b84;
+    --teal:#0e9a8b;
+    --teal-dark:#078273;
+    --teal-soft:#d9f5f0;
+    --coral:#ff6b4a;
+    --coral-dark:#e84e2e;
+    --sun:#ffb800;
+    --sun-soft:#fff0b8;
+    --pink:#ff5a8a;
+    --card-back:#0e9a8b;
+    --card-back2:#12b5a1;
+    --card-front:#ffffff;
+    --card-border:#cbdff5;
+    --shadow:0 10px 24px rgba(23,35,59,.12);
+    --shadow-sm:0 4px 12px rgba(23,35,59,.10);
+    --radius:20px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#101b29;
+      --bg2:#162233;
+      --panel:#1b2c42;
+      --panel-border:#2e4766;
+      --text:#f2f7ff;
+      --muted:#a8bdd6;
+      --teal-soft:#123f3a;
+      --card-front:#22354d;
+      --card-border:#355276;
+      --sun-soft:#4a3a08;
+      --shadow:0 10px 24px rgba(0,0,0,.35);
+      --shadow-sm:0 4px 12px rgba(0,0,0,.3);
+    }
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:"Nunito",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    background: radial-gradient(900px 500px at 15% -5%, var(--sun-soft) 0%, transparent 55%),
+                radial-gradient(900px 600px at 95% 0%, var(--teal-soft) 0%, transparent 50%),
+                linear-gradient(180deg,var(--bg) 0%, var(--bg2) 140%);
+    color:var(--text);
+    min-height:100vh;
+  }
+  .wrap{max-width:980px;margin:0 auto;padding:16px 16px 28px}
+  /* Header */
+  .title-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  h1{
+    font-family:"Baloo 2", "Nunito", sans-serif;
+    font-size:clamp(2rem,5vw,3rem);
+    line-height:1;margin:2px 0 2px;letter-spacing:.2px;font-weight:800;
+  }
+  h1 .star{color:var(--sun)}
+  .subtitle{margin:0;color:var(--muted);font-weight:800;font-size:clamp(1rem,2.4vw,1.15rem)}
+  .new-top{
+    border:none;cursor:pointer;
+    background:var(--coral);color:#fff;
+    font-family:"Baloo 2",sans-serif;font-weight:800;font-size:1.15rem;
+    padding:12px 20px;border-radius:999px;box-shadow:0 6px 0 var(--coral-dark), var(--shadow-sm);
+    transition:transform .08s, box-shadow .08s;
+  }
+  .new-top:active{transform:translateY(4px);box-shadow:0 2px 0 var(--coral-dark)}
+  /* Mode switcher */
+  .modes{
+    display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:16px 0 12px;
+    background:var(--panel);border:2px solid var(--panel-border);border-radius:999px;padding:6px;box-shadow:var(--shadow-sm);
+  }
+  .mode-btn{
+    border:3px solid transparent;background:transparent;color:var(--text);cursor:pointer;
+    border-radius:999px;padding:12px 8px;
+    font-family:"Baloo 2",sans-serif;font-weight:800;font-size:clamp(1.05rem,3.2vw,1.45rem);
+    display:flex;align-items:center;justify-content:center;gap:8px;line-height:1;
+  }
+  .mode-btn .ico{font-size:1.35em}
+  .mode-btn[aria-pressed="true"]{background:var(--teal);color:#fff;border-color:var(--teal-dark);box-shadow:0 4px 0 var(--teal-dark)}
+  .mode-btn:focus-visible, button:focus-visible{outline:4px solid var(--sun);outline-offset:2px}
+  /* Stats + controls */
+  .bar{
+    display:flex;flex-wrap:wrap;gap:10px;align-items:stretch;justify-content:space-between;
+  }
+  .stats{display:flex;gap:10px;flex:1 1 auto;flex-wrap:wrap}
+  .stat{
+    background:var(--panel);border:2px solid var(--panel-border);border-radius:16px;
+    padding:8px 16px;min-width:118px;text-align:center;box-shadow:var(--shadow-sm);
+  }
+  .stat .label{font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:900}
+  .stat .value{font-family:"Baloo 2",sans-serif;font-size:1.7rem;line-height:1;font-weight:800;margin-top:2px}
+  .stat .value .dim{color:var(--muted);font-size:1.15rem}
+  .controls{display:flex;gap:10px;flex-wrap:wrap;align-items:stretch}
+  .ctrl-btn{
+    border:2px solid var(--panel-border);background:var(--panel);color:var(--text);cursor:pointer;
+    border-radius:16px;padding:10px 16px;font-weight:900;font-size:1rem;
+    display:inline-flex;align-items:center;gap:8px;box-shadow:var(--shadow-sm);font-family:"Nunito",sans-serif;
+  }
+  .ctrl-btn.primary{background:var(--sun);border-color:#e6a200;color:#3a2800}
+  .ctrl-btn:active{transform:scale(.97)}
+  /* Feedback */
+  .feedback{
+    margin:14px 0 12px;min-height:54px;
+    background:var(--panel);border:2px dashed var(--panel-border);border-radius:16px;
+    display:flex;align-items:center;justify-content:center;text-align:center;
+    padding:10px 16px;
+    font-family:"Baloo 2",sans-serif;font-weight:800;font-size:clamp(1.2rem,3.4vw,1.6rem);
+  }
+  .feedback.good{border-color:var(--teal);background:var(--teal-soft);border-style:solid}
+  .feedback.try{border-color:var(--sun)}
+  /* Board */
+  .board{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:12px;
+  }
+  @media (max-width:560px){
+    .board{gap:9px} .wrap{padding:12px 10px 22px}
+    .modes{gap:5px;padding:5px}
+    .mode-btn{font-size:.98rem;padding:10px 2px;gap:4px;min-width:0;white-space:nowrap}
+    .mode-btn .ico{font-size:1.05em}
+    .stats{gap:8px}
+    .stat{min-width:0;flex:1 1 30%;padding:8px 6px}
+    .stat .value{font-size:1.35rem}
+    #starsVal{font-size:.72rem;letter-spacing:-.18em;white-space:nowrap}
+    .celebration p{font-size:1.02rem}
+  }
+  .mode-btn{min-width:0}
+  /* Desktop / projector: whole game fits in one screen, no scrolling */
+  @media (min-width:761px){
+    body{height:100dvh;overflow:hidden}
+    .wrap{height:100dvh;display:flex;flex-direction:column;padding:10px 16px 10px;max-width:880px}
+    h1{font-size:2.15rem}
+    .subtitle{font-size:1rem}
+    .new-top{padding:9px 18px;font-size:1.05rem}
+    .modes{margin:10px 0 8px;padding:5px;flex:none}
+    .mode-btn{padding:9px 6px;font-size:1.3rem}
+    .bar{flex:none}
+    .stat{padding:5px 14px;min-width:108px}
+    .stat .value{font-size:1.4rem}
+    .ctrl-btn{padding:8px 14px}
+    .feedback{margin:8px 0;min-height:42px;padding:6px 12px;font-size:1.3rem;flex:none}
+    main{flex:1;min-height:0;display:flex;flex-direction:column}
+    .board{flex:1;min-height:0;gap:10px;grid-template-rows:repeat(4,1fr)}
+    .card{aspect-ratio:auto;height:100%;min-height:0}
+    .hint{margin:8px 0 0;font-size:.9rem;flex:none}
+    .emoji{font-size:clamp(2rem,6vh,3.4rem)}
+    .big-letter,.big-num{font-size:clamp(2.2rem,7vh,3.8rem)}
+    .big-word{font-size:clamp(1.3rem,4.5vh,2.2rem)}
+    .face.back .q{font-size:clamp(1.8rem,6vh,3rem)}
+  }
+  .card{
+    position:relative;border:none;background:transparent;padding:0;cursor:pointer;
+    aspect-ratio: 3 / 3.4; perspective:900px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .card-inner{
+    position:absolute;inset:0;transition:transform .45s cubic-bezier(.2,.7,.3,1.2);transform-style:preserve-3d;
+  }
+  .card.flipped .card-inner, .card.matched .card-inner{transform:rotateY(180deg)}
+  .face{
+    position:absolute;inset:0;border-radius:20px;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+    overflow:hidden;padding:8px;
+  }
+  .face.back{
+    background:
+      radial-gradient(circle at 20% 20%, rgba(255,255,255,.22) 0 18px, transparent 19px),
+      radial-gradient(circle at 85% 80%, rgba(255,255,255,.18) 0 22px, transparent 23px),
+      linear-gradient(145deg,var(--card-back2),var(--card-back));
+    border:3px solid rgba(255,255,255,.65);
+    box-shadow:var(--shadow-sm), inset 0 0 0 3px rgba(0,0,0,.06);
+    color:#fff;
+  }
+  .face.back .q{font-family:"Baloo 2",sans-serif;font-size:clamp(2.2rem,8vw,3.6rem);font-weight:800;line-height:1;text-shadow:0 3px 0 rgba(0,0,0,.15)}
+  .face.back .dots{font-size:1rem;letter-spacing:.35em;opacity:.9}
+  .face.front{
+    background:var(--card-front);border:3px solid var(--card-border);transform:rotateY(180deg);box-shadow:var(--shadow-sm);
+  }
+  .card.matched .face.front{border-color:var(--sun);background:linear-gradient(180deg,var(--card-front), var(--sun-soft))}
+  .card.matched{cursor:default}
+  .big-letter{font-family:"Baloo 2",sans-serif;font-size:clamp(2.8rem,11vw,4.8rem);line-height:.95;font-weight:800;color:var(--teal-dark)}
+  @media (prefers-color-scheme: dark){ .big-letter{color:#5eead4} }
+  .big-word{font-family:"Baloo 2",sans-serif;font-size:clamp(1.55rem,6.2vw,2.6rem);line-height:1;font-weight:800;letter-spacing:.04em;word-break:break-word;text-align:center}
+  .big-num{font-family:"Baloo 2",sans-serif;font-size:clamp(2.8rem,11vw,4.8rem);line-height:.95;font-weight:800;color:var(--coral-dark)}
+  @media (prefers-color-scheme: dark){ .big-num{color:#fda08a} }
+  .num-word{font-weight:900;letter-spacing:.12em;font-size:clamp(.8rem,2.6vw,1rem);color:var(--muted);text-transform:uppercase}
+  .emoji{font-size:clamp(2.6rem,10vw,4.4rem);line-height:1.05}
+  .pic-word{font-family:"Baloo 2",sans-serif;font-weight:800;font-size:clamp(1.05rem,3.8vw,1.5rem);line-height:1;text-transform:capitalize}
+  .pic-word small{display:block;font-family:"Nunito",sans-serif;font-size:.78rem;letter-spacing:.06em;color:var(--muted);text-transform:none;font-weight:800;margin-top:2px}
+  .count-grid{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:2px 4px;max-width:92%;line-height:1}
+  .count-grid span{font-size:clamp(1.35rem,5.2vw,2.1rem);line-height:1.1}
+  .count-grid.c6 span, .count-grid.c7 span, .count-grid.c8 span, .count-grid.c9 span, .count-grid.c10 span{font-size:clamp(1.15rem,4.6vw,1.85rem)}
+  .badge{
+    position:absolute;top:6px;right:8px;font-size:1.35rem;line-height:1;display:none;z-index:2;
+    filter:drop-shadow(0 2px 2px rgba(0,0,0,.2));
+  }
+  .card.matched .badge{display:block;animation:pop .45s ease}
+  @keyframes pop{0%{transform:scale(0) rotate(-20deg)}70%{transform:scale(1.35)}100%{transform:scale(1)}}
+  .hint{ text-align:center;color:var(--muted);font-weight:800;margin:14px 0 0;font-size:.98rem}
+  /* Celebration */
+  .overlay{
+    position:fixed;inset:0;background:rgba(10,20,35,.62);display:none;align-items:center;justify-content:center;padding:18px;z-index:50;
+  }
+  .overlay.show{display:flex}
+  .celebration{
+    background:var(--panel);border-radius:28px;border:4px solid var(--sun);max-width:520px;width:100%;
+    text-align:center;padding:28px 22px 24px;box-shadow:var(--shadow);position:relative;overflow:hidden;
+  }
+  .celebration .big-emoji{font-size:4.2rem;line-height:1}
+  .celebration h2{font-family:"Baloo 2",sans-serif;font-size:clamp(2.2rem,7vw,3.2rem);margin:8px 0 4px;line-height:1}
+  .celebration p{margin:6px 0 18px;font-weight:800;color:var(--muted);font-size:1.15rem}
+  .celebration .stars{font-size:2rem;letter-spacing:.15em;margin:6px 0 2px}
+  .play-again{
+    border:none;cursor:pointer;background:var(--teal);color:#fff;font-family:"Baloo 2",sans-serif;font-weight:800;font-size:1.4rem;
+    padding:14px 28px;border-radius:999px;box-shadow:0 6px 0 var(--teal-dark);width:100%;
+  }
+  .play-again:active{transform:translateY(4px);box-shadow:0 2px 0 var(--teal-dark)}
+  #confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+  .confetto{position:absolute;top:-18px;width:11px;height:16px;border-radius:3px;animation:fall linear forwards}
+  @keyframes fall{to{transform:translateY(560px) rotate(720deg);opacity:.9}}
+  @media (prefers-reduced-motion: reduce){
+    .card-inner{transition:none}
+    .confetto{animation:none;display:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="title-row">
+    <div>
+      <h1>Memory Game <span class="star" aria-hidden="true">★</span></h1>
+      <p class="subtitle">Tap a card. Find its match!</p>
+    </div>
+    <button class="new-top" id="newGameTop" type="button">↻ &nbsp;New Game</button>
+  </div>
+
+  <div class="modes" role="group" aria-label="Choose a game">
+    <button class="mode-btn" type="button" data-mode="letters" aria-pressed="true"><span class="ico" aria-hidden="true">🔤</span> Letters</button>
+    <button class="mode-btn" type="button" data-mode="numbers" aria-pressed="false"><span class="ico" aria-hidden="true">🔢</span> Numbers</button>
+    <button class="mode-btn" type="button" data-mode="words" aria-pressed="false"><span class="ico" aria-hidden="true">🖼️</span> Words</button>
+  </div>
+
+  <div class="bar">
+    <div class="stats" aria-label="Score">
+      <div class="stat"><div class="label">Moves</div><div class="value" id="movesVal">0</div></div>
+      <div class="stat"><div class="label">Matched</div><div class="value"><span id="matchedVal">0</span> <span class="dim">/ <span id="totalVal">8</span></span></div></div>
+      <div class="stat"><div class="label">Stars</div><div class="value" id="starsVal" aria-label="Stars earned">☆☆☆☆☆☆☆☆</div></div>
+    </div>
+    <div class="controls">
+      <button class="ctrl-btn primary" id="hearBtn" type="button">🔊 Hear It</button>
+      <button class="ctrl-btn" id="soundBtn" type="button" aria-pressed="true">🔔 Sound: On</button>
+    </div>
+  </div>
+
+  <div class="feedback" id="feedback" aria-live="polite">Pick a card to start! 👀</div>
+
+  <main>
+    <div class="board" id="board" aria-label="Memory cards"></div>
+    <p class="hint">Tap two cards. If they match, they stay up! ⭐</p>
+  </main>
+</div>
+
+<div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="winTitle">
+  <div class="celebration">
+    <div id="confetti" aria-hidden="true"></div>
+    <div class="big-emoji" aria-hidden="true">🎉</div>
+    <div class="stars" aria-hidden="true">⭐⭐⭐</div>
+    <h2 id="winTitle">Great Job!</h2>
+    <p id="winText">You found all the pairs!</p>
+    <button class="play-again" id="playAgainBtn" type="button">▶ &nbsp;Play Again — New Game</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var WORDS = [
+    {word:"CAT", emoji:"🐱"},
+    {word:"DOG", emoji:"🐶"},
+    {word:"SUN", emoji:"☀️"},
+    {word:"FISH", emoji:"🐟"},
+    {word:"APPLE", emoji:"🍎"},
+    {word:"BALL", emoji:"⚽"},
+    {word:"BUS", emoji:"🚌"},
+    {word:"CAKE", emoji:"🎂"},
+    {word:"DUCK", emoji:"🦆"},
+    {word:"FROG", emoji:"🐸"},
+    {word:"PIG", emoji:"🐷"},
+    {word:"HEN", emoji:"🐔"},
+    {word:"PEN", emoji:"🖊️"},
+    {word:"MAP", emoji:"🗺️"},
+    {word:"BOOK", emoji:"📖"},
+    {word:"BEE", emoji:"🐝"},
+    {word:"EGG", emoji:"🥚"},
+    {word:"FOX", emoji:"🦊"},
+    {word:"COW", emoji:"🐄"},
+    {word:"ANT", emoji:"🐜"},
+    {word:"CAR", emoji:"🚗"},
+    {word:"BAT", emoji:"🦇"},
+    {word:"BED", emoji:"🛏️"},
+    {word:"MILK", emoji:"🥛"},
+    {word:"HAND", emoji:"✋"},
+    {word:"JAM", emoji:"🍓"},
+    {word:"LION", emoji:"🦁"},
+    {word:"KITE", emoji:"🪁"},
+    {word:"GOAT", emoji:"🐐"},
+    {word:"BEAR", emoji:"🐻"}
+  ];
+
+  var NUM_WORDS = ["zero","one","two","three","four","five","six","seven","eight","nine","ten"];
+  var COUNT_OBJECTS = ["⭐","🍎","🎈","🌸","🐠","🍊","💜","🔵"];
+  // Note: purple heart is just one counting object option among many; keep variety but avoid relying on it
+  COUNT_OBJECTS = ["⭐","🍎","🎈","🌸","🐠","🍊","⚽","🍓"];
+
+  var PAIRS = 8;
+
+  var boardEl = document.getElementById('board');
+  var feedbackEl = document.getElementById('feedback');
+  var movesEl = document.getElementById('movesVal');
+  var matchedEl = document.getElementById('matchedVal');
+  var totalEl = document.getElementById('totalVal');
+  var starsEl = document.getElementById('starsVal');
+  var overlayEl = document.getElementById('overlay');
+  var winTextEl = document.getElementById('winText');
+  var confettiEl = document.getElementById('confetti');
+  var soundBtn = document.getElementById('soundBtn');
+  var hearBtn = document.getElementById('hearBtn');
+
+  var mode = 'letters';
+  var soundOn = true;
+  var firstCard = null;
+  var secondCard = null;
+  var lock = false;
+  var moves = 0;
+  var matched = 0;
+  var lastSpeak = '';
+  var lastLabel = '';
+  var audioCtx = null;
+
+  function shuffle(arr){
+    var a = arr.slice();
+    for(var i=a.length-1;i>0;i--){
+      var j = Math.floor(Math.random()*(i+1));
+      var t=a[i]; a[i]=a[j]; a[j]=t;
+    }
+    return a;
+  }
+  function pick(arr,n){ return shuffle(arr).slice(0,n); }
+  function cap(w){ return w.charAt(0)+w.slice(1).toLowerCase(); }
+
+  // ---------- Sound (Web Audio only) ----------
+  function ensureAudio(){
+    if(!audioCtx){
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if(AC) audioCtx = new AC();
+    }
+    if(audioCtx && audioCtx.state==='suspended') audioCtx.resume();
+    return audioCtx;
+  }
+  function tone(freq, start, dur, type, vol){
+    if(!soundOn) return;
+    var ctx = ensureAudio(); if(!ctx) return;
+    var o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type||'sine'; o.frequency.value=freq;
+    var t = ctx.currentTime + start;
+    g.gain.setValueAtTime(0.0001,t);
+    g.gain.exponentialRampToValueAtTime(vol||0.18, t+0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, t+dur);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(t); o.stop(t+dur+0.05);
+  }
+  function playFlip(){ tone(520,0,0.09,'sine',0.10); tone(760,0.05,0.08,'sine',0.07); }
+  function playMatch(){ tone(523,0,0.16,'triangle',0.20); tone(659,0.10,0.16,'triangle',0.20); tone(784,0.20,0.26,'triangle',0.22); }
+  function playMiss(){ tone(330,0,0.18,'sine',0.12); tone(262,0.14,0.22,'sine',0.10); }
+  function playWin(){ var notes=[523,659,784,1047,784,1047,1319]; for(var i=0;i<notes.length;i++) tone(notes[i], i*0.13, 0.28,'triangle',0.20); }
+
+  // ---------- Speech ----------
+  function speak(text){
+    if(!text) return;
+    try{
+      if(!('speechSynthesis' in window)) { setFeedback('🔊 ' + text); return; }
+      window.speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      u.rate = 0.88; u.pitch = 1.05;
+      window.speechSynthesis.speak(u);
+    }catch(e){}
+  }
+
+  function setFeedback(text, kind){
+    feedbackEl.textContent = text;
+    feedbackEl.className = 'feedback' + (kind ? ' '+kind : '');
+  }
+
+  // ---------- Deck builders ----------
+  function buildLettersDeck(){
+    var byLetter = {};
+    WORDS.forEach(function(w){
+      var L = w.word.charAt(0);
+      if(!byLetter[L]) byLetter[L]=[];
+      byLetter[L].push(w);
+    });
+    var letters = pick(Object.keys(byLetter), PAIRS);
+    var cards=[];
+    letters.forEach(function(L){
+      var w = pick(byLetter[L],1)[0];
+      var label = L + ' — ' + cap(w.word);
+      var speakText = L + '. ' + cap(w.word) + ' starts with ' + L + '.';
+      cards.push({pair:L, kind:'letter', letter:L, label:label, speak:speakText, aria:L + ' letter card'});
+      cards.push({pair:L, kind:'picture', emoji:w.emoji, word:w.word, showWord:true, label:label, speak:speakText, aria:cap(w.word)+' picture'});
+    });
+    return cards;
+  }
+  function buildWordsDeck(){
+    var chosen = pick(WORDS, PAIRS);
+    var cards=[];
+    chosen.forEach(function(w){
+      var speakText = cap(w.word) + '.';
+      cards.push({pair:w.word, kind:'word', word:w.word, label:w.word, speak:speakText, aria:w.word+' word card'});
+      cards.push({pair:w.word, kind:'picture', emoji:w.emoji, word:w.word, showWord:false, label:w.word, speak:speakText, aria:cap(w.word)+' picture'});
+    });
+    return cards;
+  }
+  function buildNumbersDeck(){
+    var nums = pick([1,2,3,4,5,6,7,8,9,10], PAIRS);
+    var objs = shuffle(COUNT_OBJECTS);
+    var cards=[];
+    nums.forEach(function(n, idx){
+      var obj = objs[idx % objs.length];
+      var objName = obj==='⭐'?'stars': obj==='🍎'?'apples': obj==='🎈'?'balloons': obj==='🌸'?'flowers': obj==='🐠'?'fish': obj==='🍊'?'oranges': obj==='⚽'?'balls':'berries';
+      var speakText = cap(NUM_WORDS[n]) + '. ' + n + ' ' + objName + '.';
+      var label = n + ' — ' + cap(NUM_WORDS[n]);
+      cards.push({pair:'n'+n, kind:'number', num:n, numWord:NUM_WORDS[n], label:label, speak:speakText, aria:'Number '+n+' card'});
+      cards.push({pair:'n'+n, kind:'count', num:n, obj:obj, objName:objName, label:label, speak:speakText, aria:n+' '+objName+' picture'});
+    });
+    return cards;
+  }
+
+  function frontHTML(card){
+    if(card.kind==='letter'){
+      return '<div class="big-letter">'+card.letter+'</div><div class="num-word">Letter</div>';
+    }
+    if(card.kind==='word'){
+      return '<div class="big-word">'+card.word+'</div>';
+    }
+    if(card.kind==='number'){
+      return '<div class="big-num">'+card.num+'</div><div class="num-word">'+card.numWord+'</div>';
+    }
+    if(card.kind==='count'){
+      var spans='';
+      for(var i=0;i<card.num;i++) spans+='<span aria-hidden="true">'+card.obj+'</span>';
+      return '<div class="count-grid c'+card.num+'" aria-hidden="true">'+spans+'</div>';
+    }
+    // picture
+    if(card.showWord){
+      return '<div class="emoji" aria-hidden="true">'+card.emoji+'</div><div class="pic-word">'+cap(card.word)+'</div>';
+    }
+    return '<div class="emoji" aria-hidden="true">'+card.emoji+'</div>';
+  }
+
+  function updateStats(){
+    movesEl.textContent = moves;
+    matchedEl.textContent = matched;
+    totalEl.textContent = PAIRS;
+    var s='';
+    for(var i=0;i<PAIRS;i++) s += (i<matched ? '⭐' : '☆');
+    starsEl.textContent = s;
+  }
+
+  function newGame(){
+    firstCard=null; secondCard=null; lock=false; moves=0; matched=0;
+    lastSpeak=''; lastLabel='';
+    overlayEl.classList.remove('show');
+    confettiEl.innerHTML='';
+    var deck;
+    if(mode==='letters') deck = buildLettersDeck();
+    else if(mode==='numbers') deck = buildNumbersDeck();
+    else deck = buildWordsDeck();
+    deck = shuffle(deck);
+
+    boardEl.innerHTML='';
+    deck.forEach(function(card, idx){
+      var btn = document.createElement('button');
+      btn.type='button';
+      btn.className='card';
+      btn.setAttribute('aria-label','Hidden card '+(idx+1)+'. Tap to flip.');
+      btn.dataset.pair = card.pair;
+      btn._card = card;
+      btn.innerHTML =
+        '<span class="badge" aria-hidden="true">⭐</span>'+
+        '<span class="card-inner">'+
+          '<span class="face back" aria-hidden="true"><span class="q">?</span><span class="dots">★ ★ ★</span></span>'+
+          '<span class="face front">'+frontHTML(card)+'</span>'+
+        '</span>';
+      btn.addEventListener('click', function(){ onCardClick(btn); });
+      boardEl.appendChild(btn);
+    });
+    updateStats();
+    if(mode==='letters') setFeedback('Find the letter and its picture! 🔤');
+    else if(mode==='numbers') setFeedback('Find the number and count the pictures! 🔢');
+    else setFeedback('Find the word and its picture! 🖼️');
+  }
+
+  function onCardClick(btn){
+    if(lock) return;
+    if(btn.classList.contains('flipped') || btn.classList.contains('matched')) return;
+    ensureAudio();
+    btn.classList.add('flipped');
+    var card = btn._card;
+    lastSpeak = card.speak;
+    lastLabel = card.label;
+    btn.setAttribute('aria-label', card.aria + ' — ' + card.label);
+    playFlip();
+
+    if(!firstCard){
+      firstCard = btn;
+      setFeedback('You found: ' + card.label + ' — now find its match!');
+      return;
+    }
+    secondCard = btn;
+    moves++;
+    updateStats();
+
+    if(firstCard.dataset.pair === secondCard.dataset.pair){
+      // Match!
+      var a=firstCard, b=secondCard;
+      a.classList.add('matched'); b.classList.add('matched');
+      a.setAttribute('aria-label', a._card.aria + ' — matched!');
+      b.setAttribute('aria-label', b._card.aria + ' — matched!');
+      matched++;
+      updateStats();
+      playMatch();
+      setFeedback('⭐ Yes! You found ' + card.label + '!', 'good');
+      firstCard=null; secondCard=null;
+      if(matched>=PAIRS){
+        lock=true;
+        setTimeout(showWin, 650);
+      }
+    } else {
+      lock=true;
+      var fa=firstCard, fb=secondCard;
+      setFeedback('Try again! Look and remember 👀', 'try');
+      setTimeout(function(){ playMiss(); }, 250);
+      setTimeout(function(){
+        fa.classList.remove('flipped'); fb.classList.remove('flipped');
+        fa.setAttribute('aria-label','Hidden card. Tap to flip.');
+        fb.setAttribute('aria-label','Hidden card. Tap to flip.');
+        firstCard=null; secondCard=null; lock=false;
+      }, 1150);
+    }
+  }
+
+  function showWin(){
+    playWin();
+    winTextEl.textContent = 'You found all ' + PAIRS + ' pairs in ' + moves + ' moves!';
+    overlayEl.classList.add('show');
+    launchConfetti();
+    speak('Great job! You found all the pairs!');
+    var btn = document.getElementById('playAgainBtn');
+    if(btn) btn.focus();
+  }
+
+  function launchConfetti(){
+    confettiEl.innerHTML='';
+    var colors=['#ffb800','#ff6b4a','#0e9a8b','#ff5a8a','#3b82f6','#22c55e'];
+    for(var i=0;i<70;i++){
+      var d=document.createElement('div');
+      d.className='confetto';
+      d.style.left = Math.random()*100+'%';
+      d.style.background = colors[i%colors.length];
+      d.style.animationDuration = (1.6+Math.random()*1.8)+'s';
+      d.style.animationDelay = (Math.random()*0.7)+'s';
+      d.style.transform = 'rotate('+(Math.random()*180)+'deg)';
+      if(i%3===0) d.style.borderRadius='50%';
+      confettiEl.appendChild(d);
+    }
+    setTimeout(function(){ confettiEl.innerHTML=''; }, 4200);
+  }
+
+  // ---------- Controls ----------
+  document.querySelectorAll('.mode-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if(mode===btn.dataset.mode) { newGame(); return; }
+      mode = btn.dataset.mode;
+      document.querySelectorAll('.mode-btn').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.mode===mode ? 'true':'false'); });
+      ensureAudio(); playFlip();
+      newGame();
+    });
+  });
+
+  function bindNew(id){
+    document.getElementById(id).addEventListener('click', function(){ ensureAudio(); newGame(); });
+  }
+  bindNew('newGameTop');
+  document.getElementById('playAgainBtn').addEventListener('click', function(){ ensureAudio(); newGame(); });
+
+  soundBtn.addEventListener('click', function(){
+    soundOn = !soundOn;
+    soundBtn.setAttribute('aria-pressed', soundOn?'true':'false');
+    soundBtn.textContent = soundOn ? '🔔 Sound: On' : '🔕 Sound: Off';
+    if(soundOn){ ensureAudio(); playMatch(); }
+    else if('speechSynthesis' in window) window.speechSynthesis.cancel();
+  });
+
+  hearBtn.addEventListener('click', function(){
+    if(lastSpeak){
+      speak(lastSpeak);
+      setFeedback('🔊 ' + lastLabel, feedbackEl.classList.contains('good') ? 'good' : '');
+    } else {
+      if(mode==='letters') speak('Find the letter and its picture!');
+      else if(mode==='numbers') speak('Find the number. Count the pictures!');
+      else speak('Find the word and its picture!');
+      setFeedback('Tap a card first, then tap Hear It! 🔊');
+    }
+  });
+
+  newGame();
+})();
+</script>
+</body>
+</html>

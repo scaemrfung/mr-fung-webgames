@@ -202,7 +202,8 @@
 (function(){
   "use strict";
 
-  // Grade One words only: short, picture-able classroom words (3-5 letters)
+  // Grade One words (3-5 letters) plus Grade Two words (4-7 letters):
+  // all short, picture-able classroom words
   var WORDS = [
     {word:"CAT", emoji:"🐱"},
     {word:"DOG", emoji:"🐶"},
@@ -229,7 +230,60 @@
     {word:"BED", emoji:"🛏️"},
     {word:"MILK", emoji:"🥛"},
     {word:"HAND", emoji:"✋"},
-    {word:"JAM", emoji:"🫙"}
+    {word:"JAM", emoji:"🫙"},
+    // ---- Grade Two words ----
+    {word:"HORSE", emoji:"🐴"},
+    {word:"TIGER", emoji:"🐯"},
+    {word:"LION", emoji:"🦁"},
+    {word:"BEAR", emoji:"🐻"},
+    {word:"MONKEY", emoji:"🐵"},
+    {word:"RABBIT", emoji:"🐰"},
+    {word:"SNAKE", emoji:"🐍"},
+    {word:"TURTLE", emoji:"🐢"},
+    {word:"WHALE", emoji:"🐳"},
+    {word:"SHARK", emoji:"🦈"},
+    {word:"PANDA", emoji:"🐼"},
+    {word:"ZEBRA", emoji:"🦓"},
+    {word:"GIRAFFE", emoji:"🦒"},
+    {word:"SPIDER", emoji:"🕷️"},
+    {word:"BIRD", emoji:"🐦"},
+    {word:"MOUSE", emoji:"🐭"},
+    {word:"BANANA", emoji:"🍌"},
+    {word:"ORANGE", emoji:"🍊"},
+    {word:"GRAPE", emoji:"🍇"},
+    {word:"LEMON", emoji:"🍋"},
+    {word:"PIZZA", emoji:"🍕"},
+    {word:"COOKIE", emoji:"🍪"},
+    {word:"BREAD", emoji:"🍞"},
+    {word:"CHEESE", emoji:"🧀"},
+    {word:"CARROT", emoji:"🥕"},
+    {word:"CORN", emoji:"🌽"},
+    {word:"DONUT", emoji:"🍩"},
+    {word:"CANDY", emoji:"🍬"},
+    {word:"FLOWER", emoji:"🌸"},
+    {word:"TREE", emoji:"🌳"},
+    {word:"MOON", emoji:"🌙"},
+    {word:"SNOW", emoji:"❄️"},
+    {word:"CLOUD", emoji:"☁️"},
+    {word:"RAINBOW", emoji:"🌈"},
+    {word:"GUITAR", emoji:"🎸"},
+    {word:"DRUM", emoji:"🥁"},
+    {word:"PLANET", emoji:"🪐"},
+    {word:"ROCKET", emoji:"🚀"},
+    {word:"PENCIL", emoji:"✏️"},
+    {word:"SCHOOL", emoji:"🏫"},
+    {word:"FRIEND", emoji:"🧑‍🤝‍🧑"},
+    {word:"TRAIN", emoji:"🚂"},
+    {word:"PLANE", emoji:"✈️"},
+    {word:"TRUCK", emoji:"🚚"},
+    {word:"CLOCK", emoji:"🕐"},
+    {word:"KITE", emoji:"🪁"},
+    {word:"CASTLE", emoji:"🏰"},
+    {word:"CROWN", emoji:"👑"},
+    {word:"ROBOT", emoji:"🤖"},
+    {word:"CAMERA", emoji:"📷"},
+    {word:"BALLOON", emoji:"🎈"},
+    {word:"SHIRT", emoji:"👕"}
   ];
 
   // ---------- Helpers ----------
@@ -511,7 +565,7 @@
   var sAdvanceTimer = null;
 
   function makeChoices(correct){
-    // Distractors are the starting letters of other Grade One words in the set
+    // Distractors are the starting letters of other words in the set
     var starters = [];
     WORDS.forEach(function(w){ var c=w.word[0]; if(c!==correct && starters.indexOf(c)===-1) starters.push(c); });
     starters = shuffleArr(starters);
