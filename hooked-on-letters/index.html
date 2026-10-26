@@ -1,0 +1,1044 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>Hooked on Letters!</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --bg: #d9f2ee;
+        --panel: #ffffff;
+        --panel-edge: #bfe6df;
+        --ink: #10333d;
+        --ink-soft: #41707d;
+        --accent: #ff7a29;
+        --accent-dark: #e85f10;
+        --teal: #0e7f86;
+        --teal-dark: #0a5f66;
+        --gold: #ffb400;
+        --pond-top: #8fe6ef;
+        --pond-mid: #37b3cf;
+        --pond-deep: #1b7fa8;
+        --sand: #f4d98c;
+        --weed: #1f9e6e;
+        --shadow: 0 10px 30px rgba(16, 80, 96, 0.18);
+        --chip-empty: #eef7f5;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #07222c;
+          --panel: #0e3442;
+          --panel-edge: #1c4c5e;
+          --ink: #eafcff;
+          --ink-soft: #a8cfda;
+          --accent: #ff8a3d;
+          --accent-dark: #ff7a29;
+          --teal: #2bb3ba;
+          --teal-dark: #7fd8dc;
+          --gold: #ffc61a;
+          --pond-top: #3d9db8;
+          --pond-mid: #166e8f;
+          --pond-deep: #0b4a6e;
+          --sand: #7d6535;
+          --weed: #157a50;
+          --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+          --chip-empty: #123f4f;
+        }
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; }
+      body {
+        font-family: "Nunito", system-ui, -apple-system, sans-serif;
+        background: var(--bg);
+        color: var(--ink);
+        min-height: 100vh;
+      }
+      button { font-family: inherit; cursor: pointer; }
+      button:focus-visible { outline: 4px solid var(--gold); outline-offset: 2px; }
+
+      .page {
+        max-width: 1240px;
+        margin: 0 auto;
+        padding: 14px 16px 22px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      /* ---------- Top bar ---------- */
+      .topbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .modes {
+        display: flex;
+        background: var(--panel);
+        border: 2px solid var(--panel-edge);
+        border-radius: 999px;
+        padding: 5px;
+        gap: 5px;
+        box-shadow: var(--shadow);
+      }
+      .mode-btn {
+        border: none;
+        background: transparent;
+        color: var(--ink-soft);
+        font-family: "Fredoka", "Nunito", sans-serif;
+        font-weight: 600;
+        font-size: clamp(17px, 2.4vw, 23px);
+        padding: 10px 22px;
+        border-radius: 999px;
+        letter-spacing: 0.01em;
+      }
+      .mode-btn.active {
+        background: var(--accent);
+        color: #fff;
+        box-shadow: 0 4px 12px rgba(232, 95, 16, 0.35);
+      }
+      .top-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+      .tool-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: 2px solid var(--panel-edge);
+        background: var(--panel);
+        color: var(--ink);
+        font-weight: 900;
+        font-size: clamp(15px, 2vw, 19px);
+        padding: 10px 18px;
+        border-radius: 999px;
+        box-shadow: var(--shadow);
+      }
+      .tool-btn svg { width: 22px; height: 22px; flex: none; }
+      .tool-btn.primary {
+        background: var(--teal);
+        border-color: var(--teal);
+        color: #fff;
+      }
+      .tool-btn.primary:active { background: var(--teal-dark); }
+      .tool-btn:active { transform: translateY(1px); }
+
+      /* ---------- Target bar ---------- */
+      .target-bar {
+        background: var(--panel);
+        border: 2px solid var(--panel-edge);
+        border-radius: 22px;
+        box-shadow: var(--shadow);
+        padding: 12px 20px;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        flex-wrap: wrap;
+      }
+      .target-left {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        min-width: 0;
+      }
+      .target-stack { display: flex; flex-direction: column; gap: 2px; }
+      .target-label {
+        font-weight: 900;
+        font-size: clamp(14px, 1.8vw, 18px);
+        color: var(--ink-soft);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+      .target-letter {
+        font-family: "Fredoka", sans-serif;
+        font-weight: 700;
+        font-size: clamp(56px, 8vw, 84px);
+        line-height: 0.95;
+        color: #fff;
+        background: var(--accent);
+        width: clamp(76px, 10vw, 104px);
+        height: clamp(76px, 10vw, 104px);
+        border-radius: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 6px 0 var(--accent-dark), 0 12px 22px rgba(232, 95, 16, 0.3);
+        text-shadow: 0 2px 0 rgba(0,0,0,0.15);
+      }
+      .target-letter.pop { animation: popIn 0.35s ease; }
+      @keyframes popIn {
+        0% { transform: scale(0.6) rotate(-6deg); }
+        60% { transform: scale(1.12) rotate(2deg); }
+        100% { transform: scale(1) rotate(0); }
+      }
+      .hear-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        border: 2px solid var(--panel-edge);
+        background: var(--chip-empty);
+        color: var(--ink);
+        font-weight: 900;
+        font-size: 16px;
+        padding: 9px 14px;
+        border-radius: 999px;
+      }
+      .hear-btn svg { width: 20px; height: 20px; }
+      .target-center { flex: 1 1 260px; min-width: 220px; }
+      .word-tiles { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 4px; }
+      .tile {
+        font-family: "Fredoka", sans-serif;
+        font-weight: 700;
+        font-size: clamp(28px, 4.4vw, 44px);
+        width: clamp(42px, 6vw, 60px);
+        height: clamp(52px, 7.4vw, 72px);
+        border-radius: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--chip-empty);
+        border: 3px dashed var(--panel-edge);
+        color: transparent;
+      }
+      .tile.filled {
+        background: var(--teal);
+        border: 3px solid var(--teal);
+        color: #fff;
+        animation: popIn 0.35s ease;
+      }
+      .tile.next {
+        border: 3px dashed var(--accent);
+        animation: tilePulse 1.1s ease-in-out infinite;
+      }
+      @keyframes tilePulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(255, 122, 41, 0.45); }
+        50% { box-shadow: 0 0 0 7px rgba(255, 122, 41, 0); }
+      }
+      .target-right {
+        margin-left: auto;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 3px;
+      }
+      .stars { font-size: clamp(24px, 3.4vw, 34px); letter-spacing: 3px; line-height: 1; }
+      .stars .on { color: var(--gold); text-shadow: 0 2px 0 rgba(180, 110, 0, 0.35); }
+      .stars .off { color: var(--panel-edge); }
+      .progress-text { font-weight: 900; font-size: clamp(14px, 1.8vw, 18px); color: var(--ink-soft); }
+      .total-stars { font-weight: 900; font-size: 16px; color: var(--ink-soft); }
+      .total-stars .big-star { color: var(--gold); font-size: 20px; }
+
+      /* ---------- Pond ---------- */
+      .pond {
+        position: relative;
+        border-radius: 26px;
+        overflow: hidden;
+        height: clamp(360px, 54vh, 580px);
+        background: linear-gradient(180deg, var(--pond-top) 0%, var(--pond-mid) 55%, var(--pond-deep) 100%);
+        box-shadow: var(--shadow), inset 0 0 0 3px rgba(255,255,255,0.25);
+        touch-action: manipulation;
+        user-select: none;
+        -webkit-user-select: none;
+      }
+      .pond .sun-glow {
+        position: absolute; top: -70px; right: -50px;
+        width: 260px; height: 260px; border-radius: 50%;
+        background: radial-gradient(circle, rgba(255,255,210,0.5) 0%, rgba(255,255,210,0) 70%);
+        pointer-events: none;
+      }
+      .sand {
+        position: absolute; left: 0; right: 0; bottom: 0; height: 30px;
+        background: var(--sand);
+        border-radius: 50% 50% 0 0 / 18px 18px 0 0;
+        opacity: 0.9;
+        pointer-events: none;
+      }
+      .weed { position: absolute; bottom: 12px; pointer-events: none; opacity: 0.85; }
+      .weed.left { left: 8px; }
+      .weed.right { right: 96px; }
+      .bubble {
+        position: absolute; bottom: 24px; border-radius: 50%;
+        border: 2px solid rgba(255,255,255,0.65);
+        background: rgba(255,255,255,0.18);
+        animation: rise linear infinite;
+        pointer-events: none;
+      }
+      @keyframes rise {
+        0% { transform: translateY(0); opacity: 0; }
+        12% { opacity: 0.85; }
+        100% { transform: translateY(-58vh); opacity: 0; }
+      }
+
+      /* Fish */
+      .fish {
+        position: absolute;
+        width: 128px; height: 84px;
+        left: 0; top: 0;
+        cursor: pointer;
+        z-index: 5;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .fish .shake { position: absolute; inset: 0; }
+      .fish.wiggling .shake { animation: wiggle 0.5s ease; }
+      @keyframes wiggle {
+        0%, 100% { transform: rotate(0deg) translateX(0); }
+        20% { transform: rotate(-9deg) translateX(-7px); }
+        40% { transform: rotate(8deg) translateX(7px); }
+        60% { transform: rotate(-7deg) translateX(-5px); }
+        80% { transform: rotate(5deg) translateX(5px); }
+      }
+      .fish .flip { position: absolute; inset: 0; }
+      .fish svg.body { width: 100%; height: 100%; display: block; filter: drop-shadow(0 5px 6px rgba(6, 60, 80, 0.35)); }
+      .fish .letter {
+        position: absolute;
+        left: 54%; top: 50%;
+        transform: translate(-50%, -54%);
+        font-family: "Fredoka", sans-serif;
+        font-weight: 700;
+        font-size: 44px;
+        color: #fff;
+        text-shadow: 0 2px 0 rgba(0,0,0,0.28), 0 0 10px rgba(0,0,0,0.12);
+        pointer-events: none;
+      }
+      .fish.caught { transition: transform 0.62s cubic-bezier(0.5, -0.1, 0.3, 1), opacity 0.62s ease; z-index: 30; pointer-events: none; }
+
+      /* Hook */
+      .hook {
+        position: absolute; top: 0; width: 0; z-index: 20;
+        opacity: 0; pointer-events: none;
+      }
+      .hook.show { opacity: 1; }
+      .hook .line {
+        position: absolute; left: -1.5px; top: 0; width: 3px;
+        background: rgba(255,255,255,0.9);
+        border-radius: 2px;
+        height: 0;
+        transition: height 0.22s ease-in;
+      }
+      .hook .head {
+        position: absolute; left: -9px; width: 18px; height: 22px;
+        border: 4px solid #e8f4f6;
+        border-top: none;
+        border-radius: 0 0 12px 12px;
+        top: 0;
+        transition: top 0.22s ease-in;
+        filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
+      }
+      .splash-ring {
+        position: absolute; border: 3px solid rgba(255,255,255,0.9);
+        border-radius: 50%; z-index: 15; pointer-events: none;
+        animation: splash 0.55s ease-out forwards;
+      }
+      @keyframes splash {
+        0% { transform: scale(0.25); opacity: 1; }
+        100% { transform: scale(1.5); opacity: 0; }
+      }
+      .drop {
+        position: absolute; width: 7px; height: 7px; border-radius: 50%;
+        background: rgba(255,255,255,0.95); z-index: 15; pointer-events: none;
+        animation: dropFly 0.5s ease-out forwards;
+      }
+      @keyframes dropFly {
+        0% { transform: translate(0,0); opacity: 1; }
+        100% { transform: translate(var(--dx), var(--dy)); opacity: 0; }
+      }
+
+      /* Bucket in pond */
+      .pond-bucket {
+        position: absolute; right: 14px; bottom: 8px; z-index: 8;
+        width: 92px; pointer-events: none;
+        filter: drop-shadow(0 6px 8px rgba(6, 60, 80, 0.35));
+      }
+      .pond-bucket.bounce { animation: bucketBounce 0.45s ease; }
+      @keyframes bucketBounce {
+        0% { transform: scale(1); }
+        40% { transform: scale(1.14) rotate(-3deg); }
+        100% { transform: scale(1); }
+      }
+
+      /* Confetti */
+      .confetti {
+        position: absolute; top: -14px; width: 11px; height: 16px;
+        border-radius: 3px; z-index: 40; pointer-events: none;
+        animation: confettiFall linear forwards;
+      }
+      @keyframes confettiFall {
+        0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+        100% { transform: translateY(62vh) rotate(560deg); opacity: 0.7; }
+      }
+
+      /* Celebration */
+      .celebration {
+        position: absolute; inset: 0; z-index: 50;
+        display: flex; align-items: center; justify-content: center;
+        background: rgba(7, 47, 62, 0.45);
+        padding: 16px;
+      }
+      .celebration[hidden] { display: none; }
+      .cele-card {
+        background: var(--panel);
+        border-radius: 26px;
+        padding: 28px 34px;
+        text-align: center;
+        max-width: 520px;
+        box-shadow: 0 24px 60px rgba(0,0,0,0.35);
+        animation: popIn 0.4s ease;
+      }
+      .cele-card .big-stars { font-size: 46px; color: var(--gold); letter-spacing: 6px; text-shadow: 0 3px 0 rgba(180,110,0,0.3); }
+      .cele-card h2 {
+        font-family: "Fredoka", sans-serif; font-weight: 700;
+        font-size: clamp(32px, 5.4vw, 46px); margin: 8px 0 6px; color: var(--ink);
+      }
+      .cele-card p { font-size: clamp(17px, 2.4vw, 21px); font-weight: 800; color: var(--ink-soft); margin: 0 0 20px; }
+      .cele-btn {
+        background: var(--accent); color: #fff; border: none;
+        font-family: "Fredoka", sans-serif; font-weight: 600;
+        font-size: clamp(20px, 3vw, 26px);
+        padding: 13px 34px; border-radius: 999px;
+        box-shadow: 0 6px 0 var(--accent-dark);
+      }
+      .cele-btn:active { transform: translateY(3px); box-shadow: 0 3px 0 var(--accent-dark); }
+
+      /* ---------- Bucket bar ---------- */
+      .bucket-bar {
+        background: var(--panel);
+        border: 2px solid var(--panel-edge);
+        border-radius: 22px;
+        box-shadow: var(--shadow);
+        padding: 12px 20px;
+        display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+      }
+      .bucket-title {
+        font-family: "Fredoka", sans-serif; font-weight: 600;
+        font-size: clamp(20px, 2.6vw, 26px);
+        display: flex; align-items: center; gap: 9px;
+      }
+      .bucket-title svg { width: 30px; height: 30px; }
+      .bucket-chips { display: flex; gap: 8px; flex-wrap: wrap; flex: 1; min-height: 44px; align-items: center; }
+      .bucket-empty { font-weight: 800; color: var(--ink-soft); font-size: 17px; }
+      .chip {
+        position: relative;
+        font-family: "Fredoka", sans-serif; font-weight: 700; font-size: 23px;
+        color: #fff; text-shadow: 0 1px 0 rgba(0,0,0,0.25);
+        padding: 6px 18px 6px 13px;
+        border-radius: 999px 6px 6px 999px;
+        animation: popIn 0.3s ease;
+      }
+      .chip::after {
+        content: ""; position: absolute; right: -9px; top: 50%;
+        transform: translateY(-50%);
+        border-top: 9px solid transparent; border-bottom: 9px solid transparent;
+        border-left: 11px solid;
+        border-left-color: inherit;
+      }
+      .bucket-count { font-weight: 900; color: var(--ink-soft); font-size: 17px; }
+
+      @media (max-width: 640px) {
+        .page { padding: 10px 10px 18px; }
+        .pond { height: clamp(330px, 50vh, 460px); }
+        .fish { width: 100px; height: 66px; }
+        .fish .letter { font-size: 34px; }
+        .target-right { align-items: flex-start; margin-left: 0; }
+        .target-bar { padding: 12px 14px; gap: 12px; }
+        .mode-btn { padding: 9px 15px; }
+        .weed.right { right: 84px; }
+        .pond-bucket { width: 74px; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .bubble, .tile.next { animation: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+
+      <header class="topbar">
+        <div class="modes" role="group" aria-label="Choose a game">
+          <button class="mode-btn active" id="modeCatch" type="button">Catch a Letter</button>
+          <button class="mode-btn" id="modeSpell" type="button">Spell a Word</button>
+        </div>
+        <div class="top-actions">
+          <button class="tool-btn" id="soundBtn" type="button" aria-pressed="true">
+            <svg id="soundIconOn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor" stroke="none"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.4 5.6a9 9 0 0 1 0 12.8"/></svg>
+            <svg id="soundIconOff" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:none"><path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor" stroke="none"/><line x1="16" y1="9" x2="22" y2="15"/><line x1="22" y1="9" x2="16" y2="15"/></svg>
+            <span id="soundLabel">Sound: On</span>
+          </button>
+          <button class="tool-btn primary" id="newGameBtn" type="button">New Game</button>
+        </div>
+      </header>
+
+      <section class="target-bar" aria-live="polite">
+        <div class="target-left">
+          <div class="target-letter" id="targetLetter">B</div>
+          <div class="target-stack">
+            <span class="target-label" id="targetLabel">Catch the letter</span>
+            <button class="hear-btn" id="hearBtn" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor" stroke="none"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg>
+              Hear it
+            </button>
+          </div>
+        </div>
+        <div class="target-center" id="wordArea" hidden>
+          <span class="target-label">Spell the word</span>
+          <div class="word-tiles" id="wordTiles"></div>
+        </div>
+        <div class="target-right">
+          <div class="stars" id="stars" aria-hidden="true"></div>
+          <div class="progress-text" id="progressText"></div>
+          <div class="total-stars"><span class="big-star">★</span> <span id="totalStars">0</span> caught all together</div>
+        </div>
+      </section>
+
+      <main class="pond" id="pond" aria-label="Pond. Tap or click the fish with the right letter.">
+        <div class="sun-glow"></div>
+        <svg class="weed left" width="54" height="86" viewBox="0 0 54 86" aria-hidden="true"><path d="M10 86 C4 60 16 44 8 18 C20 40 16 62 20 86 Z" fill="var(--weed)"/><path d="M28 86 C24 56 36 40 30 8 C42 36 36 60 40 86 Z" fill="var(--weed)" opacity="0.75"/><path d="M44 86 C42 64 50 50 46 30 C54 50 50 66 52 86 Z" fill="var(--weed)" opacity="0.55"/></svg>
+        <svg class="weed right" width="44" height="70" viewBox="0 0 54 86" aria-hidden="true"><path d="M12 86 C6 58 18 42 10 14 C22 38 18 62 22 86 Z" fill="var(--weed)"/><path d="M32 86 C28 60 38 46 34 22 C44 44 38 64 42 86 Z" fill="var(--weed)" opacity="0.7"/></svg>
+        <div class="sand"></div>
+        <div class="hook" id="hook"><div class="line" id="hookLine"></div><div class="head" id="hookHead"></div></div>
+        <svg class="pond-bucket" id="pondBucket" viewBox="0 0 100 84" aria-hidden="true">
+          <path d="M14 30 L24 78 Q25 84 32 84 L68 84 Q75 84 76 78 L86 30 Z" fill="#e2543e"/>
+          <path d="M14 30 L24 78 Q25 84 32 84 L68 84 Q75 84 76 78 L86 30 Z" fill="rgba(0,0,0,0.08)"/>
+          <ellipse cx="50" cy="30" rx="36" ry="8" fill="#7ad3e8"/>
+          <ellipse cx="50" cy="29" rx="36" ry="8" fill="none" stroke="#b23a26" stroke-width="4"/>
+          <path d="M18 28 Q50 -8 82 28" fill="none" stroke="#8a5a2b" stroke-width="5" stroke-linecap="round"/>
+          <rect x="10" y="46" width="80" height="7" rx="3.5" fill="rgba(255,255,255,0.35)"/>
+        </svg>
+        <div class="celebration" id="celebration" hidden>
+          <div class="cele-card">
+            <div class="big-stars" aria-hidden="true">★ ★ ★</div>
+            <h2 id="celeTitle">Great Fishing!</h2>
+            <p id="celeText">You caught all the letters!</p>
+            <button class="cele-btn" id="celeBtn" type="button">New Round</button>
+          </div>
+        </div>
+      </main>
+
+      <section class="bucket-bar">
+        <div class="bucket-title">
+          <svg viewBox="0 0 100 84" aria-hidden="true"><path d="M14 30 L24 78 Q25 84 32 84 L68 84 Q75 84 76 78 L86 30 Z" fill="#e2543e"/><ellipse cx="50" cy="30" rx="36" ry="8" fill="#7ad3e8"/><ellipse cx="50" cy="29" rx="36" ry="8" fill="none" stroke="#b23a26" stroke-width="5"/><path d="M18 28 Q50 -8 82 28" fill="none" stroke="#8a5a2b" stroke-width="6" stroke-linecap="round"/></svg>
+          Bucket
+        </div>
+        <div class="bucket-chips" id="bucketChips"><span class="bucket-empty">No fish yet — catch one!</span></div>
+        <div class="bucket-count" id="bucketCount"></div>
+      </section>
+
+    </div>
+
+    <script>
+      (function () {
+        "use strict";
+
+        var WORDS = ["PEN","BOOK","DESK","MAP","BUS","BAG","ART","GYM","READ","BELL","PLAY","MATH","RULER","PAPER","CHAIR","CLOCK","CRAYON","SCHOOL","THE","SAID","TO","DO","OF","SEE","HE","BE","ME","FROM","LOOK","ARE","WAS","YOU","WHAT","HAVE","YOUR","WANT","GO","NO","SO","GOES","SAYS","SHE","WE","THEY","THEIR","WERE","TALK","WALK","COULD","WOULD","SHOULD","OR","FOR","THERE","WHERE","WHO","BY","MY","ONE","ONCE","TWO","DOES","MANY","ANY","BEEN","INTO","FRIEND","BECAUSE","WOMAN","WOMEN","MOVE","BOTH","FOUR","FOURTH","FORTY","PEOPLE","PRETTY","NOTHING"];
+        var ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        var FISH_COLORS = ["#ff8a3d", "#ffc93d", "#ff5d73", "#2fbfae", "#4f9cf9", "#ff7ac2", "#7ac74f", "#ffa62b", "#38b6d3", "#f26d5b"];
+        var ROUND_GOAL = 8;
+        var FISH_COUNT = 6;
+
+        var pond = document.getElementById("pond");
+        var targetLetterEl = document.getElementById("targetLetter");
+        var targetLabelEl = document.getElementById("targetLabel");
+        var wordArea = document.getElementById("wordArea");
+        var wordTiles = document.getElementById("wordTiles");
+        var starsEl = document.getElementById("stars");
+        var progressText = document.getElementById("progressText");
+        var totalStarsEl = document.getElementById("totalStars");
+        var bucketChips = document.getElementById("bucketChips");
+        var bucketCount = document.getElementById("bucketCount");
+        var pondBucket = document.getElementById("pondBucket");
+        var celebration = document.getElementById("celebration");
+        var celeTitle = document.getElementById("celeTitle");
+        var celeText = document.getElementById("celeText");
+        var celeBtn = document.getElementById("celeBtn");
+        var hook = document.getElementById("hook");
+        var hookLine = document.getElementById("hookLine");
+        var hookHead = document.getElementById("hookHead");
+
+        var mode = "catch";
+        var soundOn = true;
+        var interacted = false;
+        var targetLetter = "B";
+        var roundCaught = 0;
+        var totalCaught = 0;
+        var wordsDone = 0;
+        var currentWord = "";
+        var wordIndex = 0;
+        var lastWord = "";
+        var busy = false;
+        var roundOver = false;
+        var fishes = [];
+        var fishSeq = 0;
+        var lastTime = 0;
+
+        /* ---------------- Sound (Web Audio, in-browser only) ---------------- */
+        var audioCtx = null;
+        function initAudio() {
+          if (!audioCtx) {
+            try {
+              var AC = window.AudioContext || window.webkitAudioContext;
+              if (AC) audioCtx = new AC();
+            } catch (e) { audioCtx = null; }
+          }
+          if (audioCtx && audioCtx.state === "suspended") { audioCtx.resume(); }
+        }
+        function tone(freq, start, dur, type, vol, slideTo) {
+          if (!soundOn || !audioCtx) return;
+          try {
+            var t = audioCtx.currentTime + start;
+            var osc = audioCtx.createOscillator();
+            var gain = audioCtx.createGain();
+            osc.type = type || "sine";
+            osc.frequency.setValueAtTime(freq, t);
+            if (slideTo) osc.frequency.exponentialRampToValueAtTime(slideTo, t + dur);
+            gain.gain.setValueAtTime(0.0001, t);
+            gain.gain.exponentialRampToValueAtTime(vol || 0.22, t + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(t); osc.stop(t + dur + 0.05);
+          } catch (e) {}
+        }
+        function sfxSplash() {
+          if (!soundOn || !audioCtx) return;
+          try {
+            var dur = 0.35;
+            var buffer = audioCtx.createBuffer(1, audioCtx.sampleRate * dur, audioCtx.sampleRate);
+            var data = buffer.getChannelData(0);
+            for (var i = 0; i < data.length; i++) { data[i] = (Math.random() * 2 - 1) * (1 - i / data.length); }
+            var src = audioCtx.createBufferSource(); src.buffer = buffer;
+            var filter = audioCtx.createBiquadFilter();
+            filter.type = "bandpass";
+            filter.frequency.setValueAtTime(1400, audioCtx.currentTime);
+            filter.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + dur);
+            var gain = audioCtx.createGain(); gain.gain.value = 0.35;
+            src.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
+            src.start();
+          } catch (e) {}
+        }
+        function sfxHappy() { tone(523, 0, 0.16, "sine", 0.25); tone(659, 0.09, 0.16, "sine", 0.25); tone(784, 0.18, 0.3, "sine", 0.28); }
+        function sfxWiggle() { tone(220, 0, 0.14, "square", 0.08, 140); tone(190, 0.1, 0.14, "square", 0.07, 120); }
+        function sfxFanfare() {
+          var notes = [523, 659, 784, 1047, 784, 1047];
+          for (var i = 0; i < notes.length; i++) { tone(notes[i], i * 0.13, 0.28, "triangle", 0.26); }
+          tone(1319, 0.8, 0.5, "triangle", 0.24);
+        }
+        function speak(text) {
+          if (!soundOn || !interacted) return;
+          try {
+            if (!("speechSynthesis" in window)) return;
+            window.speechSynthesis.cancel();
+            var u = new SpeechSynthesisUtterance(text);
+            u.rate = 0.92; u.pitch = 1.05;
+            window.speechSynthesis.speak(u);
+          } catch (e) {}
+        }
+
+        /* ---------------- Helpers ---------------- */
+        function randInt(n) { return Math.floor(Math.random() * n); }
+        function randomLetter() { return ALPHABET.charAt(randInt(26)); }
+        function pondW() { return pond.clientWidth; }
+        function pondH() { return pond.clientHeight; }
+        function neededLetter() { return mode === "catch" ? targetLetter : currentWord.charAt(wordIndex); }
+        function countNeeded() {
+          var n = 0, need = neededLetter();
+          for (var i = 0; i < fishes.length; i++) {
+            if (fishes[i].state === "swim" && fishes[i].letter === need) n++;
+          }
+          return n;
+        }
+        function pickLetterForSpawn() {
+          var need = neededLetter();
+          var have = countNeeded();
+          if (have === 0) return need;
+          if (have < 2 && Math.random() < 0.22) return need;
+          if (mode === "spell" && Math.random() < 0.3) {
+            var rest = currentWord.slice(wordIndex);
+            if (rest.length) return rest.charAt(randInt(rest.length));
+          }
+          return randomLetter();
+        }
+        function ensureNeededPresent() {
+          if (countNeeded() > 0 || roundOver) return;
+          var swimmers = fishes.filter(function (f) { return f.state === "swim"; });
+          if (!swimmers.length) return;
+          var f = swimmers[randInt(swimmers.length)];
+          setFishLetter(f, neededLetter());
+          f.el.classList.remove("wiggling");
+          var sh = f.el.querySelector(".shake");
+          sh.style.animation = "none"; void sh.offsetWidth; sh.style.animation = "";
+          f.el.animate(
+            [{ transform: f.transformStr }, { transform: f.transformStr }],
+            { duration: 10 }
+          );
+        }
+        function setFishLetter(f, letter) {
+          f.letter = letter;
+          f.letterEl.textContent = letter;
+          f.el.setAttribute("aria-label", "Fish with letter " + letter);
+        }
+
+        /* ---------------- Fish ---------------- */
+        function fishSVG(color) {
+          return '<svg class="body" viewBox="0 0 130 84" aria-hidden="true">' +
+            '<polygon points="20,42 0,14 0,70" fill="' + color + '" stroke="rgba(0,0,0,0.15)" stroke-width="2"/>' +
+            '<ellipse cx="68" cy="42" rx="50" ry="31" fill="' + color + '"/>' +
+            '<path d="M40 16 Q62 2 84 15 Q62 10 40 16Z" fill="rgba(255,255,255,0.35)"/>' +
+            '<ellipse cx="66" cy="50" rx="34" ry="18" fill="rgba(255,255,255,0.20)"/>' +
+            '<circle cx="95" cy="34" r="6.5" fill="#fff"/>' +
+            '<circle cx="96.5" cy="34.5" r="3.4" fill="#12333d"/>' +
+            '<path d="M104 50 Q110 54 104 58" fill="none" stroke="rgba(0,0,0,0.3)" stroke-width="2.5" stroke-linecap="round"/>' +
+            '</svg>';
+        }
+        function laneY(f) {
+          var range = Math.max(60, pondH() - f.h - 52);
+          var step = range / FISH_COUNT;
+          var y = 6 + f.lane * step + step / 2 - f.h / 2 + (f.jitter || 0);
+          return Math.max(4, Math.min(y, pondH() - f.h - 40));
+        }
+        function freeLane() {
+          var used = {};
+          for (var i = 0; i < fishes.length; i++) used[fishes[i].lane] = true;
+          for (var l = 0; l < FISH_COUNT; l++) { if (!used[l]) return l; }
+          return randInt(FISH_COUNT);
+        }
+        function spawnFish(atEdge) {
+          var color = FISH_COLORS[randInt(FISH_COLORS.length)];
+          var el = document.createElement("div");
+          el.className = "fish";
+          el.setAttribute("role", "button");
+          el.setAttribute("tabindex", "0");
+          el.innerHTML = '<div class="shake"><div class="flip">' + fishSVG(color) + '</div><span class="letter"></span></div>';
+          pond.insertBefore(el, pondBucket);
+          var w = el.offsetWidth || 128;
+          var h = el.offsetHeight || 84;
+          var dir = Math.random() < 0.5 ? 1 : -1;
+          var x;
+          if (atEdge) { x = dir === 1 ? -w - 6 : pondW() + 6; }
+          else { x = Math.random() * Math.max(60, pondW() - w); }
+          var f = {
+            id: ++fishSeq, el: el, letterEl: el.querySelector(".letter"),
+            color: color, x: x, y: 10, w: w, h: h, dir: dir,
+            speed: 26 + Math.random() * 30, state: "swim",
+            burstUntil: 0, transformStr: "",
+            lane: freeLane(), jitter: Math.random() * 10 - 5
+          };
+          f.y = laneY(f);
+          el.querySelector(".flip").style.transform = dir === 1 ? "scaleX(1)" : "scaleX(-1)";
+          setFishLetter(f, pickLetterForSpawn());
+          el.addEventListener("click", function () { onFishClick(f); });
+          el.addEventListener("keydown", function (ev) {
+            if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); onFishClick(f); }
+          });
+          el.addEventListener("pointerenter", function () { f.hoverPause = true; });
+          el.addEventListener("pointerleave", function () { f.hoverPause = false; });
+          el.addEventListener("pointerdown", function () { f.hoverPause = true; });
+          fishes.push(f);
+          return f;
+        }
+        function removeFish(f) {
+          var i = fishes.indexOf(f);
+          if (i >= 0) fishes.splice(i, 1);
+          if (f.el.parentNode) f.el.parentNode.removeChild(f.el);
+        }
+        function recycleFish(f) {
+          var w = f.w;
+          f.dir = Math.random() < 0.5 ? 1 : -1;
+          f.x = f.dir === 1 ? -w - 6 : pondW() + 6;
+          f.jitter = Math.random() * 10 - 5;
+          f.y = laneY(f);
+          f.speed = 26 + Math.random() * 30;
+          f.el.querySelector(".flip").style.transform = f.dir === 1 ? "scaleX(1)" : "scaleX(-1)";
+          f.letter = "\0"; /* exclude this fish from the needed-letter count while re-picking */
+          setFishLetter(f, pickLetterForSpawn());
+        }
+        var lastEnsure = 0;
+        function step(now) {
+          var dt = Math.min(0.05, (now - lastTime) / 1000 || 0.016);
+          lastTime = now;
+          if (now - lastEnsure > 800) {
+            lastEnsure = now;
+            if (!busy && !roundOver) ensureNeededPresent();
+          }
+          for (var i = 0; i < fishes.length; i++) {
+            var f = fishes[i];
+            if (f.state !== "swim") continue;
+            if (!f.hoverPause) {
+              var sp = f.speed * (now < f.burstUntil ? 2.4 : 1);
+              f.x += sp * f.dir * dt;
+              if ((f.dir === 1 && f.x > pondW() + 14) || (f.dir === -1 && f.x < -f.w - 14)) {
+                recycleFish(f);
+              }
+            }
+            var bob = f.hoverPause ? 0 : Math.sin((now / 620) + f.id * 1.7) * 4;
+            f.transformStr = "translate(" + f.x + "px," + (f.y + bob) + "px)";
+            f.el.style.transform = f.transformStr;
+          }
+          requestAnimationFrame(step);
+        }
+
+        /* ---------------- Splash ---------------- */
+        function splashAt(cx, cy) {
+          var ring = document.createElement("div");
+          ring.className = "splash-ring";
+          ring.style.width = "70px"; ring.style.height = "26px";
+          ring.style.left = (cx - 35) + "px"; ring.style.top = (cy - 10) + "px";
+          pond.appendChild(ring);
+          setTimeout(function () { if (ring.parentNode) ring.parentNode.removeChild(ring); }, 600);
+          for (var i = 0; i < 7; i++) {
+            var d = document.createElement("div");
+            d.className = "drop";
+            d.style.left = cx + "px"; d.style.top = cy + "px";
+            d.style.setProperty("--dx", (Math.random() * 90 - 45) + "px");
+            d.style.setProperty("--dy", (-(24 + Math.random() * 42)) + "px");
+            pond.appendChild(d);
+            (function (el) { setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 550); })(d);
+          }
+        }
+
+        /* ---------------- Game flow ---------------- */
+        function onFishClick(f) {
+          interacted = true;
+          initAudio();
+          if (roundOver || busy || f.state !== "swim") return;
+          if (f.letter === neededLetter()) { catchFish(f); }
+          else { wrongFish(f); }
+        }
+        function wrongFish(f) {
+          sfxWiggle();
+          f.burstUntil = performance.now() + 900;
+          f.el.classList.remove("wiggling");
+          void f.el.offsetWidth;
+          f.el.classList.add("wiggling");
+          setTimeout(function () { f.el.classList.remove("wiggling"); }, 520);
+        }
+        function catchFish(f) {
+          busy = true;
+          f.state = "caught";
+          var cx = f.x + f.w / 2;
+          var cy = f.y + f.h / 2;
+          sfxSplash();
+          splashAt(cx, cy + 8);
+          /* hook drops */
+          hook.style.left = cx + "px";
+          hook.classList.add("show");
+          hookLine.style.height = "0px"; hookHead.style.top = "0px";
+          requestAnimationFrame(function () {
+            hookLine.style.height = Math.max(10, cy - 16) + "px";
+            hookHead.style.top = Math.max(10, cy - 16) + "px";
+          });
+          setTimeout(function () {
+            /* reel to bucket */
+            var pr = pond.getBoundingClientRect();
+            var br = pondBucket.getBoundingClientRect();
+            var bx = br.left - pr.left + br.width / 2 - f.w / 2;
+            var by = br.top - pr.top + br.height / 2 - f.h / 2;
+            f.el.classList.add("caught");
+            f.el.style.transform = "translate(" + bx + "px," + by + "px) scale(0.22) rotate(18deg)";
+            f.el.style.opacity = "0.35";
+            hookLine.style.height = "0px"; hookHead.style.top = "0px";
+            sfxHappy();
+          }, 300);
+          setTimeout(function () {
+            hook.classList.remove("show");
+            var color = f.color;
+            var letter = f.letter;
+            removeFish(f);
+            pondBucket.classList.remove("bounce"); void pondBucket.offsetWidth; pondBucket.classList.add("bounce");
+            landCatch(letter, color);
+          }, 980);
+        }
+        function landCatch(letter, color) {
+          totalCaught++;
+          totalStarsEl.textContent = totalCaught;
+          addChip(letter, color);
+          if (mode === "catch") {
+            roundCaught++;
+            renderProgress();
+            if (roundCaught >= ROUND_GOAL) { finishRound(); busy = false; return; }
+            newTargetLetter();
+          } else {
+            wordIndex++;
+            renderWordTiles();
+            renderProgress();
+            if (wordIndex >= currentWord.length) { finishWord(); busy = false; return; }
+            updateTargetUI(false);
+            speak("Find the letter " + neededLetter() + ".");
+          }
+          spawnFish(true);
+          ensureNeededPresent();
+          busy = false;
+        }
+        function newTargetLetter() {
+          var next = randomLetter();
+          if (next === targetLetter) next = ALPHABET.charAt((ALPHABET.indexOf(next) + 7) % 26);
+          targetLetter = next;
+          updateTargetUI(true);
+          speak("Catch the letter " + targetLetter + ".");
+        }
+        function finishRound() {
+          roundOver = true;
+          sfxFanfare();
+          confettiBurst();
+          celeTitle.textContent = "Great Fishing!";
+          celeText.textContent = "You caught " + ROUND_GOAL + " letters. The bucket is full!";
+          celeBtn.textContent = "New Round";
+          celebration.hidden = false;
+        }
+        function finishWord() {
+          roundOver = true;
+          wordsDone++;
+          sfxFanfare();
+          confettiBurst();
+          celeTitle.textContent = "You spelled " + currentWord + "!";
+          celeText.textContent = wordsDone === 1 ? "Great reading! Ready for another word?" : "That is " + wordsDone + " words spelled. Ready for another?";
+          celeBtn.textContent = "Next Word";
+          celebration.hidden = false;
+        }
+        function confettiBurst() {
+          var colors = ["#ff7a29", "#ffc93d", "#2fbfae", "#ff5d73", "#4f9cf9", "#7ac74f"];
+          for (var i = 0; i < 30; i++) {
+            var c = document.createElement("div");
+            c.className = "confetti";
+            c.style.left = (Math.random() * 98) + "%";
+            c.style.background = colors[randInt(colors.length)];
+            c.style.animationDuration = (1.3 + Math.random() * 1.2) + "s";
+            c.style.animationDelay = (Math.random() * 0.35) + "s";
+            pond.appendChild(c);
+            (function (el) { setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 3200); })(c);
+          }
+        }
+
+        /* ---------------- UI rendering ---------------- */
+        function addChip(letter, color) {
+          var empty = bucketChips.querySelector(".bucket-empty");
+          if (empty) empty.remove();
+          var chip = document.createElement("span");
+          chip.className = "chip";
+          chip.style.background = color;
+          chip.style.borderLeftColor = color;
+          chip.textContent = letter;
+          bucketChips.appendChild(chip);
+          var n = bucketChips.querySelectorAll(".chip").length;
+          bucketCount.textContent = n === 1 ? "1 fish in the bucket" : n + " fish in the bucket";
+        }
+        function clearBucket() {
+          bucketChips.innerHTML = '<span class="bucket-empty">No fish yet — catch one!</span>';
+          bucketCount.textContent = "";
+        }
+        function renderStars(filled, total) {
+          var s = "";
+          for (var i = 0; i < total; i++) {
+            s += '<span class="' + (i < filled ? "on" : "off") + '">★</span>';
+          }
+          starsEl.innerHTML = s;
+        }
+        function renderProgress() {
+          if (mode === "catch") {
+            renderStars(roundCaught, ROUND_GOAL);
+            progressText.textContent = roundCaught + " of " + ROUND_GOAL + " letters caught";
+          } else {
+            renderStars(wordIndex, currentWord.length);
+            progressText.textContent = "Word " + (wordsDone + 1) + " — " + wordIndex + " of " + currentWord.length + " letters";
+          }
+        }
+        function renderWordTiles() {
+          wordTiles.innerHTML = "";
+          for (var i = 0; i < currentWord.length; i++) {
+            var t = document.createElement("div");
+            t.className = "tile" + (i < wordIndex ? " filled" : (i === wordIndex ? " next" : ""));
+            t.textContent = i < wordIndex ? currentWord.charAt(i) : currentWord.charAt(i);
+            if (i >= wordIndex) t.style.color = "transparent";
+            if (i < wordIndex) t.style.color = "#fff";
+            wordTiles.appendChild(t);
+          }
+        }
+        function updateTargetUI(pop) {
+          var need = neededLetter();
+          targetLetterEl.textContent = need;
+          targetLabelEl.textContent = mode === "catch" ? "Catch the letter" : "Find the letter";
+          if (pop) {
+            targetLetterEl.classList.remove("pop"); void targetLetterEl.offsetWidth; targetLetterEl.classList.add("pop");
+          }
+        }
+        function pickWord() {
+          var w = WORDS[randInt(WORDS.length)];
+          if (w === lastWord) w = WORDS[(WORDS.indexOf(w) + 5) % WORDS.length];
+          lastWord = w;
+          return w;
+        }
+
+        /* ---------------- Reset / modes ---------------- */
+        function resetGame() {
+          busy = false; roundOver = false;
+          celebration.hidden = true;
+          for (var i = fishes.length - 1; i >= 0; i--) removeFish(fishes[i]);
+          fishes = [];
+          clearBucket();
+          if (mode === "catch") {
+            roundCaught = 0;
+            targetLetter = randomLetter();
+            wordArea.hidden = true;
+          } else {
+            currentWord = pickWord();
+            wordIndex = 0;
+            wordArea.hidden = false;
+            renderWordTiles();
+          }
+          updateTargetUI(true);
+          renderProgress();
+          for (var j = 0; j < FISH_COUNT; j++) spawnFish(false);
+          ensureNeededPresent();
+        }
+        function setMode(m) {
+          mode = m;
+          document.getElementById("modeCatch").classList.toggle("active", m === "catch");
+          document.getElementById("modeSpell").classList.toggle("active", m === "spell");
+          resetGame();
+          if (m === "catch") speak("Catch the letter " + targetLetter + ".");
+          else speak("Spell the word " + currentWord + ". Find the letter " + neededLetter() + ".");
+        }
+
+        /* ---------------- Controls ---------------- */
+        document.getElementById("modeCatch").addEventListener("click", function () { interacted = true; initAudio(); if (mode !== "catch") setMode("catch"); });
+        document.getElementById("modeSpell").addEventListener("click", function () { interacted = true; initAudio(); if (mode !== "spell") setMode("spell"); });
+        document.getElementById("newGameBtn").addEventListener("click", function () { interacted = true; initAudio(); resetGame(); });
+        celeBtn.addEventListener("click", function () { interacted = true; initAudio(); resetGame(); });
+        document.getElementById("hearBtn").addEventListener("click", function () {
+          interacted = true; initAudio();
+          if (mode === "catch") speak("Catch the letter " + targetLetter + ".");
+          else speak("Spell the word " + currentWord + ". Find the letter " + neededLetter() + ".");
+        });
+        var soundBtn = document.getElementById("soundBtn");
+        soundBtn.addEventListener("click", function () {
+          soundOn = !soundOn;
+          interacted = true;
+          document.getElementById("soundLabel").textContent = soundOn ? "Sound: On" : "Sound: Off";
+          document.getElementById("soundIconOn").style.display = soundOn ? "" : "none";
+          document.getElementById("soundIconOff").style.display = soundOn ? "none" : "";
+          soundBtn.setAttribute("aria-pressed", soundOn ? "true" : "false");
+          if (!soundOn && "speechSynthesis" in window) { try { window.speechSynthesis.cancel(); } catch (e) {} }
+          if (soundOn) { initAudio(); tone(660, 0, 0.12, "sine", 0.2); tone(880, 0.1, 0.18, "sine", 0.2); }
+        });
+        document.addEventListener("pointerdown", function () { interacted = true; initAudio(); }, { once: true });
+
+        /* Bubbles */
+        (function makeBubbles() {
+          for (var i = 0; i < 9; i++) {
+            var b = document.createElement("div");
+            b.className = "bubble";
+            var size = 8 + Math.random() * 16;
+            b.style.width = size + "px"; b.style.height = size + "px";
+            b.style.left = (3 + Math.random() * 92) + "%";
+            b.style.animationDuration = (6 + Math.random() * 7) + "s";
+            b.style.animationDelay = (-Math.random() * 9) + "s";
+            pond.insertBefore(b, pondBucket);
+          }
+        })();
+
+        resetGame();
+        requestAnimationFrame(function (t) { lastTime = t; requestAnimationFrame(step); });
+      })();
+    </script>
+  </body>
+</html>

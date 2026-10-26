@@ -1,0 +1,1036 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>Hooked on Numbers</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --bg: #fdf6e9;
+        --panel: #ffffff;
+        --ink: #173a4d;
+        --ink-soft: #4a6a7a;
+        --accent: #e4572e;
+        --accent-ink: #ffffff;
+        --tab-bg: #e8f3f7;
+        --tab-active: #0e7c9c;
+        --tab-active-ink: #ffffff;
+        --pond-top: #7fd4e8;
+        --pond-bottom: #1d7fa8;
+        --pond-deep: #14607f;
+        --sand: #f2d492;
+        --star-empty: #c9d8de;
+        --star-full: #ffb703;
+        --chip-bg: #fff3d6;
+        --shadow: 0 4px 14px rgba(23, 58, 77, 0.18);
+        --focus-ring: #ffb703;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0d1b26;
+          --panel: #16303f;
+          --ink: #eef7fa;
+          --ink-soft: #a9c6d2;
+          --accent: #ff7a4d;
+          --accent-ink: #1c130c;
+          --tab-bg: #1d4256;
+          --tab-active: #ffb703;
+          --tab-active-ink: #231a04;
+          --pond-top: #1b5f7d;
+          --pond-bottom: #0a3247;
+          --pond-deep: #072636;
+          --sand: #8a6d3b;
+          --star-empty: #33586a;
+          --star-full: #ffb703;
+          --chip-bg: #274b3a;
+          --shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+          --focus-ring: #ffd34d;
+        }
+      }
+      * { box-sizing: border-box; }
+      html, body { height: 100%; }
+      body {
+        margin: 0;
+        font-family: "Nunito", system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--ink);
+        display: flex;
+        flex-direction: column;
+        min-height: 100dvh;
+      }
+      button { font-family: inherit; cursor: pointer; }
+      button:focus-visible { outline: 4px solid var(--focus-ring); outline-offset: 2px; }
+
+      /* ---------- top controls ---------- */
+      .topbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 14px 4px;
+        max-width: 1200px;
+        width: 100%;
+        margin: 0 auto;
+      }
+      .modes { display: flex; flex-wrap: wrap; gap: 8px; }
+      .mode-btn {
+        border: 3px solid transparent;
+        background: var(--tab-bg);
+        color: var(--ink);
+        font-family: "Fredoka", sans-serif;
+        font-weight: 600;
+        font-size: clamp(1rem, 2.4vw, 1.3rem);
+        padding: 8px 18px;
+        border-radius: 999px;
+        transition: background 0.15s, transform 0.1s;
+      }
+      .mode-btn:hover { transform: translateY(-1px); }
+      .mode-btn[aria-pressed="true"] {
+        background: var(--tab-active);
+        color: var(--tab-active-ink);
+        border-color: rgba(0,0,0,0.12);
+      }
+      .tools { display: flex; gap: 8px; }
+      .tool-btn {
+        border: none;
+        border-radius: 999px;
+        padding: 9px 16px;
+        font-weight: 800;
+        font-size: clamp(0.95rem, 2.2vw, 1.1rem);
+        background: var(--panel);
+        color: var(--ink);
+        box-shadow: var(--shadow);
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+      }
+      .tool-btn.primary { background: var(--accent); color: var(--accent-ink); }
+      .tool-btn svg { width: 20px; height: 20px; flex: none; }
+
+      /* ---------- question banner ---------- */
+      .question-zone {
+        text-align: center;
+        padding: 6px 14px 10px;
+        max-width: 1200px;
+        width: 100%;
+        margin: 0 auto;
+      }
+      .question {
+        font-family: "Fredoka", sans-serif;
+        font-weight: 700;
+        font-size: clamp(2.1rem, 6.5vw, 3.6rem);
+        line-height: 1.1;
+        margin: 2px 0 4px;
+        letter-spacing: 0.01em;
+      }
+      .question .blank {
+        display: inline-block;
+        min-width: 1.1em;
+        padding: 0 0.12em;
+        border-bottom: 6px solid var(--accent);
+        color: var(--accent);
+      }
+      .count-trail {
+        display: none;
+        justify-content: center;
+        gap: 6px;
+        margin: 4px 0 2px;
+        flex-wrap: wrap;
+      }
+      .count-trail.on { display: flex; }
+      .trail-chip {
+        width: 40px; height: 40px;
+        border-radius: 50%;
+        display: grid; place-items: center;
+        font-family: "Fredoka", sans-serif;
+        font-weight: 700;
+        font-size: 1.25rem;
+        background: var(--chip-bg);
+        color: var(--ink);
+        border: 3px solid transparent;
+      }
+      .trail-chip.next {
+        background: var(--panel);
+        border: 3px dashed var(--accent);
+        color: var(--accent);
+      }
+      .stars {
+        display: flex;
+        justify-content: center;
+        gap: 4px;
+        font-size: clamp(1.4rem, 3.5vw, 1.9rem);
+        line-height: 1;
+        margin-top: 4px;
+      }
+      .stars .star { color: var(--star-empty); transition: transform 0.25s, color 0.25s; }
+      .stars .star.full { color: var(--star-full); }
+      .stars .star.pop { transform: scale(1.45); }
+
+      /* ---------- pond ---------- */
+      .pond-wrap {
+        flex: 1;
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 4px 14px 10px;
+        display: flex;
+        min-height: 340px;
+      }
+      .pond {
+        position: relative;
+        flex: 1;
+        border-radius: 26px;
+        overflow: hidden;
+        background: linear-gradient(180deg, var(--pond-top) 0%, var(--pond-bottom) 78%, var(--pond-deep) 100%);
+        box-shadow: inset 0 0 0 4px rgba(255,255,255,0.25), var(--shadow);
+        touch-action: manipulation;
+      }
+      .pond .sand {
+        position: absolute; left: 0; right: 0; bottom: 0; height: 34px;
+        background: var(--sand);
+        border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+        opacity: 0.85;
+      }
+      .bubble {
+        position: absolute;
+        border-radius: 50%;
+        border: 2px solid rgba(255,255,255,0.55);
+        background: rgba(255,255,255,0.12);
+        animation: rise linear infinite;
+        pointer-events: none;
+      }
+      @keyframes rise {
+        from { transform: translateY(0); opacity: 0; }
+        12% { opacity: 1; }
+        to { transform: translateY(-46vh); opacity: 0; }
+      }
+      .weed {
+        position: absolute; bottom: 22px;
+        width: 14px; border-radius: 999px 999px 0 0;
+        background: rgba(24, 122, 74, 0.55);
+        transform-origin: bottom center;
+        animation: sway 3.4s ease-in-out infinite alternate;
+        pointer-events: none;
+      }
+      @keyframes sway { from { transform: rotate(-5deg); } to { transform: rotate(6deg); } }
+
+      /* fish */
+      .fish {
+        position: absolute;
+        width: 128px; height: 84px;
+        background: none; border: none; padding: 0;
+        z-index: 3;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .fish:focus-visible { outline: none; }
+      .fish:focus-visible .fish-body { box-shadow: 0 0 0 5px var(--focus-ring); }
+      .fish-art {
+        position: absolute; inset: 0;
+        transition: transform 0.12s;
+      }
+      .fish.flip .fish-art { transform: scaleX(-1); }
+      .fish-body {
+        position: absolute;
+        left: 22px; top: 10px;
+        width: 88px; height: 62px;
+        border-radius: 58% 42% 42% 58% / 55% 50% 50% 45%;
+        box-shadow: inset -8px -10px 0 rgba(0,0,0,0.10), 0 3px 6px rgba(0,0,0,0.18);
+      }
+      .fish-tail {
+        position: absolute;
+        left: 0; top: 24px;
+        width: 0; height: 0;
+        border-top: 17px solid transparent;
+        border-bottom: 17px solid transparent;
+        border-right: 26px solid;
+      }
+      .fish-fin {
+        position: absolute;
+        left: 58px; top: 4px;
+        width: 26px; height: 16px;
+        border-radius: 50% 50% 0 0;
+        opacity: 0.75;
+      }
+      .fish-eye {
+        position: absolute;
+        right: 16px; top: 26px;
+        width: 11px; height: 11px;
+        border-radius: 50%;
+        background: #173a4d;
+        box-shadow: 0 0 0 3px #ffffff;
+      }
+      .fish-num {
+        position: absolute;
+        left: 30px; top: 10px;
+        width: 76px; height: 62px;
+        display: grid; place-items: center;
+        font-family: "Fredoka", sans-serif;
+        font-weight: 700;
+        font-size: 2.15rem;
+        color: #ffffff;
+        text-shadow: 0 2px 0 rgba(0,0,0,0.28);
+        pointer-events: none;
+        z-index: 2;
+      }
+      .fish.wiggle .fish-art { animation: wiggle 0.45s ease-in-out; }
+      @keyframes wiggle {
+        0%, 100% { transform: rotate(0deg); }
+        20% { transform: rotate(-13deg); }
+        45% { transform: rotate(11deg); }
+        70% { transform: rotate(-8deg); }
+      }
+      .fish.wiggle.flip .fish-art { animation: wiggleflip 0.45s ease-in-out; }
+      @keyframes wiggleflip {
+        0%, 100% { transform: scaleX(-1) rotate(0deg); }
+        20% { transform: scaleX(-1) rotate(-13deg); }
+        45% { transform: scaleX(-1) rotate(11deg); }
+        70% { transform: scaleX(-1) rotate(-8deg); }
+      }
+
+      /* hook */
+      .hook {
+        position: absolute;
+        top: 0;
+        width: 4px;
+        z-index: 5;
+        pointer-events: none;
+        opacity: 0;
+      }
+      .hook .line {
+        width: 4px; height: 100%;
+        background: repeating-linear-gradient(180deg, rgba(255,255,255,0.95) 0 8px, rgba(255,255,255,0.55) 8px 16px);
+        margin: 0 auto;
+        border-radius: 2px;
+      }
+      .hook svg {
+        position: absolute; bottom: -26px; left: 50%;
+        transform: translateX(-50%);
+        width: 30px; height: 30px;
+      }
+      .splash-ring {
+        position: absolute;
+        border: 4px solid rgba(255,255,255,0.9);
+        border-radius: 50%;
+        z-index: 6;
+        pointer-events: none;
+        animation: ring 0.55s ease-out forwards;
+      }
+      @keyframes ring {
+        from { transform: translate(-50%, -50%) scale(0.25); opacity: 1; }
+        to { transform: translate(-50%, -50%) scale(1.6); opacity: 0; }
+      }
+      .drop {
+        position: absolute;
+        width: 9px; height: 13px;
+        border-radius: 50% 50% 60% 60%;
+        background: rgba(255,255,255,0.95);
+        z-index: 6;
+        pointer-events: none;
+      }
+
+      /* celebration overlay */
+      .celebrate {
+        position: absolute; inset: 0;
+        z-index: 8;
+        display: none;
+        place-items: center;
+        background: rgba(10, 40, 56, 0.35);
+        text-align: center;
+        padding: 16px;
+      }
+      .celebrate.on { display: grid; }
+      .celebrate .card {
+        background: var(--panel);
+        color: var(--ink);
+        border-radius: 24px;
+        padding: 26px 34px;
+        box-shadow: var(--shadow);
+      }
+      .celebrate h2 {
+        font-family: "Fredoka", sans-serif;
+        font-size: clamp(2rem, 6vw, 3rem);
+        margin: 0 0 6px;
+      }
+      .celebrate .big-stars { font-size: 2rem; color: var(--star-full); letter-spacing: 4px; }
+      .celebrate p { margin: 6px 0 16px; font-weight: 700; color: var(--ink-soft); font-size: 1.15rem; }
+      .celebrate button {
+        border: none; border-radius: 999px;
+        background: var(--accent); color: var(--accent-ink);
+        font-family: "Fredoka", sans-serif; font-weight: 600;
+        font-size: 1.35rem; padding: 12px 30px;
+        box-shadow: var(--shadow);
+      }
+      #confetti { position: absolute; inset: 0; z-index: 7; pointer-events: none; display: none; }
+
+      /* ---------- bucket bar ---------- */
+      .bucket-bar {
+        max-width: 1200px;
+        width: 100%;
+        margin: 0 auto;
+        padding: 2px 14px 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .bucket-label {
+        font-family: "Fredoka", sans-serif;
+        font-weight: 600;
+        font-size: 1.25rem;
+        display: flex; align-items: center; gap: 8px;
+      }
+      .bucket-label svg { width: 30px; height: 30px; }
+      .bucket-items { display: flex; gap: 8px; flex-wrap: wrap; min-height: 52px; align-items: center; }
+      .bucket-chip {
+        min-width: 52px; height: 52px;
+        padding: 0 10px;
+        border-radius: 16px;
+        display: grid; place-items: center;
+        font-family: "Fredoka", sans-serif;
+        font-weight: 700; font-size: 1.5rem;
+        color: #ffffff;
+        text-shadow: 0 1px 0 rgba(0,0,0,0.25);
+        box-shadow: var(--shadow);
+      }
+      .bucket-chip.pop-in { animation: popin 0.35s ease-out; }
+      @keyframes popin { from { transform: scale(0.3); } 60% { transform: scale(1.18); } to { transform: scale(1); } }
+      .bucket-empty { color: var(--ink-soft); font-weight: 700; font-size: 1.05rem; }
+
+      @media (max-width: 640px) {
+        .pond-wrap { min-height: 46vh; padding: 4px 10px 8px; }
+        .topbar, .question-zone, .bucket-bar { padding-left: 10px; padding-right: 10px; }
+        .fish { width: 104px; height: 70px; }
+        .fish-body { left: 18px; top: 8px; width: 72px; height: 52px; }
+        .fish-tail { top: 20px; border-top-width: 14px; border-bottom-width: 14px; border-right-width: 21px; }
+        .fish-fin { left: 47px; top: 2px; width: 22px; height: 13px; }
+        .fish-eye { right: 14px; top: 21px; width: 9px; height: 9px; }
+        .fish-num { left: 24px; top: 8px; width: 62px; height: 52px; font-size: 1.8rem; }
+        .trail-chip { width: 34px; height: 34px; font-size: 1.05rem; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .bubble, .weed { animation: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="topbar">
+      <div class="modes" role="group" aria-label="Choose a game">
+        <button class="mode-btn" data-mode="counting" aria-pressed="true">Counting</button>
+        <button class="mode-btn" data-mode="adding" aria-pressed="false">Adding</button>
+        <button class="mode-btn" data-mode="subtracting" aria-pressed="false">Subtracting</button>
+        <button class="mode-btn" data-mode="make10" aria-pressed="false">Make 10</button>
+      </div>
+      <div class="tools">
+        <button class="tool-btn" id="soundBtn" aria-pressed="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor" stroke="none"/><path class="sound-waves" d="M15.5 8.5a5 5 0 0 1 0 7"/><path class="sound-waves" d="M18.2 6a9 9 0 0 1 0 12"/></svg>
+          <span id="soundLabel">Sound On</span>
+        </button>
+        <button class="tool-btn primary" id="newGameBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></svg>
+          New Game
+        </button>
+      </div>
+    </div>
+
+    <div class="question-zone">
+      <div class="question" id="question" aria-live="polite">Catch the number 1!</div>
+      <div class="count-trail" id="countTrail" aria-hidden="true"></div>
+      <div class="stars" id="stars" aria-label="Stars earned"></div>
+    </div>
+
+    <div class="pond-wrap">
+      <div class="pond" id="pond">
+        <div class="sand"></div>
+        <div class="hook" id="hook">
+          <div class="line"></div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="#f4f7f8" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 1v13a5 5 0 0 0 10 0v-2"/><path d="M18.5 8.5 22 12l-3.8.6" fill="none"/></svg>
+        </div>
+        <canvas id="confetti"></canvas>
+        <div class="celebrate" id="celebrate">
+          <div class="card">
+            <h2>Great Job!</h2>
+            <div class="big-stars" aria-hidden="true">★ ★ ★ ★ ★ ★ ★ ★</div>
+            <p>You caught 8 fish!</p>
+            <button id="newRoundBtn">New Round</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bucket-bar">
+      <div class="bucket-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h16l-1.6 11a2 2 0 0 1-2 1.7H7.6a2 2 0 0 1-2-1.7L4 8z"/><path d="M8 8a4 4 0 0 1 8 0"/></svg>
+        Bucket
+      </div>
+      <div class="bucket-items" id="bucketItems">
+        <span class="bucket-empty" id="bucketEmpty">No fish yet — catch one!</span>
+      </div>
+    </div>
+
+    <script>
+      "use strict";
+      var ROUND_GOAL = 8;
+      var FISH_COUNT = 5;
+      var FISH_COLORS = ["#ef476f", "#f78c2b", "#ffd166", "#2fbf71", "#118ab2", "#9b5de5", "#00b8a9", "#e86aa8"];
+      var MODES = ["counting", "adding", "subtracting", "make10"];
+
+      var pond = document.getElementById("pond");
+      var questionEl = document.getElementById("question");
+      var countTrailEl = document.getElementById("countTrail");
+      var starsEl = document.getElementById("stars");
+      var bucketItemsEl = document.getElementById("bucketItems");
+      var bucketEmptyEl = document.getElementById("bucketEmpty");
+      var hookEl = document.getElementById("hook");
+      var celebrateEl = document.getElementById("celebrate");
+      var confettiCanvas = document.getElementById("confetti");
+      var soundBtn = document.getElementById("soundBtn");
+      var soundLabel = document.getElementById("soundLabel");
+
+      var state = {
+        mode: "counting",
+        answer: 1,
+        countNext: 1,
+        caught: 0,
+        busy: false,
+        roundId: 0,
+        roundOver: false,
+        sound: true,
+        colorIdx: 0
+      };
+      var fishes = []; // {el, numEl, x, y(lane), speed, dir, value, hovered, gone, laneH}
+
+      /* ---------------- sound (WebAudio, in-browser only) ---------------- */
+      var audioCtx = null;
+      function ac() {
+        if (!audioCtx) {
+          var AC = window.AudioContext || window.webkitAudioContext;
+          if (AC) audioCtx = new AC();
+        }
+        if (audioCtx && audioCtx.state === "suspended") audioCtx.resume();
+        return audioCtx;
+      }
+      function tone(freq, dur, type, vol, delay, slideTo) {
+        if (!state.sound) return;
+        var ctx = ac(); if (!ctx) return;
+        var t0 = ctx.currentTime + (delay || 0);
+        var osc = ctx.createOscillator();
+        var gain = ctx.createGain();
+        osc.type = type || "sine";
+        osc.frequency.setValueAtTime(freq, t0);
+        if (slideTo) osc.frequency.exponentialRampToValueAtTime(slideTo, t0 + dur);
+        gain.gain.setValueAtTime(0.0001, t0);
+        gain.gain.exponentialRampToValueAtTime(vol || 0.18, t0 + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(t0); osc.stop(t0 + dur + 0.05);
+      }
+      function sndClick() { tone(660, 0.07, "triangle", 0.10); }
+      function sndWiggle() { tone(300, 0.28, "sine", 0.14, 0, 140); tone(210, 0.2, "sine", 0.08, 0.05, 320); }
+      function sndSplash() {
+        if (!state.sound) return;
+        var ctx = ac(); if (!ctx) return;
+        var dur = 0.35, t0 = ctx.currentTime;
+        var buffer = ctx.createBuffer(1, ctx.sampleRate * dur, ctx.sampleRate);
+        var data = buffer.getChannelData(0);
+        for (var i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / data.length);
+        var src = ctx.createBufferSource(); src.buffer = buffer;
+        var filter = ctx.createBiquadFilter();
+        filter.type = "bandpass";
+        filter.frequency.setValueAtTime(1600, t0);
+        filter.frequency.exponentialRampToValueAtTime(400, t0 + dur);
+        var gain = ctx.createGain();
+        gain.gain.setValueAtTime(0.35, t0);
+        gain.gain.exponentialRampToValueAtTime(0.001, t0 + dur);
+        src.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
+        src.start(t0);
+        tone(500, 0.18, "sine", 0.10, 0, 900);
+      }
+      function sndHappy() {
+        var notes = [523.25, 659.25, 783.99, 1046.5];
+        for (var i = 0; i < notes.length; i++) tone(notes[i], 0.22, "triangle", 0.16, i * 0.09);
+      }
+      function sndFanfare() {
+        var seq = [523.25, 659.25, 783.99, 1046.5, 783.99, 1046.5, 1318.5];
+        for (var i = 0; i < seq.length; i++) tone(seq[i], 0.3, "triangle", 0.16, i * 0.13);
+        tone(262, 1.1, "sine", 0.08, 0);
+      }
+
+      /* ---------------- helpers ---------------- */
+      function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+      function shuffle(arr) {
+        for (var i = arr.length - 1; i > 0; i--) {
+          var j = Math.floor(Math.random() * (i + 1));
+          var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+        }
+        return arr;
+      }
+      function distractors(answer, count) {
+        var pool = [];
+        var cands = [answer - 2, answer - 1, answer + 1, answer + 2, answer - 3, answer + 3, answer + 4, answer - 4, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+        shuffle(cands);
+        for (var i = 0; i < cands.length && pool.length < count; i++) {
+          var c = cands[i];
+          if (c !== answer && c >= 0 && pool.indexOf(c) === -1) pool.push(c);
+        }
+        return pool;
+      }
+
+      /* ---------------- questions ---------------- */
+      function newQuestion() {
+        var q = "";
+        if (state.mode === "counting") {
+          state.answer = state.countNext;
+          q = "Catch the number " + state.answer + "!";
+        } else if (state.mode === "adding") {
+          var a = randInt(0, 10);
+          var b = randInt(0, 10 - a);
+          state.answer = a + b;
+          q = a + " + " + b + " = ?";
+        } else if (state.mode === "subtracting") {
+          var c = randInt(0, 10);
+          var d = randInt(0, c);
+          state.answer = c - d;
+          q = c + " − " + d + " = ?";
+        } else { // make10
+          var n = randInt(0, 10);
+          state.answer = 10 - n;
+          q = n + " + ? = 10";
+        }
+        questionEl.textContent = q;
+        renderTrail();
+      }
+      function renderTrail() {
+        countTrailEl.innerHTML = "";
+        if (state.mode !== "counting") { countTrailEl.classList.remove("on"); return; }
+        countTrailEl.classList.add("on");
+        for (var i = 1; i < state.countNext; i++) {
+          var done = document.createElement("span");
+          done.className = "trail-chip";
+          done.textContent = i;
+          countTrailEl.appendChild(done);
+        }
+        var next = document.createElement("span");
+        next.className = "trail-chip next";
+        next.textContent = "?";
+        countTrailEl.appendChild(next);
+      }
+      function renderStars(popLast) {
+        starsEl.innerHTML = "";
+        for (var i = 0; i < ROUND_GOAL; i++) {
+          var s = document.createElement("span");
+          s.className = "star" + (i < state.caught ? " full" : "") + (popLast && i === state.caught - 1 ? " pop" : "");
+          s.textContent = "★";
+          starsEl.appendChild(s);
+        }
+        starsEl.setAttribute("aria-label", state.caught + " of " + ROUND_GOAL + " stars earned");
+      }
+
+      /* ---------------- fish ---------------- */
+      function pondSize() { return { w: pond.clientWidth, h: pond.clientHeight }; }
+      function laneTop(lane) {
+        var h = pondSize().h;
+        var fishH = window.innerWidth <= 640 ? 70 : 84;
+        var usable = Math.max(h - fishH - 44, 60);
+        return 8 + (usable * lane) / (FISH_COUNT - 1);
+      }
+      function makeFish(value, lane, startX) {
+        var el = document.createElement("button");
+        el.type = "button";
+        el.className = "fish";
+        var color = FISH_COLORS[state.colorIdx % FISH_COLORS.length];
+        state.colorIdx++;
+        var art = document.createElement("span");
+        art.className = "fish-art";
+        art.setAttribute("aria-hidden", "true");
+        var tail = document.createElement("span");
+        tail.className = "fish-tail";
+        tail.style.borderRightColor = color;
+        var fin = document.createElement("span");
+        fin.className = "fish-fin";
+        fin.style.background = color;
+        var body = document.createElement("span");
+        body.className = "fish-body";
+        body.style.background = color;
+        var eye = document.createElement("span");
+        eye.className = "fish-eye";
+        art.appendChild(tail); art.appendChild(fin); art.appendChild(body); art.appendChild(eye);
+        var num = document.createElement("span");
+        num.className = "fish-num";
+        num.textContent = value;
+        el.appendChild(art); el.appendChild(num);
+        el.setAttribute("aria-label", "Fish with number " + value);
+        pond.appendChild(el);
+        var dir = Math.random() < 0.5 ? 1 : -1;
+        var w = pondSize().w;
+        var fish = {
+          el: el, value: value, lane: lane,
+          x: (typeof startX === "number") ? startX : randInt(0, Math.max(w - 140, 10)),
+          dir: dir,
+          speed: randInt(34, 62),
+          hovered: false, gone: false, caught: false
+        };
+        if (dir < 0) el.classList.add("flip");
+        el.addEventListener("click", function () { onFishClick(fish); });
+        el.addEventListener("mouseenter", function () { fish.hovered = true; });
+        el.addEventListener("mouseleave", function () { fish.hovered = false; });
+        el.addEventListener("focus", function () { fish.hovered = true; });
+        el.addEventListener("blur", function () { fish.hovered = false; });
+        positionFish(fish);
+        fishes.push(fish);
+        return fish;
+      }
+      function positionFish(fish) {
+        fish.el.style.left = fish.x + "px";
+        fish.el.style.top = laneTop(fish.lane) + "px";
+      }
+      function removeFish(fish) {
+        fish.gone = true;
+        if (fish.el.parentNode) fish.el.parentNode.removeChild(fish.el);
+        fishes = fishes.filter(function (f) { return f !== fish; });
+      }
+      function spawnSet() {
+        // clear existing
+        fishes.slice().forEach(removeFish);
+        var values = [state.answer].concat(distractors(state.answer, FISH_COUNT - 1));
+        shuffle(values);
+        var w = pondSize().w;
+        for (var lane = 0; lane < FISH_COUNT; lane++) {
+          var x = (w / FISH_COUNT) * lane + randInt(-20, 30);
+          makeFish(values[lane], lane, x);
+        }
+      }
+      function ensureAnswerPresent() {
+        var present = fishes.some(function (f) { return f.value === state.answer && !f.gone; });
+        if (!present && fishes.length) {
+          var f = fishes[randInt(0, fishes.length - 1)];
+          f.value = state.answer;
+          f.el.querySelector(".fish-num").textContent = state.answer;
+          f.el.setAttribute("aria-label", "Fish with number " + state.answer);
+        }
+      }
+
+      var lastTime = null;
+      function tick(now) {
+        if (lastTime === null) lastTime = now;
+        var dt = Math.min((now - lastTime) / 1000, 0.05);
+        lastTime = now;
+        var w = pondSize().w;
+        var fishW = window.innerWidth <= 640 ? 104 : 128;
+        for (var i = 0; i < fishes.length; i++) {
+          var f = fishes[i];
+          if (f.gone || f.caught) continue;
+          if (!f.hovered && !state.busy) {
+            f.x += f.dir * f.speed * dt;
+            if (f.dir > 0 && f.x > w + 10) f.x = -fishW - 6;
+            if (f.dir < 0 && f.x < -fishW - 10) f.x = w + 6;
+          }
+          positionFish(f);
+        }
+        requestAnimationFrame(tick);
+      }
+
+      /* ---------------- splash & hook ---------------- */
+      function splash(x, y) {
+        for (var r = 0; r < 2; r++) {
+          var ring = document.createElement("div");
+          ring.className = "splash-ring";
+          var size = 46 + r * 30;
+          ring.style.width = size + "px";
+          ring.style.height = size * 0.45 + "px";
+          ring.style.left = x + "px";
+          ring.style.top = y + "px";
+          ring.style.animationDelay = (r * 0.12) + "s";
+          pond.appendChild(ring);
+          (function (el) { setTimeout(function () { el.remove(); }, 900); })(ring);
+        }
+        for (var d = 0; d < 7; d++) {
+          var drop = document.createElement("div");
+          drop.className = "drop";
+          drop.style.left = (x - 4) + "px";
+          drop.style.top = y + "px";
+          pond.appendChild(drop);
+          var dx = randInt(-46, 46), up = randInt(28, 62);
+          drop.animate([
+            { transform: "translate(0,0)", opacity: 1 },
+            { transform: "translate(" + dx * 0.6 + "px," + (-up) + "px)", opacity: 1, offset: 0.45 },
+            { transform: "translate(" + dx + "px, 26px)", opacity: 0 }
+          ], { duration: 520, easing: "ease-out" });
+          (function (el) { setTimeout(function () { el.remove(); }, 560); })(drop);
+        }
+      }
+
+      function onFishClick(fish) {
+        if (state.busy || state.roundOver || fish.gone || fish.caught) return;
+        ac();
+        if (fish.value === state.answer) {
+          catchFish(fish);
+        } else {
+          sndWiggle();
+          fish.el.classList.add("wiggle");
+          // wiggle free and dart away, then a fresh fish swims in
+          var oldDir = fish.dir;
+          var ridW = state.roundId;
+          fish.speed = 340;
+          setTimeout(function () {
+            fish.el.classList.remove("wiggle");
+          }, 460);
+          setTimeout(function () {
+            if (fish.gone || ridW !== state.roundId) return;
+            var lane = fish.lane;
+            removeFish(fish);
+            var others = fishes.map(function (f) { return f.value; });
+            var pool = distractors(state.answer, 8).filter(function (v) { return others.indexOf(v) === -1; });
+            var val = pool.length ? pool[0] : distractors(state.answer, 1)[0];
+            var nf = makeFish(val, lane, oldDir > 0 ? -140 : pondSize().w + 10);
+            nf.dir = oldDir;
+            nf.el.classList.toggle("flip", oldDir < 0);
+            ensureAnswerPresent();
+          }, 700);
+        }
+      }
+
+      function catchFish(fish) {
+        state.busy = true;
+        fish.caught = true;
+        var rid = state.roundId;
+        var pondRect = pond.getBoundingClientRect();
+        var fishRect = fish.el.getBoundingClientRect();
+        var cx = fishRect.left - pondRect.left + fishRect.width / 2;
+        var cy = fishRect.top - pondRect.top + fishRect.height / 2;
+        // hook drops
+        hookEl.style.left = (cx - 2) + "px";
+        hookEl.style.height = "0px";
+        hookEl.style.opacity = "1";
+        var targetH = Math.max(cy - 8, 10);
+        var hookAnim = hookEl.animate(
+          [{ height: "0px" }, { height: targetH + "px" }],
+          { duration: 260, easing: "ease-in", fill: "forwards" }
+        );
+        hookAnim.onfinish = function () {
+          if (rid !== state.roundId) return;
+          hookEl.style.height = targetH + "px";
+          sndSplash();
+          splash(cx, cy - 6);
+          // reel up: fish + hook rise together
+          var startTop = parseFloat(fish.el.style.top);
+          var rise = fish.el.animate(
+            [{ transform: "translateY(0)" }, { transform: "translateY(" + (-(startTop + 6)) + "px)" }],
+            { duration: 480, easing: "ease-in-out", fill: "forwards" }
+          );
+          var hookUp = hookEl.animate(
+            [{ height: targetH + "px" }, { height: "6px" }],
+            { duration: 480, easing: "ease-in-out", fill: "forwards" }
+          );
+          rise.onfinish = function () {
+            if (rid !== state.roundId) return;
+            hookEl.style.opacity = "0";
+            hookEl.style.height = "0px";
+            sndHappy();
+            flyToBucket(fish, rid);
+          };
+          hookUp.onfinish = function () { hookEl.style.height = "6px"; };
+        };
+      }
+
+      function flyToBucket(fish, rid) {
+        var fishRect = fish.el.getBoundingClientRect();
+        var bucketRect = bucketItemsEl.getBoundingClientRect();
+        var dx = bucketRect.left + 30 - (fishRect.left + fishRect.width / 2);
+        var dy = bucketRect.top + 20 - (fishRect.top + fishRect.height / 2);
+        fish.el.style.zIndex = "9";
+        var fly = fish.el.animate([
+          { transform: "translate(0, " + (-(parseFloat(fish.el.style.top) + 6)) + "px) scale(1)", opacity: 1 },
+          { transform: "translate(" + dx + "px, " + (dy - (parseFloat(fish.el.style.top) + 6)) + "px) scale(0.35)", opacity: 0.4 }
+        ], { duration: 450, easing: "ease-in", fill: "forwards" });
+        fly.onfinish = function () {
+          if (rid !== state.roundId) { removeFish(fish); return; }
+          addToBucket(fish.value, fish.el.querySelector(".fish-body").style.background);
+          removeFish(fish);
+          state.caught++;
+          if (state.mode === "counting") state.countNext++;
+          renderStars(true);
+          if (state.caught >= ROUND_GOAL) {
+            finishRound();
+          } else {
+            newQuestion();
+            spawnSet();
+          }
+          state.busy = false;
+        };
+      }
+
+      function addToBucket(value, color) {
+        if (bucketEmptyEl && bucketEmptyEl.parentNode) bucketEmptyEl.remove();
+        var chip = document.createElement("span");
+        chip.className = "bucket-chip pop-in";
+        chip.style.background = color;
+        chip.textContent = value;
+        bucketItemsEl.appendChild(chip);
+      }
+
+      /* ---------------- round flow ---------------- */
+      function finishRound() {
+        state.roundOver = true;
+        sndFanfare();
+        celebrateEl.classList.add("on");
+        runConfetti();
+      }
+      function resetRound() {
+        state.roundId++;
+        hookEl.style.opacity = "0";
+        hookEl.style.height = "0px";
+        state.caught = 0;
+        state.countNext = 1;
+        state.roundOver = false;
+        state.busy = false;
+        celebrateEl.classList.remove("on");
+        confettiCanvas.style.display = "none";
+        bucketItemsEl.innerHTML = "";
+        var empty = document.createElement("span");
+        empty.className = "bucket-empty";
+        empty.id = "bucketEmpty";
+        empty.textContent = "No fish yet — catch one!";
+        bucketItemsEl.appendChild(empty);
+        bucketEmptyEl = empty;
+        renderStars(false);
+        newQuestion();
+        spawnSet();
+      }
+
+      /* ---------------- confetti ---------------- */
+      function runConfetti() {
+        var ctx = confettiCanvas.getContext("2d");
+        var w = pond.clientWidth, h = pond.clientHeight;
+        confettiCanvas.width = w; confettiCanvas.height = h;
+        confettiCanvas.style.display = "block";
+        var colors = ["#ef476f", "#ffd166", "#2fbf71", "#118ab2", "#9b5de5", "#f78c2b"];
+        var parts = [];
+        for (var i = 0; i < 130; i++) {
+          parts.push({
+            x: Math.random() * w, y: -20 - Math.random() * h * 0.5,
+            w: randInt(6, 12), h: randInt(8, 16),
+            vy: randInt(90, 220), vx: randInt(-30, 30),
+            rot: Math.random() * Math.PI, vr: (Math.random() - 0.5) * 6,
+            color: colors[i % colors.length]
+          });
+        }
+        var start = null;
+        function frame(now) {
+          if (!state.roundOver) { confettiCanvas.style.display = "none"; return; }
+          if (!start) start = now;
+          var t = (now - start) / 1000;
+          ctx.clearRect(0, 0, w, h);
+          for (var i = 0; i < parts.length; i++) {
+            var p = parts[i];
+            p.y += p.vy * 0.016; p.x += p.vx * 0.016 + Math.sin(t * 3 + i) * 0.7; p.rot += p.vr * 0.016;
+            ctx.save();
+            ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+            ctx.fillStyle = p.color;
+            ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+            ctx.restore();
+            if (p.y > h + 24) { p.y = -20; p.x = Math.random() * w; }
+          }
+          if (t < 4) requestAnimationFrame(frame);
+          else { confettiCanvas.style.display = "none"; }
+        }
+        requestAnimationFrame(frame);
+      }
+
+      /* ---------------- pond dressing ---------------- */
+      function dressPond() {
+        for (var i = 0; i < 9; i++) {
+          var b = document.createElement("div");
+          b.className = "bubble";
+          var size = randInt(7, 18);
+          b.style.width = size + "px"; b.style.height = size + "px";
+          b.style.left = randInt(2, 96) + "%";
+          b.style.bottom = randInt(4, 30) + "px";
+          b.style.animationDuration = randInt(5, 11) + "s";
+          b.style.animationDelay = (Math.random() * 6) + "s";
+          pond.appendChild(b);
+        }
+        var weedXs = [4, 22, 55, 78, 93];
+        for (var j = 0; j < weedXs.length; j++) {
+          var wd = document.createElement("div");
+          wd.className = "weed";
+          wd.style.left = weedXs[j] + "%";
+          wd.style.height = randInt(36, 64) + "px";
+          wd.style.animationDelay = (j * 0.5) + "s";
+          pond.appendChild(wd);
+        }
+      }
+
+      /* ---------------- controls ---------------- */
+      document.querySelectorAll(".mode-btn").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          if (state.mode === btn.dataset.mode) return;
+          state.mode = btn.dataset.mode;
+          document.querySelectorAll(".mode-btn").forEach(function (b) {
+            b.setAttribute("aria-pressed", b === btn ? "true" : "false");
+          });
+          sndClick();
+          resetRound();
+        });
+      });
+      document.getElementById("newGameBtn").addEventListener("click", function () { sndClick(); resetRound(); });
+      document.getElementById("newRoundBtn").addEventListener("click", function () { sndClick(); resetRound(); });
+      soundBtn.addEventListener("click", function () {
+        state.sound = !state.sound;
+        soundBtn.setAttribute("aria-pressed", state.sound ? "true" : "false");
+        soundLabel.textContent = state.sound ? "Sound On" : "Sound Off";
+        soundBtn.querySelectorAll(".sound-waves").forEach(function (p) {
+          p.style.display = state.sound ? "" : "none";
+        });
+        if (state.sound) sndClick();
+      });
+
+      /* keyboard: digits catch a fish showing that number; arrows move between fish */
+      document.addEventListener("keydown", function (e) {
+        if (state.busy || state.roundOver) return;
+        if (/^[0-9]$/.test(e.key)) {
+          var want = parseInt(e.key, 10);
+          var target = null;
+          for (var i = 0; i < fishes.length; i++) {
+            if (fishes[i].value === want) { target = fishes[i]; break; }
+          }
+          if (!target && want === 1) {
+            for (var j = 0; j < fishes.length; j++) {
+              if (fishes[j].value === 10) { target = fishes[j]; break; }
+            }
+          }
+          if (target) { e.preventDefault(); onFishClick(target); }
+        } else if (e.key === "ArrowRight" || e.key === "ArrowLeft" || e.key === "ArrowDown" || e.key === "ArrowUp") {
+          var active = document.activeElement;
+          var idx = -1;
+          for (var k = 0; k < fishes.length; k++) if (fishes[k].el === active) idx = k;
+          if (idx === -1 && fishes.length) {
+            e.preventDefault();
+            fishes[0].el.focus();
+          } else if (fishes.length) {
+            e.preventDefault();
+            var step = (e.key === "ArrowRight" || e.key === "ArrowDown") ? 1 : -1;
+            var next = (idx + step + fishes.length) % fishes.length;
+            fishes[next].el.focus();
+          }
+        }
+      });
+
+      window.addEventListener("resize", function () {
+        fishes.forEach(positionFish);
+      });
+
+      /* ---------------- start ---------------- */
+      dressPond();
+      renderStars(false);
+      newQuestion();
+      spawnSet();
+      requestAnimationFrame(tick);
+    </script>
+  </body>
+</html>
