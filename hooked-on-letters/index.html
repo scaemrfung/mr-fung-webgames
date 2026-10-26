@@ -176,7 +176,7 @@
         line-height: 0.95;
         color: #fff;
         background: var(--accent);
-        width: clamp(76px, 10vw, 104px);
+        width: clamp(98px, 12.5vw, 128px);
         height: clamp(76px, 10vw, 104px);
         border-radius: 24px;
         display: flex;
@@ -185,6 +185,8 @@
         box-shadow: 0 6px 0 var(--accent-dark), 0 12px 22px rgba(232, 95, 16, 0.3);
         text-shadow: 0 2px 0 rgba(0,0,0,0.15);
       }
+      .target-letter .t-up { font-size: clamp(44px, 6.2vw, 66px); line-height: 0.95; }
+      .target-letter .t-low { font-size: clamp(31px, 4.4vw, 47px); line-height: 0.95; margin-left: 8px; }
       .target-letter.pop { animation: popIn 0.35s ease; }
       @keyframes popIn {
         0% { transform: scale(0.6) rotate(-6deg); }
@@ -313,13 +315,18 @@
         position: absolute;
         left: 54%; top: 50%;
         transform: translate(-50%, -54%);
+        display: flex;
+        align-items: baseline;
+        gap: 5px;
         font-family: "Fredoka", sans-serif;
         font-weight: 700;
-        font-size: 44px;
         color: #fff;
         text-shadow: 0 2px 0 rgba(0,0,0,0.28), 0 0 10px rgba(0,0,0,0.12);
         pointer-events: none;
+        white-space: nowrap;
       }
+      .fish .letter .up { font-size: 42px; line-height: 1; }
+      .fish .letter .low { font-size: 29px; line-height: 1; }
       .fish.caught { transition: transform 0.62s cubic-bezier(0.5, -0.1, 0.3, 1), opacity 0.62s ease; z-index: 30; pointer-events: none; }
 
       /* Hook */
@@ -363,13 +370,8 @@
         100% { transform: translate(var(--dx), var(--dy)); opacity: 0; }
       }
 
-      /* Bucket in pond */
-      .pond-bucket {
-        position: absolute; right: 14px; bottom: 8px; z-index: 8;
-        width: 92px; pointer-events: none;
-        filter: drop-shadow(0 6px 8px rgba(6, 60, 80, 0.35));
-      }
-      .pond-bucket.bounce { animation: bucketBounce 0.45s ease; }
+      /* Compact bucket, top-right corner */
+      .bucket-widget.bounce { animation: bucketBounce 0.45s ease; }
       @keyframes bucketBounce {
         0% { transform: scale(1); }
         40% { transform: scale(1.14) rotate(-3deg); }
@@ -419,50 +421,55 @@
       }
       .cele-btn:active { transform: translateY(3px); box-shadow: 0 3px 0 var(--accent-dark); }
 
-      /* ---------- Bucket bar ---------- */
-      .bucket-bar {
+      /* ---------- Bucket (compact, top-right corner) ---------- */
+      .bucket-widget {
         background: var(--panel);
         border: 2px solid var(--panel-edge);
-        border-radius: 22px;
+        border-radius: 18px;
         box-shadow: var(--shadow);
-        padding: 12px 20px;
-        display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+        padding: 9px 12px 10px;
+        display: flex; flex-direction: column; gap: 6px;
+        flex: 0 1 268px;
+        min-width: 216px;
+        margin-left: auto;
       }
       .bucket-title {
         font-family: "Fredoka", sans-serif; font-weight: 600;
-        font-size: clamp(20px, 2.6vw, 26px);
-        display: flex; align-items: center; gap: 9px;
+        font-size: 19px; line-height: 1;
+        display: flex; align-items: center; gap: 7px;
       }
-      .bucket-title svg { width: 30px; height: 30px; }
-      .bucket-chips { display: flex; gap: 8px; flex-wrap: wrap; flex: 1; min-height: 44px; align-items: center; }
-      .bucket-empty { font-weight: 800; color: var(--ink-soft); font-size: 17px; }
+      .bucket-title svg { width: 24px; height: 24px; flex: none; }
+      .bucket-count { font-weight: 900; color: var(--ink-soft); font-size: 13px; margin-left: auto; text-align: right; }
+      .bucket-chips { display: flex; gap: 6px; flex-wrap: wrap; min-height: 30px; align-items: center; }
+      .bucket-empty { font-weight: 800; color: var(--ink-soft); font-size: 13.5px; line-height: 1.25; }
       .chip {
         position: relative;
-        font-family: "Fredoka", sans-serif; font-weight: 700; font-size: 23px;
+        font-family: "Fredoka", sans-serif; font-weight: 700; font-size: 16.5px;
         color: #fff; text-shadow: 0 1px 0 rgba(0,0,0,0.25);
-        padding: 6px 18px 6px 13px;
+        padding: 4px 13px 4px 9px;
         border-radius: 999px 6px 6px 999px;
         animation: popIn 0.3s ease;
+        white-space: nowrap;
       }
       .chip::after {
-        content: ""; position: absolute; right: -9px; top: 50%;
+        content: ""; position: absolute; right: -7px; top: 50%;
         transform: translateY(-50%);
-        border-top: 9px solid transparent; border-bottom: 9px solid transparent;
-        border-left: 11px solid;
+        border-top: 7px solid transparent; border-bottom: 7px solid transparent;
+        border-left: 8px solid;
         border-left-color: inherit;
       }
-      .bucket-count { font-weight: 900; color: var(--ink-soft); font-size: 17px; }
 
       @media (max-width: 640px) {
         .page { padding: 10px 10px 18px; }
         .pond { height: clamp(330px, 50vh, 460px); }
         .fish { width: 100px; height: 66px; }
-        .fish .letter { font-size: 34px; }
+        .fish .letter .up { font-size: 32px; }
+        .fish .letter .low { font-size: 22px; }
         .target-right { align-items: flex-start; margin-left: 0; }
         .target-bar { padding: 12px 14px; gap: 12px; }
         .mode-btn { padding: 9px 15px; }
         .weed.right { right: 84px; }
-        .pond-bucket { width: 74px; }
+        .bucket-widget { flex: 0 1 268px; margin-left: auto; }
       }
       @media (prefers-reduced-motion: reduce) {
         .bubble, .tile.next { animation: none; }
@@ -489,6 +496,14 @@
           </button>
           <button class="tool-btn primary" id="newGameBtn" type="button">New Game</button>
         </div>
+        <section class="bucket-widget" id="bucketWidget" aria-label="Bucket of caught fish">
+          <div class="bucket-title">
+            <svg viewBox="0 0 100 84" aria-hidden="true"><path d="M14 30 L24 78 Q25 84 32 84 L68 84 Q75 84 76 78 L86 30 Z" fill="#e2543e"/><ellipse cx="50" cy="30" rx="36" ry="8" fill="#7ad3e8"/><ellipse cx="50" cy="29" rx="36" ry="8" fill="none" stroke="#b23a26" stroke-width="5"/><path d="M18 28 Q50 -8 82 28" fill="none" stroke="#8a5a2b" stroke-width="6" stroke-linecap="round"/></svg>
+            Bucket
+            <span class="bucket-count" id="bucketCount"></span>
+          </div>
+          <div class="bucket-chips" id="bucketChips"><span class="bucket-empty">No fish yet — catch one!</span></div>
+        </section>
       </header>
 
       <section class="target-bar" aria-live="polite">
@@ -513,29 +528,12 @@
         </div>
       </section>
 
-      <section class="bucket-bar">
-        <div class="bucket-title">
-          <svg viewBox="0 0 100 84" aria-hidden="true"><path d="M14 30 L24 78 Q25 84 32 84 L68 84 Q75 84 76 78 L86 30 Z" fill="#e2543e"/><ellipse cx="50" cy="30" rx="36" ry="8" fill="#7ad3e8"/><ellipse cx="50" cy="29" rx="36" ry="8" fill="none" stroke="#b23a26" stroke-width="5"/><path d="M18 28 Q50 -8 82 28" fill="none" stroke="#8a5a2b" stroke-width="6" stroke-linecap="round"/></svg>
-          Bucket
-        </div>
-        <div class="bucket-chips" id="bucketChips"><span class="bucket-empty">No fish yet — catch one!</span></div>
-        <div class="bucket-count" id="bucketCount"></div>
-      </section>
-
       <main class="pond" id="pond" aria-label="Pond. Tap or click the fish with the right letter.">
         <div class="sun-glow"></div>
         <svg class="weed left" width="54" height="86" viewBox="0 0 54 86" aria-hidden="true"><path d="M10 86 C4 60 16 44 8 18 C20 40 16 62 20 86 Z" fill="var(--weed)"/><path d="M28 86 C24 56 36 40 30 8 C42 36 36 60 40 86 Z" fill="var(--weed)" opacity="0.75"/><path d="M44 86 C42 64 50 50 46 30 C54 50 50 66 52 86 Z" fill="var(--weed)" opacity="0.55"/></svg>
         <svg class="weed right" width="44" height="70" viewBox="0 0 54 86" aria-hidden="true"><path d="M12 86 C6 58 18 42 10 14 C22 38 18 62 22 86 Z" fill="var(--weed)"/><path d="M32 86 C28 60 38 46 34 22 C44 44 38 64 42 86 Z" fill="var(--weed)" opacity="0.7"/></svg>
         <div class="sand"></div>
         <div class="hook" id="hook"><div class="line" id="hookLine"></div><div class="head" id="hookHead"></div></div>
-        <svg class="pond-bucket" id="pondBucket" viewBox="0 0 100 84" aria-hidden="true">
-          <path d="M14 30 L24 78 Q25 84 32 84 L68 84 Q75 84 76 78 L86 30 Z" fill="#e2543e"/>
-          <path d="M14 30 L24 78 Q25 84 32 84 L68 84 Q75 84 76 78 L86 30 Z" fill="rgba(0,0,0,0.08)"/>
-          <ellipse cx="50" cy="30" rx="36" ry="8" fill="#7ad3e8"/>
-          <ellipse cx="50" cy="29" rx="36" ry="8" fill="none" stroke="#b23a26" stroke-width="4"/>
-          <path d="M18 28 Q50 -8 82 28" fill="none" stroke="#8a5a2b" stroke-width="5" stroke-linecap="round"/>
-          <rect x="10" y="46" width="80" height="7" rx="3.5" fill="rgba(255,255,255,0.35)"/>
-        </svg>
         <div class="celebration" id="celebration" hidden>
           <div class="cele-card">
             <div class="big-stars" aria-hidden="true">★ ★ ★</div>
@@ -568,7 +566,7 @@
         var totalStarsEl = document.getElementById("totalStars");
         var bucketChips = document.getElementById("bucketChips");
         var bucketCount = document.getElementById("bucketCount");
-        var pondBucket = document.getElementById("pondBucket");
+        var bucketWidget = document.getElementById("bucketWidget");
         var celebration = document.getElementById("celebration");
         var celeTitle = document.getElementById("celeTitle");
         var celeText = document.getElementById("celeText");
@@ -695,8 +693,8 @@
         }
         function setFishLetter(f, letter) {
           f.letter = letter;
-          f.letterEl.textContent = letter;
-          f.el.setAttribute("aria-label", "Fish with letter " + letter);
+          f.letterEl.innerHTML = '<span class="up">' + letter + '</span><span class="low">' + letter.toLowerCase() + "</span>";
+          f.el.setAttribute("aria-label", "Fish with letter " + letter + " " + letter.toLowerCase());
         }
 
         /* ---------------- Fish ---------------- */
@@ -730,7 +728,7 @@
           el.setAttribute("role", "button");
           el.setAttribute("tabindex", "0");
           el.innerHTML = '<div class="shake"><div class="flip">' + fishSVG(color) + '</div><span class="letter"></span></div>';
-          pond.insertBefore(el, pondBucket);
+          pond.insertBefore(el, celebration);
           var w = el.offsetWidth || 128;
           var h = el.offsetHeight || 84;
           var dir = Math.random() < 0.5 ? 1 : -1;
@@ -850,14 +848,27 @@
             hookHead.style.top = Math.max(10, cy - 16) + "px";
           });
           setTimeout(function () {
-            /* reel to bucket */
-            var pr = pond.getBoundingClientRect();
-            var br = pondBucket.getBoundingClientRect();
-            var bx = br.left - pr.left + br.width / 2 - f.w / 2;
-            var by = br.top - pr.top + br.height / 2 - f.h / 2;
+            /* fly to the bucket in the top-right corner: lift the fish out of
+               the pond (which clips overflow) and glide it to the bucket */
+            var br = bucketWidget.getBoundingClientRect();
+            var fr = f.el.getBoundingClientRect();
+            document.body.appendChild(f.el);
+            f.el.style.position = "fixed";
+            f.el.style.left = fr.left + "px";
+            f.el.style.top = fr.top + "px";
+            f.el.style.width = fr.width + "px";
+            f.el.style.height = fr.height + "px";
+            f.el.style.margin = "0";
+            f.el.style.zIndex = "200";
+            f.el.style.transform = "translate(0px, 0px)";
+            void f.el.offsetWidth;
             f.el.classList.add("caught");
-            f.el.style.transform = "translate(" + bx + "px," + by + "px) scale(0.22) rotate(18deg)";
-            f.el.style.opacity = "0.35";
+            var dx = (br.left + br.width / 2) - (fr.left + fr.width / 2);
+            var dy = (br.top + br.height / 2) - (fr.top + fr.height / 2);
+            requestAnimationFrame(function () {
+              f.el.style.transform = "translate(" + dx + "px," + dy + "px) scale(0.2) rotate(18deg)";
+              f.el.style.opacity = "0.3";
+            });
             hookLine.style.height = "0px"; hookHead.style.top = "0px";
             sfxHappy();
           }, 300);
@@ -866,7 +877,7 @@
             var color = f.color;
             var letter = f.letter;
             removeFish(f);
-            pondBucket.classList.remove("bounce"); void pondBucket.offsetWidth; pondBucket.classList.add("bounce");
+            bucketWidget.classList.remove("bounce"); void bucketWidget.offsetWidth; bucketWidget.classList.add("bounce");
             landCatch(letter, color);
           }, 980);
         }
@@ -939,7 +950,7 @@
           chip.className = "chip";
           chip.style.background = color;
           chip.style.borderLeftColor = color;
-          chip.textContent = letter;
+          chip.textContent = letter + " " + letter.toLowerCase();
           bucketChips.appendChild(chip);
           var n = bucketChips.querySelectorAll(".chip").length;
           bucketCount.textContent = n === 1 ? "1 fish in the bucket" : n + " fish in the bucket";
@@ -977,7 +988,7 @@
         }
         function updateTargetUI(pop) {
           var need = neededLetter();
-          targetLetterEl.textContent = need;
+          targetLetterEl.innerHTML = '<span class="t-up">' + need + '</span><span class="t-low">' + need.toLowerCase() + "</span>";
           targetLabelEl.textContent = mode === "catch" ? "Catch the letter" : "Find the letter";
           if (pop) {
             targetLetterEl.classList.remove("pop"); void targetLetterEl.offsetWidth; targetLetterEl.classList.add("pop");
@@ -1054,7 +1065,7 @@
             b.style.left = (3 + Math.random() * 92) + "%";
             b.style.animationDuration = (6 + Math.random() * 7) + "s";
             b.style.animationDelay = (-Math.random() * 9) + "s";
-            pond.insertBefore(b, pondBucket);
+            pond.insertBefore(b, celebration);
           }
         })();
 
