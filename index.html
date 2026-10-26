@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>My Apps</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --bg: #fdfaf4;
+        --ink: #22304a;
+        --ink-soft: #55617a;
+        --card: #ffffff;
+        --card-line: #e9e2d4;
+        --shadow: 0 10px 24px rgba(34, 48, 74, 0.10);
+        --shadow-hover: 0 16px 32px rgba(34, 48, 74, 0.16);
+        --focus: #1d6fe0;
+
+        --c-search: #e2503a;
+        --c-search-soft: #fdeee9;
+        --c-word: #2e9e5b;
+        --c-word-soft: #e8f6ee;
+        --c-letters: #1d8fa8;
+        --c-letters-soft: #e6f5f8;
+        --c-numbers: #e8912d;
+        --c-numbers-soft: #fdf2e2;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #171d2a;
+          --ink: #f2f0e9;
+          --ink-soft: #b7c0d2;
+          --card: #232c3d;
+          --card-line: #37425c;
+          --shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+          --shadow-hover: 0 16px 32px rgba(0, 0, 0, 0.45);
+          --focus: #7db8ff;
+
+          --c-search: #ff7a63;
+          --c-search-soft: #3a2b2c;
+          --c-word: #5ccf8a;
+          --c-word-soft: #25382e;
+          --c-letters: #4fc3d9;
+          --c-letters-soft: #22383f;
+          --c-numbers: #ffb35c;
+          --c-numbers-soft: #3d3323;
+        }
+      }
+
+      * { box-sizing: border-box; }
+      html { -webkit-text-size-adjust: 100%; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+        line-height: 1.45;
+      }
+
+      .wrap {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: clamp(28px, 5vw, 56px) clamp(18px, 4vw, 40px) clamp(40px, 6vw, 64px);
+      }
+
+      header { text-align: center; margin-bottom: clamp(28px, 4vw, 44px); }
+      h1 {
+        font-family: "Fredoka", "Nunito", system-ui, sans-serif;
+        font-weight: 700;
+        font-size: clamp(44px, 8vw, 72px);
+        letter-spacing: 0.01em;
+        margin: 0 0 10px;
+      }
+      .sub {
+        font-size: clamp(19px, 3vw, 26px);
+        font-weight: 700;
+        color: var(--ink-soft);
+        margin: 0;
+      }
+      .dots { margin-top: 18px; font-size: 0; }
+      .dots span {
+        display: inline-block;
+        width: 14px; height: 14px;
+        border-radius: 50%;
+        margin: 0 6px;
+      }
+      .dots .d1 { background: var(--c-search); }
+      .dots .d2 { background: var(--c-word); }
+      .dots .d3 { background: var(--c-letters); }
+      .dots .d4 { background: var(--c-numbers); }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: clamp(18px, 3vw, 28px);
+      }
+      @media (max-width: 640px) {
+        .grid { grid-template-columns: 1fr; }
+      }
+
+      .card {
+        background: var(--card);
+        border: 2px solid var(--card-line);
+        border-radius: 28px;
+        padding: clamp(22px, 3.5vw, 34px);
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+        box-shadow: var(--shadow);
+      }
+
+      .art {
+        width: 100%;
+        color: var(--ink);
+        border-radius: 18px;
+        padding: 18px 10px 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .art svg { width: 150px; height: auto; display: block; }
+      .art-search { background: var(--c-search-soft); }
+      .art-word { background: var(--c-word-soft); }
+      .art-letters { background: var(--c-letters-soft); }
+      .art-numbers { background: var(--c-numbers-soft); }
+
+      h2 {
+        font-family: "Fredoka", "Nunito", system-ui, sans-serif;
+        font-weight: 600;
+        font-size: clamp(28px, 4vw, 36px);
+        margin: 2px 0 0;
+        line-height: 1.15;
+      }
+      .desc {
+        font-size: clamp(18px, 2.6vw, 21px);
+        font-weight: 600;
+        color: var(--ink-soft);
+        margin: 0;
+        flex: 1;
+      }
+
+      .play {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        justify-content: center;
+        font-family: "Fredoka", "Nunito", system-ui, sans-serif;
+        font-weight: 600;
+        font-size: 24px;
+        letter-spacing: 0.02em;
+        color: #fff;
+        text-decoration: none;
+        padding: 16px 24px;
+        border-radius: 999px;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+      }
+      .play svg { width: 20px; height: 20px; flex: none; }
+      .play:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); }
+      .play:active { transform: translateY(0); }
+      .play:focus-visible {
+        outline: 4px solid var(--focus);
+        outline-offset: 3px;
+      }
+      .play-search { background: var(--c-search); }
+      .play-word { background: var(--c-word); }
+      .play-letters { background: var(--c-letters); }
+      .play-numbers { background: var(--c-numbers); }
+      @media (prefers-color-scheme: dark) {
+        .play { color: #14202e; }
+      }
+
+      footer {
+        text-align: center;
+        margin-top: clamp(32px, 5vw, 48px);
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--ink-soft);
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .play { transition: none; }
+        .play:hover { transform: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <h1>My Apps</h1>
+        <p class="sub">Games for Kindergarten and Grade One — pick one and play!</p>
+        <div class="dots" aria-hidden="true"><span class="d1"></span><span class="d2"></span><span class="d3"></span><span class="d4"></span></div>
+      </header>
+
+      <main class="grid">
+
+        <section class="card">
+          <div class="art art-search" aria-hidden="true">
+            <svg viewBox="0 0 160 120" role="img">
+              <rect x="18" y="14" width="96" height="96" rx="12" fill="none" stroke="#e2503a" stroke-width="5"/>
+              <g font-family="Fredoka, sans-serif" font-weight="700" font-size="26" fill="currentColor">
+                <text x="34" y="50">C</text><text x="62" y="50">A</text><text x="90" y="50">T</text>
+                <text x="34" y="82">D</text><text x="62" y="82" fill="#e2503a">O</text><text x="90" y="82">G</text>
+              </g>
+              <circle cx="118" cy="86" r="20" fill="none" stroke="#e2503a" stroke-width="7"/>
+              <line x1="132" y1="100" x2="148" y2="116" stroke="#e2503a" stroke-width="8" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h2>Word Search Fun!</h2>
+          <p class="desc">Find school words hiding in the letters. Pick a lesson, or type in your own words!</p>
+          <a class="play play-search" href="https://scaemrfung.github.io/mr-fung-webgames/word-search-fun/" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15c0 .8.9 1.3 1.6.9l12-7.5c.7-.4.7-1.4 0-1.8l-12-7.5C7.9 3.2 7 3.7 7 4.5z"/></svg>
+            Play
+          </a>
+        </section>
+
+        <section class="card">
+          <div class="art art-word" aria-hidden="true">
+            <svg viewBox="0 0 160 120" role="img">
+              <rect x="14" y="26" width="58" height="76" rx="10" fill="#2e9e5b" transform="rotate(-8 43 64)"/>
+              <rect x="88" y="26" width="58" height="76" rx="10" fill="#ffffff" stroke="#2e9e5b" stroke-width="5" transform="rotate(8 117 64)"/>
+              <text x="117" y="80" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="40" fill="#2e9e5b" transform="rotate(8 117 64)">A</text>
+              <g fill="#ffffff" font-family="Fredoka, sans-serif" font-weight="700" font-size="22">
+                <text x="43" y="72" text-anchor="middle" transform="rotate(-8 43 64)">?</text>
+              </g>
+            </svg>
+          </div>
+          <h2>My Word Remake</h2>
+          <p class="desc">Letters flip up one by one. Call the word first — the team with the most cards wins!</p>
+          <a class="play play-word" href="https://scaemrfung.github.io/mr-fung-webgames/my-word-remake/" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15c0 .8.9 1.3 1.6.9l12-7.5c.7-.4.7-1.4 0-1.8l-12-7.5C7.9 3.2 7 3.7 7 4.5z"/></svg>
+            Play
+          </a>
+        </section>
+
+        <section class="card">
+          <div class="art art-letters" aria-hidden="true">
+            <svg viewBox="0 0 160 120" role="img">
+              <path d="M118 6 v34" stroke="#55617a" stroke-width="4" stroke-linecap="round"/>
+              <path d="M118 40 q0 12 -10 12" fill="none" stroke="#55617a" stroke-width="4" stroke-linecap="round"/>
+              <circle cx="106" cy="52" r="4" fill="#55617a"/>
+              <path d="M14 78 q14 -22 38 -22 q20 0 30 14 q4 6 12 8 q-8 2 -12 8 q-10 14 -30 14 q-24 0 -38 -22 z" fill="#1d8fa8"/>
+              <path d="M14 78 l-10 -14 q14 2 18 14 q-4 12 -18 14 z" fill="#157086"/>
+              <circle cx="34" cy="72" r="4.5" fill="#ffffff"/>
+              <text x="62" y="88" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="30" fill="#ffffff">B</text>
+              <path d="M6 108 q12 -8 24 0 q12 8 24 0 q12 -8 24 0 q12 8 24 0 q12 -8 24 0 q12 8 24 0" fill="none" stroke="#1d8fa8" stroke-width="4" stroke-linecap="round" opacity="0.55"/>
+            </svg>
+          </div>
+          <h2>Hooked on Letters!</h2>
+          <p class="desc">Go fishing in the pond! Catch a letter and spell a word.</p>
+          <a class="play play-letters" href="https://scaemrfung.github.io/mr-fung-webgames/hooked-on-letters/" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15c0 .8.9 1.3 1.6.9l12-7.5c.7-.4.7-1.4 0-1.8l-12-7.5C7.9 3.2 7 3.7 7 4.5z"/></svg>
+            Play
+          </a>
+        </section>
+
+        <section class="card">
+          <div class="art art-numbers" aria-hidden="true">
+            <svg viewBox="0 0 160 120" role="img">
+              <path d="M118 6 v34" stroke="#55617a" stroke-width="4" stroke-linecap="round"/>
+              <path d="M118 40 q0 12 -10 12" fill="none" stroke="#55617a" stroke-width="4" stroke-linecap="round"/>
+              <circle cx="106" cy="52" r="4" fill="#55617a"/>
+              <path d="M14 78 q14 -22 38 -22 q20 0 30 14 q4 6 12 8 q-8 2 -12 8 q-10 14 -30 14 q-24 0 -38 -22 z" fill="#e8912d"/>
+              <path d="M14 78 l-10 -14 q14 2 18 14 q-4 12 -18 14 z" fill="#c06f14"/>
+              <circle cx="34" cy="72" r="4.5" fill="#ffffff"/>
+              <text x="62" y="89" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="30" fill="#ffffff">7</text>
+              <path d="M6 108 q12 -8 24 0 q12 8 24 0 q12 -8 24 0 q12 8 24 0 q12 -8 24 0 q12 8 24 0" fill="none" stroke="#e8912d" stroke-width="4" stroke-linecap="round" opacity="0.55"/>
+            </svg>
+          </div>
+          <h2>Hooked on Numbers!</h2>
+          <p class="desc">Fishing for math! Counting, adding, subtracting, and making 10.</p>
+          <a class="play play-numbers" href="https://scaemrfung.github.io/mr-fung-webgames/hooked-on-numbers/" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15c0 .8.9 1.3 1.6.9l12-7.5c.7-.4.7-1.4 0-1.8l-12-7.5C7.9 3.2 7 3.7 7 4.5z"/></svg>
+            Play
+          </a>
+        </section>
+
+      </main>
+
+      <footer>Made for Mr. Fung's class</footer>
+    </div>
+  </body>
+</html>
