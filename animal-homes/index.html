@@ -104,6 +104,12 @@ h1 .leaf{color:var(--green)}
   position:relative;overflow:hidden;
 }
 .animal-emoji{font-size:clamp(96px,18vw,150px);line-height:1.05;display:block}
+.animal-media{display:block}
+.animal-photo{
+  width:min(440px,100%);height:clamp(170px,32vw,230px);object-fit:cover;
+  border-radius:18px;display:block;margin:0 auto;
+}
+.animal-photo[hidden]{display:none}
 .animal-name{
   font-family:"Fredoka",sans-serif;font-weight:700;
   font-size:clamp(34px,6vw,52px);line-height:1.05;margin:2px 0 2px;text-transform:capitalize;
@@ -142,6 +148,14 @@ h1 .leaf{color:var(--green)}
 }
 .choice:hover{transform:translateY(-3px);border-color:var(--green)}
 .choice .home-emoji{font-size:clamp(60px,10vw,84px);line-height:1.1}
+.choice .home-media{display:block;width:100%}
+.choice .home-photo{
+  width:100%;height:84px;object-fit:cover;border-radius:12px;display:block;
+}
+.choice .home-photo[hidden]{display:none}
+.photo-credit{
+  text-align:center;font-size:14px;font-weight:700;color:var(--ink-soft);margin:16px 0 0;
+}
 .choice .home-name{
   font-family:"Fredoka",sans-serif;font-weight:700;
   font-size:clamp(24px,4vw,34px);line-height:1.1;text-transform:capitalize;
@@ -176,6 +190,8 @@ h1 .leaf{color:var(--green)}
   .choices{grid-template-columns:1fr;gap:10px}
   .choice{min-height:112px;flex-direction:row;gap:14px;padding:12px 18px;justify-content:flex-start;text-align:left}
   .choice .home-emoji{font-size:56px}
+  .choice .home-media{width:auto;flex:none}
+  .choice .home-photo{width:84px;height:64px}
   header.top{justify-content:center;text-align:center}
   .controls{justify-content:center}
   h1{width:100%;text-align:center}
@@ -214,7 +230,7 @@ h1 .leaf{color:var(--green)}
 
   <main id="gameArea">
     <section class="animal-card" aria-label="Animal">
-      <span class="animal-emoji" id="animalEmoji" role="img" aria-label="Animal picture">🐦</span>
+      <span class="animal-media"><span class="animal-emoji" id="animalEmoji" role="img" aria-label="Animal picture">🐦</span><img class="animal-photo" id="animalPhoto" alt="" hidden></span>
       <div class="animal-name" id="animalName">Bird</div>
       <div class="baby-line" id="babyLine" hidden><span class="baby-emoji" id="babyEmoji" aria-hidden="true"></span><span id="babyText"></span></div>
       <p class="question" id="question">Where does the bird live?</p>
@@ -231,6 +247,8 @@ h1 .leaf{color:var(--green)}
     <p id="finishText">You found every animal's home!</p>
     <button class="btn primary" id="againBtn" type="button" style="font-size:22px;padding:14px 26px;">Play Again</button>
   </section>
+
+  <p class="photo-credit">Animal and home photos from Wikimedia Commons (CC BY, CC BY-SA, CC0 and public domain).</p>
 </div>
 <div class="confetti" id="confetti" aria-hidden="true"></div>
 
@@ -260,12 +278,39 @@ h1 .leaf{color:var(--green)}
   ROUNDS[1].homeEmoji = "⛰️";   // den — rocky cave opening
   ROUNDS[5].homeEmoji = "🌿";   // burrow — hole in the grass (shown with label)
 
-  var ALL_HOMES = ROUNDS.map(function(r){ return { name:r.home, emoji:r.homeEmoji, svg:r.homeSvg || null }; });
+  // Real photographs (Wikimedia Commons, freely licensed: CC BY / CC BY-SA / CC0 / public domain).
+  // The drawn emoji/SVG picture stays in place as the fallback if a photo fails to load.
+  var PHOTOS = [
+    { a:"https://thumb.wikimedia.org/wikipedia/commons/thumb/4/47/Erithacus_rubecula_profile.jpg/960px-Erithacus_rubecula_profile.jpg",
+      h:"https://thumb.wikimedia.org/wikipedia/commons/thumb/e/eb/Tree_Pipit_nest_and_eggs.jpg/960px-Tree_Pipit_nest_and_eggs.jpg" },
+    { a:"https://thumb.wikimedia.org/wikipedia/commons/thumb/9/94/Eurasian_brown_bear_%28Ursus_arctos_arctos%29_female_1.jpg/960px-Eurasian_brown_bear_%28Ursus_arctos_arctos%29_female_1.jpg",
+      h:"https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d7/OLD_BEAR_CAVE%2C_ACADIA_NATIONAL_PARK.jpg/960px-OLD_BEAR_CAVE%2C_ACADIA_NATIONAL_PARK.jpg" },
+    { a:"https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1d/European_honey_bee_extracts_nectar.jpg/960px-European_honey_bee_extracts_nectar.jpg",
+      h:"https://thumb.wikimedia.org/wikipedia/commons/thumb/9/95/Beehive_in_mountain.jpg/960px-Beehive_in_mountain.jpg" },
+    { a:"https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5a/Smiling_golden_retriever_in_a_grass_field.jpg/960px-Smiling_golden_retriever_in_a_grass_field.jpg",
+      h:"https://upload.wikimedia.org/wikipedia/commons/e/e6/Dog_Kennel_at_Ightham_Mote_-_geograph.org.uk_-_1299193.jpg" },
+    { a:"https://thumb.wikimedia.org/wikipedia/commons/thumb/9/96/Carassius_wild_golden_fish_2013_G1.jpg/960px-Carassius_wild_golden_fish_2013_G1.jpg",
+      h:"https://thumb.wikimedia.org/wikipedia/commons/thumb/d/df/Fish_bowl2.jpg/960px-Fish_bowl2.jpg" },
+    { a:"https://upload.wikimedia.org/wikipedia/commons/5/56/A_Wild_Rabbit_at_Lossiemouth_-_geograph.org.uk_-_1441920.jpg",
+      h:"https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cc/Rabbit_burrow_hole_in_Parco_Alto_Milanese_-_Legnano%2C_Lombardy%2C_Italy_2020-12-11.jpg/960px-Rabbit_burrow_hole_in_Parco_Alto_Milanese_-_Legnano%2C_Lombardy%2C_Italy_2020-12-11.jpg" },
+    { a:"https://thumb.wikimedia.org/wikipedia/commons/thumb/5/55/Cross_orbweaver_%2831148206598%29.jpg/960px-Cross_orbweaver_%2831148206598%29.jpg",
+      h:"https://thumb.wikimedia.org/wikipedia/commons/thumb/4/43/Spider_web_Luc_Viatour.jpg/960px-Spider_web_Luc_Viatour.jpg" },
+    { a:"https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d0/Red-eyed_Tree_Frog_-_Litoria_chloris_edit1.jpg/960px-Red-eyed_Tree_Frog_-_Litoria_chloris_edit1.jpg",
+      h:"https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3f/Pond_Water_lilies_Copped_Hall_walled_Kitchen_Garden%2C_Epping%2C_Essex%2C_England.jpg/960px-Pond_Water_lilies_Copped_Hall_walled_Kitchen_Garden%2C_Epping%2C_Essex%2C_England.jpg" },
+    { a:"https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a2/Horse_December_2014-1.jpg/960px-Horse_December_2014-1.jpg",
+      h:"https://thumb.wikimedia.org/wikipedia/commons/thumb/8/87/Barn_Pano%289467%29-Relic38.jpg/960px-Barn_Pano%289467%29-Relic38.jpg" },
+    { a:"https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0c/Tyto_alba_1_Luc_Viatour.jpg/960px-Tyto_alba_1_Luc_Viatour.jpg",
+      h:"https://upload.wikimedia.org/wikipedia/commons/f/fe/Single_oak_-_geograph.org.uk_-_1019197.jpg" }
+  ];
+  ROUNDS.forEach(function(r, i){ r.photo = PHOTOS[i].a; r.homePhoto = PHOTOS[i].h; });
+
+  var ALL_HOMES = ROUNDS.map(function(r){ return { name:r.home, emoji:r.homeEmoji, svg:r.homeSvg || null, photo:r.homePhoto }; });
 
   var starsEl = document.getElementById('stars');
   var progressEl = document.getElementById('progressText');
   var dotsEl = document.getElementById('dots');
   var emojiEl = document.getElementById('animalEmoji');
+  var photoEl = document.getElementById('animalPhoto');
   var nameEl = document.getElementById('animalName');
   var babyLineEl = document.getElementById('babyLine');
   var babyEmojiEl = document.getElementById('babyEmoji');
@@ -348,6 +393,17 @@ h1 .leaf{color:var(--green)}
     return 'A baby ' + r.animal.toLowerCase() + ' is called ' + articleFor(r.baby) + ' ' + r.baby.toLowerCase() + '.';
   }
 
+  // Show the real photo once it loads; keep the drawn picture if it fails.
+  function wirePhoto(img, fallbackEl, src, alt){
+    img.hidden = true;
+    fallbackEl.style.display = '';
+    img.onload = function(){ img.hidden = false; fallbackEl.style.display = 'none'; };
+    img.onerror = function(){ img.hidden = true; fallbackEl.style.display = ''; };
+    img.alt = alt;
+    img.src = src;
+    if (img.complete && img.naturalWidth > 0){ img.hidden = false; fallbackEl.style.display = 'none'; }
+  }
+
   function renderDots(){
     dotsEl.innerHTML = '';
     for (var i = 0; i < order.length; i++){
@@ -364,6 +420,7 @@ h1 .leaf{color:var(--green)}
     renderDots();
     emojiEl.textContent = r.emoji;
     emojiEl.setAttribute('aria-label', r.animal + ' picture');
+    wirePhoto(photoEl, emojiEl, r.photo, 'Photo of a ' + r.animal.toLowerCase());
     nameEl.textContent = r.animal;
     if (r.baby){
       babyLineEl.hidden = false;
@@ -377,7 +434,7 @@ h1 .leaf{color:var(--green)}
     feedbackEl.textContent = 'Tap the ' + r.animal.toLowerCase() + "'s home!";
 
     var others = shuffle(ALL_HOMES.filter(function(h){ return h.name !== r.home; })).slice(0, 2);
-    var options = shuffle([{ name:r.home, emoji:r.homeEmoji, svg:r.homeSvg || null }].concat(others));
+    var options = shuffle([{ name:r.home, emoji:r.homeEmoji, svg:r.homeSvg || null, photo:r.homePhoto }].concat(others));
 
     choicesEl.innerHTML = '';
     options.forEach(function(opt){
@@ -385,12 +442,21 @@ h1 .leaf{color:var(--green)}
       b.type = 'button';
       b.className = 'choice';
       b.setAttribute('aria-label', opt.name);
+      var media = document.createElement('span');
+      media.className = 'home-media';
       var e = document.createElement('span');
       e.className = 'home-emoji'; e.setAttribute('aria-hidden','true');
       if (opt.svg) { e.innerHTML = opt.svg; } else { e.textContent = opt.emoji; }
+      media.appendChild(e);
+      if (opt.photo){
+        var img = document.createElement('img');
+        img.className = 'home-photo'; img.hidden = true; img.alt = '';
+        media.appendChild(img);
+        wirePhoto(img, e, opt.photo, '');
+      }
       var n = document.createElement('span');
       n.className = 'home-name'; n.textContent = opt.name;
-      b.appendChild(e); b.appendChild(n);
+      b.appendChild(media); b.appendChild(n);
       b.addEventListener('click', function(){ pick(b, opt, r); });
       choicesEl.appendChild(b);
     });
