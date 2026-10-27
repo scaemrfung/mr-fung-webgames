@@ -659,6 +659,12 @@
         function neededCase() { return mode === "catch" ? targetCase : wordCases[wordIndex]; }
         function dispLetter(letter, cs) { return cs === "lower" ? letter.toLowerCase() : letter; }
         function caseWord(cs) { return cs === "upper" ? "upper case" : "lower case"; }
+        function displayWord() {
+          if (!currentWord) return "";
+          var out = "";
+          for (var i = 0; i < currentWord.length; i++) { out += dispLetter(currentWord.charAt(i), wordCases[i] || (i === 0 ? "upper" : "lower")); }
+          return out;
+        }
         function randomCase() { return Math.random() < 0.5 ? "upper" : "lower"; }
         function targetSpeech() {
           var verb = mode === "catch" ? "Catch" : "Find";
@@ -933,7 +939,7 @@
           wordsDone++;
           sfxFanfare();
           confettiBurst();
-          celeTitle.textContent = "You spelled " + currentWord + "!";
+          celeTitle.textContent = "You spelled " + displayWord() + "!";
           celeText.textContent = wordsDone === 1 ? "Great reading! Ready for another word?" : "That is " + wordsDone + " words spelled. Ready for another?";
           celeBtn.textContent = "Next Word";
           celebration.hidden = false;
@@ -1028,7 +1034,7 @@
           } else {
             currentWord = pickWord();
             wordCases = [];
-            for (var k = 0; k < currentWord.length; k++) wordCases.push(randomCase());
+            for (var k = 0; k < currentWord.length; k++) wordCases.push(k === 0 ? "upper" : "lower");
             wordIndex = 0;
             wordArea.hidden = false;
             renderWordTiles();
@@ -1044,7 +1050,7 @@
           document.getElementById("modeSpell").classList.toggle("active", m === "spell");
           resetGame();
           if (m === "catch") speak(targetSpeech());
-          else speak("Spell the word " + currentWord + ". " + targetSpeech());
+          else speak("Spell the word " + displayWord() + ". " + targetSpeech());
         }
 
         /* ---------------- Controls ---------------- */
@@ -1055,7 +1061,7 @@
         document.getElementById("hearBtn").addEventListener("click", function () {
           interacted = true; initAudio();
           if (mode === "catch") speak(targetSpeech());
-          else speak("Spell the word " + currentWord + ". " + targetSpeech());
+          else speak("Spell the word " + displayWord() + ". " + targetSpeech());
         });
         var soundBtn = document.getElementById("soundBtn");
         soundBtn.addEventListener("click", function () {
