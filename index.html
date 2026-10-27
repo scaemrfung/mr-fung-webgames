@@ -78,6 +78,8 @@
         --c-picker-soft: #eae6f5;
         --c-message: #1565c0;
         --c-message-soft: #e3eefb;
+        --c-music: #be3455;
+        --c-music-soft: #fbe9ee;
       }
       @media (prefers-color-scheme: dark) {
         :root {
@@ -148,6 +150,8 @@
           --c-picker-soft: #302a45;
           --c-message: #90caf9;
           --c-message-soft: #26364d;
+          --c-music: #ff8fab;
+          --c-music-soft: #3d2630;
         }
       }
 
@@ -296,6 +300,7 @@
       .tag-timer { background: var(--c-timer); }
       .tag-picker { background: var(--c-picker); }
       .tag-message { background: var(--c-message); }
+      .tag-music { background: var(--c-music); }
       @media (prefers-color-scheme: dark) {
         .tag { color: #14202e; }
       }
@@ -351,6 +356,7 @@
       .art-timer { background: var(--c-timer-soft); }
       .art-picker { background: var(--c-picker-soft); }
       .art-message { background: var(--c-message-soft); }
+      .art-music { background: var(--c-music-soft); }
 
       h2 {
         font-family: "Fredoka", "Nunito", system-ui, sans-serif;
@@ -419,6 +425,7 @@
       .play-timer { background: var(--c-timer); }
       .play-picker { background: var(--c-picker); }
       .play-message { background: var(--c-message); }
+      .play-music { background: var(--c-music); }
       @media (prefers-color-scheme: dark) {
         .play { color: #14202e; }
       }
@@ -1098,6 +1105,47 @@
               <h2>Morning Message Board</h2>
               <p class="desc">Start the day with a big morning message for everyone!</p>
               <a class="play play-message" href="https://scaemrfung.github.io/mr-fung-webgames/morning-message-board/">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15c0 .8.9 1.3 1.6.9l12-7.5c.7-.4.7-1.4 0-1.8l-12-7.5C7.9 3.2 7 3.7 7 4.5z"/></svg>
+                Play
+              </a>
+            </section>
+
+          </div>
+        </div>
+
+        <div class="group">
+          <h2 class="group-title">Music</h2>
+          <div class="grid">
+
+            <section class="card">
+              <div class="art art-music" aria-hidden="true">
+                <svg viewBox="0 0 160 120" role="img">
+                  <g stroke="#be3455" stroke-width="2" opacity="0.30" stroke-linecap="round">
+                    <line x1="12" y1="34" x2="148" y2="34"/>
+                    <line x1="12" y1="46" x2="148" y2="46"/>
+                    <line x1="12" y1="58" x2="148" y2="58"/>
+                    <line x1="12" y1="70" x2="148" y2="70"/>
+                    <line x1="12" y1="82" x2="148" y2="82"/>
+                  </g>
+                  <ellipse cx="32" cy="76" rx="10" ry="7" fill="#be3455" transform="rotate(-18 32 76)"/>
+                  <line x1="41" y1="74" x2="41" y2="38" stroke="#be3455" stroke-width="4" stroke-linecap="round"/>
+                  <ellipse cx="70" cy="76" rx="9" ry="6.5" fill="#be3455" transform="rotate(-18 70 76)"/>
+                  <line x1="78" y1="74" x2="78" y2="40" stroke="#be3455" stroke-width="4" stroke-linecap="round"/>
+                  <ellipse cx="96" cy="76" rx="9" ry="6.5" fill="#be3455" transform="rotate(-18 96 76)"/>
+                  <line x1="104" y1="74" x2="104" y2="40" stroke="#be3455" stroke-width="4" stroke-linecap="round"/>
+                  <rect x="78" y="36" width="26" height="8" rx="2" fill="#be3455"/>
+                  <path d="M132 34 l12 10 -13 9 9 7 c-6 4 -8 10 -4 16 c2 3 6 4 10 3" fill="none" stroke="#be3455" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <g font-family="Fredoka, sans-serif" font-weight="700" font-size="12" fill="#be3455" text-anchor="middle">
+                    <text x="36" y="104">TA</text>
+                    <text x="87" y="104">TI-TI</text>
+                    <text x="136" y="104">REST</text>
+                  </g>
+                </svg>
+              </div>
+              <span class="tag tag-music">Music</span>
+              <h2>Rhythm Pattern Maker</h2>
+              <p class="desc">Build a rhythm with Ta, Ti-Ti and rests — choose 4 or 8 beats and play it back!</p>
+              <a class="play play-music" href="rhythm-pattern-maker/">
                 <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15c0 .8.9 1.3 1.6.9l12-7.5c.7-.4.7-1.4 0-1.8l-12-7.5C7.9 3.2 7 3.7 7 4.5z"/></svg>
                 Play
               </a>

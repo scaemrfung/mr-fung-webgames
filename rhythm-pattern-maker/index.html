@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:," />
+<title>Rhythm Pattern Maker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#fffdf7;
+    --surface:#ffffff;
+    --surface-2:#fef3c7;
+    --ink:#1a2332;
+    --muted:#5b6472;
+    --line:#e8e0cf;
+    --teal:#0e7c7b;
+    --teal-dark:#0a5e5d;
+    --teal-soft:#e0f2f1;
+    --coral:#e94e34;
+    --coral-soft:#ffe8e2;
+    --amber:#f2a007;
+    --amber-soft:#fef3c7;
+    --slate:#64748b;
+    --slate-soft:#eef2f7;
+    --green:#15803d;
+    --shadow:0 10px 30px rgba(26,35,50,.08);
+    --radius-card:20px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#12181f;
+      --surface:#1c262f;
+      --surface-2:#2a2416;
+      --ink:#f4f1e8;
+      --muted:#a8b0bc;
+      --line:#334155;
+      --teal:#2dd4bf;
+      --teal-dark:#5eead4;
+      --teal-soft:#123a38;
+      --coral:#fb7185;
+      --coral-soft:#3f1d22;
+      --amber:#fbbf24;
+      --amber-soft:#332a0a;
+      --slate:#94a3b8;
+      --slate-soft:#1e293b;
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:"Nunito",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.45;
+    -webkit-tap-highlight-color:transparent;
+  }
+  /* faint staff lines across the top */
+  .staff-bg{
+    height:6px;
+    background:repeating-linear-gradient(to bottom, var(--line) 0, var(--line) 1px, transparent 1px, transparent 6px);
+    opacity:.6;
+  }
+  .wrap{max-width:980px;margin:0 auto;padding:20px 18px 36px}
+  /* Home button back to the Fun Playground hub */
+  .topbar{display:flex; justify-content:flex-start; margin-bottom:6px}
+  .home-btn{
+    display:inline-flex; align-items:center; gap:8px;
+    background:var(--surface); color:var(--ink); text-decoration:none;
+    border:1.5px solid var(--line); border-radius:999px;
+    padding:9px 18px 9px 14px; font-weight:900; font-size:1rem;
+    box-shadow:var(--shadow); transition:transform .12s, border-color .12s;
+  }
+  .home-btn:hover{transform:translateY(-1px); border-color:var(--teal); color:var(--teal)}
+  .home-btn:active{transform:scale(.97)}
+  .home-btn:focus-visible{outline:3px solid var(--amber); outline-offset:2px}
+  .home-btn svg{width:20px; height:20px; display:block; flex:none}
+  header{ text-align:center; padding:10px 0 6px }
+  h1{
+    font-family:"Fredoka",sans-serif;
+    font-weight:700;
+    font-size:clamp(2rem,6vw,3.2rem);
+    line-height:.95;
+    letter-spacing:-.02em;
+    margin:0;
+  }
+  h1 .accent{color:var(--coral)}
+  h1 .accent2{color:var(--teal)}
+  .subtitle{
+    margin:10px auto 0; max-width:560px;
+    color:var(--muted); font-weight:700; font-size:1.05rem;
+  }
+  .subtitle strong{color:var(--ink)}
+
+  /* Control bar */
+  .controls{
+    display:flex; flex-wrap:wrap; gap:14px; align-items:stretch; justify-content:center;
+    margin:22px 0 18px;
+  }
+  .control-box{
+    background:var(--surface); border:1.5px solid var(--line); border-radius:16px;
+    padding:12px 14px; box-shadow:var(--shadow);
+    display:flex; flex-direction:column; gap:8px; min-width:0;
+  }
+  .control-box label, .control-label{
+    font-size:.78rem; letter-spacing:.09em; text-transform:uppercase; font-weight:900; color:var(--muted);
+  }
+  .segmented{display:flex; background:var(--slate-soft); border-radius:999px; padding:4px; gap:4px}
+  .segmented button{
+    border:0; background:transparent; color:var(--muted);
+    font-family:inherit; font-weight:900; font-size:1rem;
+    padding:9px 18px; border-radius:999px; cursor:pointer; white-space:nowrap;
+  }
+  .segmented button[aria-pressed="true"]{background:var(--ink); color:var(--bg); box-shadow:0 2px 8px rgba(0,0,0,.15)}
+  .segmented button:focus-visible, button:focus-visible, input:focus-visible{outline:3px solid var(--amber); outline-offset:2px}
+
+  .tempo-row{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+  .tempo-row input[type="range"]{flex:1 1 110px; min-width:100px; max-width:170px; accent-color:var(--teal); height:6px}
+  .bpm{
+    font-family:"Fredoka",sans-serif; font-weight:700; font-size:1.25rem; min-width:64px; text-align:left; line-height:1; white-space:nowrap;
+  }
+  .bpm small{display:block; font-family:"Nunito",sans-serif; font-size:.72rem; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); font-weight:900}
+  .tempo-word{font-weight:900; color:var(--teal); font-size:.9rem; white-space:nowrap}
+
+  /* Pattern staff */
+  .pattern-panel{
+    background:var(--surface); border:1.5px solid var(--line); border-radius:24px;
+    box-shadow:var(--shadow); padding:18px 16px 16px; position:relative; overflow:hidden;
+  }
+  .pattern-panel::before{
+    content:""; position:absolute; left:0; right:0; top:52%; height:44px; transform:translateY(-50%);
+    background:repeating-linear-gradient(to bottom, var(--line) 0, var(--line) 1.5px, transparent 1.5px, transparent 11px);
+    opacity:.55; pointer-events:none;
+  }
+  .pattern-head{
+    display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; position:relative; z-index:1; margin-bottom:14px;
+  }
+  .pattern-head h2{font-family:"Fredoka",sans-serif; font-size:1.15rem; margin:0; font-weight:600}
+  .now-playing{font-weight:900; color:var(--muted); font-size:.92rem}
+  .now-playing strong{color:var(--coral)}
+
+  .grid{display:grid; gap:10px; position:relative; z-index:1}
+  .grid.len-4{grid-template-columns:repeat(4,1fr)}
+  .grid.len-8{grid-template-columns:repeat(4,1fr)}
+  @media(min-width:860px){ .grid.len-8{grid-template-columns:repeat(8,1fr)} .grid.len-8 .beat-card{padding:12px 6px 10px} }
+
+  .beat-card{
+    border:2.5px solid var(--line); background:var(--surface); border-radius:18px;
+    padding:14px 8px 12px; text-align:center; cursor:pointer; position:relative;
+    transition:transform .15s ease, border-color .15s ease, background .15s ease;
+    min-height:132px; display:flex; flex-direction:column; align-items:center; justify-content:space-between; gap:4px;
+    user-select:none;
+  }
+  .beat-card:hover{transform:translateY(-2px)}
+  .beat-card.selected{border-color:var(--ink); box-shadow:0 0 0 3px var(--amber-soft), var(--shadow)}
+  .beat-card.playing{transform:scale(1.06); border-color:var(--coral); background:var(--coral-soft); z-index:2}
+  .beat-card.playing.titi{border-color:var(--teal); background:var(--teal-soft)}
+  .beat-card.playing.rest{border-color:var(--slate); background:var(--slate-soft); transform:scale(1.02)}
+  .beat-num{
+    font-size:.72rem; font-weight:900; letter-spacing:.08em; text-transform:uppercase; color:var(--muted);
+    background:var(--slate-soft); border-radius:999px; padding:3px 8px;
+  }
+  .beat-card.selected .beat-num{background:var(--ink); color:var(--bg)}
+  .notation{height:56px; display:flex; align-items:center; justify-content:center; color:var(--ink)}
+  .notation svg{height:54px; width:auto; display:block}
+  .type-ta .notation{color:var(--coral)}
+  .type-titi .notation{color:var(--teal)}
+  .type-rest .notation{color:var(--slate)}
+  .beat-name{font-family:"Fredoka",sans-serif; font-weight:700; font-size:1.15rem; line-height:1}
+  .type-ta .beat-name{color:var(--coral)}
+  .type-titi .beat-name{color:var(--teal)}
+  .type-rest .beat-name{color:var(--slate)}
+  .beat-sub{font-size:.75rem; font-weight:800; color:var(--muted); line-height:1.1}
+  svg.rest-inline{height:1.02em; width:auto; display:inline-block; vertical-align:-.16em; color:var(--slate)}
+
+  /* Picker */
+  .picker{
+    margin-top:16px; background:var(--surface); border:1.5px solid var(--line); border-radius:20px; box-shadow:var(--shadow); padding:16px;
+  }
+  .picker-head{display:flex; justify-content:space-between; align-items:baseline; gap:10px; flex-wrap:wrap; margin-bottom:12px}
+  .picker-head h2{font-family:"Fredoka",sans-serif; margin:0; font-size:1.2rem; font-weight:600}
+  .picker-head p{margin:0; color:var(--muted); font-weight:700; font-size:.92rem}
+  .picker-head p strong{color:var(--ink)}
+  .choices{display:grid; grid-template-columns:repeat(3,1fr); gap:10px}
+  @media(max-width:560px){ .choices{grid-template-columns:1fr} .choice-btn{flex-direction:row !important; justify-content:flex-start; text-align:left; padding:12px 14px !important} }
+  .choice-btn{
+    border:2.5px solid var(--line); background:var(--surface); border-radius:16px; padding:14px 10px 12px;
+    cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:2px; text-align:center;
+    font-family:inherit; color:var(--ink); transition:transform .12s, border-color .12s, background .12s;
+  }
+  .choice-btn:hover{transform:translateY(-2px)}
+  .choice-btn .notation{height:48px}
+  .choice-btn .notation svg{height:46px}
+  .choice-btn b{font-family:"Fredoka",sans-serif; font-size:1.3rem; line-height:1}
+  .choice-btn span{font-size:.82rem; font-weight:800; color:var(--muted)}
+  .choice-btn[data-value="ta"]{border-color:#f3b8ac}
+  .choice-btn[data-value="ta"] b{color:var(--coral)} .choice-btn[data-value="ta"] .notation{color:var(--coral)}
+  .choice-btn[data-value="titi"]{border-color:#8fd0cf}
+  .choice-btn[data-value="titi"] b{color:var(--teal)} .choice-btn[data-value="titi"] .notation{color:var(--teal)}
+  .choice-btn[data-value="rest"]{border-color:#cbd5e1}
+  .choice-btn[data-value="rest"] b{color:var(--slate)} .choice-btn[data-value="rest"] .notation{color:var(--slate)}
+  .choice-btn:active{transform:scale(.97)}
+
+  /* Transport */
+  .transport{display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:16px}
+  .btn{
+    border:0; cursor:pointer; font-family:inherit; font-weight:900; border-radius:999px;
+    padding:13px 22px; font-size:1rem; display:inline-flex; align-items:center; gap:8px;
+    transition:transform .12s, opacity .12s;
+  }
+  .btn:active{transform:scale(.97)}
+  .btn-play{background:var(--coral); color:#fff; font-size:1.15rem; padding:14px 30px; box-shadow:0 8px 20px rgba(233,78,52,.28)}
+  @media (prefers-color-scheme: dark){ .btn-play{color:#12181f; background:var(--amber); box-shadow:none} }
+  .btn-play.is-playing{background:var(--ink); color:var(--bg)}
+  .btn-secondary{background:var(--surface); color:var(--ink); border:1.5px solid var(--line)}
+  .btn-ghost{background:transparent; color:var(--muted); border:1.5px solid var(--line)}
+  .btn[aria-pressed="true"]{background:var(--teal); color:#fff; border-color:var(--teal)}
+
+  .readout{
+    margin-top:16px; text-align:center; background:var(--teal-soft); border-radius:14px; padding:12px 14px;
+  }
+  .readout .label{font-size:.75rem; letter-spacing:.09em; text-transform:uppercase; font-weight:900; color:var(--teal); display:block; margin-bottom:4px}
+  .readout .pattern-text{font-family:"Fredoka",sans-serif; font-weight:600; font-size:clamp(1.05rem,3.5vw,1.4rem); letter-spacing:.01em; word-break:break-word}
+  .readout .pattern-text .sep{color:var(--muted); font-weight:400; margin:0 .18em}
+
+  .examples{margin-top:18px}
+  .examples h3{font-family:"Fredoka",sans-serif; font-size:1rem; margin:0 0 8px; text-align:center; font-weight:600}
+  .example-chips{display:flex; flex-wrap:wrap; gap:8px; justify-content:center}
+  .chip{
+    background:var(--surface); border:1.5px solid var(--line); border-radius:999px; padding:8px 14px;
+    font-weight:800; font-size:.9rem; cursor:pointer; font-family:inherit; color:var(--ink);
+  }
+  .chip:hover{border-color:var(--teal); color:var(--teal)}
+  .chip small{color:var(--muted); font-weight:700}
+
+  .howto{
+    margin-top:22px; display:grid; grid-template-columns:repeat(3,1fr); gap:10px;
+  }
+  @media(max-width:640px){ .howto{grid-template-columns:1fr} }
+  .howto div{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:12px 14px}
+  .howto b{font-family:"Fredoka",sans-serif}
+  .howto p{margin:4px 0 0; color:var(--muted); font-size:.92rem; font-weight:600}
+  .howto .dot{display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; vertical-align:middle}
+  footer{ text-align:center; color:var(--muted); font-size:.85rem; font-weight:700; margin-top:20px}
+  .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="staff-bg" aria-hidden="true"></div>
+<div class="wrap">
+  <div class="topbar">
+    <a class="home-btn" href="https://scaemrfung.github.io/mr-fung-webgames/" aria-label="Home — back to Fun Playground">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9.2 8.2h-2.7V21h-4.7v-5.8H10.2V21H5.5v-9.8H2.8L12 3z" fill="currentColor"/></svg>
+      Home
+    </a>
+  </div>
+  <header>
+    <h1>Rhythm <span class="accent">Pattern</span> <span class="accent2">Maker</span></h1>
+    <p class="subtitle">Build a rhythm, then press play and clap along.<br><strong>Ta</strong> is one sound, <strong>Ti-Ti</strong> is two quick sounds, and a <strong>rest</strong> is a silent beat.</p>
+  </header>
+
+  <div class="controls" role="group" aria-label="Pattern settings">
+    <div class="control-box">
+      <span class="control-label" id="lenLabel">How many beats?</span>
+      <div class="segmented" role="group" aria-labelledby="lenLabel">
+        <button type="button" id="len4" aria-pressed="true">4 beats</button>
+        <button type="button" id="len8" aria-pressed="false">8 beats</button>
+      </div>
+    </div>
+    <div class="control-box" style="flex:1; min-width:260px; max-width:380px">
+      <span class="control-label" id="tempoLabel">Tempo — how fast?</span>
+      <div class="tempo-row">
+        <span aria-hidden="true" style="font-size:1.2rem">🐢</span>
+        <input type="range" id="tempo" min="60" max="132" step="4" value="92" aria-labelledby="tempoLabel">
+        <span aria-hidden="true" style="font-size:1.2rem">🐇</span>
+        <div class="bpm"><span id="bpmVal">92</span> <small>BPM</small></div>
+        <div class="tempo-word" id="tempoWord">Steady</div>
+      </div>
+    </div>
+  </div>
+
+  <section class="pattern-panel" aria-label="Your rhythm pattern">
+    <div class="pattern-head">
+      <h2>Your pattern</h2>
+      <div class="now-playing" id="nowPlaying" aria-live="polite">Tap a beat below, then pick Ta, Ti-Ti, or Rest.</div>
+    </div>
+    <div class="grid len-4" id="patternGrid"></div>
+  </section>
+
+  <section class="picker" aria-label="Choose a sound for the selected beat">
+    <div class="picker-head">
+      <h2 id="pickerTitle">Beat 1 — pick a sound</h2>
+      <p>Tap a beat above to change it, or pick here and it moves to the next beat.</p>
+    </div>
+    <div class="choices">
+      <button type="button" class="choice-btn" data-value="ta" aria-label="Set selected beat to Ta, one sound">
+        <span class="notation" data-notation="ta"></span>
+        <b>Ta</b><span>1 sound • clap once</span>
+      </button>
+      <button type="button" class="choice-btn" data-value="titi" aria-label="Set selected beat to Ti-Ti, two quick sounds">
+        <span class="notation" data-notation="titi"></span>
+        <b>Ti-Ti</b><span>2 quick sounds • clap-clap</span>
+      </button>
+      <button type="button" class="choice-btn" data-value="rest" aria-label="Set selected beat to Rest, silent beat">
+        <span class="notation" data-notation="rest"></span>
+        <b>Rest</b><span>Silent beat • hands still</span>
+      </button>
+    </div>
+  </section>
+
+  <div class="transport">
+    <button type="button" class="btn btn-play" id="playBtn">▶ &nbsp;Play my rhythm</button>
+    <button type="button" class="btn btn-secondary" id="loopBtn" aria-pressed="false">↻ Loop</button>
+    <button type="button" class="btn btn-secondary" id="randomBtn">🎲 Surprise me</button>
+    <button type="button" class="btn btn-ghost" id="clearBtn">Clear — all rests</button>
+  </div>
+
+  <div class="readout" aria-live="polite">
+    <span class="label">Say it like this</span>
+    <div class="pattern-text" id="patternText"></div>
+  </div>
+
+  <div class="examples">
+    <h3>Try an example</h3>
+    <div class="example-chips" id="exampleChips"></div>
+  </div>
+
+  <div class="howto" aria-label="How each sound works">
+    <div><b><span class="dot" style="background:var(--coral)"></span>Ta</b><p>One quarter note. It lasts the whole beat — say “Ta” and clap once.</p></div>
+    <div><b><span class="dot" style="background:var(--teal)"></span>Ti-Ti</b><p>Two eighth notes sharing one beat. Say “Ti-Ti” and clap twice, quickly.</p></div>
+    <div><b><span class="dot" style="background:var(--slate)"></span>Rest</b><p>A silent beat. Keep the beat in your head, but make no sound.</p></div>
+  </div>
+
+  <footer>Tip for class: press Play, listen once, then clap and say it together on Loop.</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var LABELS = { ta: "Ta", titi: "Ti-Ti", rest: "Rest" };
+  var SUBS = { ta: "1 sound", titi: "2 quick sounds", rest: "silent" };
+
+  // Standard quarter rest glyph, drawn as a bold SVG squiggle so it reads
+  // at the same size and weight as the Ta and Ti-Ti note notation.
+  var REST_PATH = "M35 5 C30 12 25 16 20 21 C28 24 35 27 38 33 C34 38 27 42 21 46 C27 50 29 56 26 62 C23 68 16 70 12 65";
+  function quarterRestSVG(cls){
+    return '<svg class="' + cls + '" viewBox="0 0 56 76" role="img" aria-hidden="true"><path d="' + REST_PATH + '" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  }
+  function restToken(){
+    return '<span role="img" aria-label="Rest (quarter rest)">' + quarterRestSVG("rest-inline") + '</span>';
+  }
+  function patternTokens(pat, sep){
+    return pat.map(function(t){ return t === "rest" ? restToken() : LABELS[t]; }).join(sep);
+  }
+
+  function notationSVG(type){
+    if(type === "ta"){
+      return '<svg viewBox="0 0 56 76" role="img" aria-hidden="true"><ellipse cx="20" cy="62" rx="13" ry="9" transform="rotate(-18 20 62)" fill="currentColor"/><rect x="31" y="8" width="4.5" height="54" rx="2" fill="currentColor"/></svg>';
+    }
+    if(type === "titi"){
+      return '<svg viewBox="0 0 76 76" role="img" aria-hidden="true"><path d="M28 10 L62 4 L62 18 L28 24 Z" fill="currentColor"/><ellipse cx="17" cy="62" rx="12" ry="8.5" transform="rotate(-18 17 62)" fill="currentColor"/><rect x="27" y="10" width="4.5" height="52" rx="2" fill="currentColor"/><ellipse cx="51" cy="56" rx="12" ry="8.5" transform="rotate(-18 51 56)" fill="currentColor"/><rect x="61" y="4" width="4.5" height="52" rx="2" fill="currentColor"/></svg>';
+    }
+    return quarterRestSVG("");
+  }
+
+  // Fill choice-button notations
+  document.querySelectorAll("[data-notation]").forEach(function(el){
+    el.innerHTML = notationSVG(el.getAttribute("data-notation"));
+  });
+
+  var state = {
+    length: 4,
+    pattern: ["ta","titi","ta","rest","ta","titi","rest","ta"],
+    selected: 0,
+    tempo: 92,
+    loop: false,
+    playing: false,
+    playIndex: -1,
+    timer: null,
+    subTimer: null
+  };
+
+  var grid = document.getElementById("patternGrid");
+  var patternText = document.getElementById("patternText");
+  var nowPlaying = document.getElementById("nowPlaying");
+  var pickerTitle = document.getElementById("pickerTitle");
+  var playBtn = document.getElementById("playBtn");
+  var tempoInput = document.getElementById("tempo");
+  var bpmVal = document.getElementById("bpmVal");
+  var tempoWord = document.getElementById("tempoWord");
+
+  function currentPattern(){ return state.pattern.slice(0, state.length); }
+
+  function render(){
+    grid.className = "grid len-" + state.length;
+    grid.innerHTML = "";
+    var pat = currentPattern();
+    pat.forEach(function(type, i){
+      var card = document.createElement("button");
+      card.type = "button";
+      card.className = "beat-card type-" + type + (i === state.selected ? " selected" : "") + (i === state.playIndex ? " playing" : "");
+      card.setAttribute("aria-label", "Beat " + (i+1) + ": " + LABELS[type] + ". Tap to select this beat.");
+      card.setAttribute("aria-pressed", i === state.selected ? "true" : "false");
+      card.innerHTML =
+        '<span class="beat-num">Beat ' + (i+1) + '</span>' +
+        '<span class="notation">' + notationSVG(type) + '</span>' +
+        '<span><span class="beat-name">' + LABELS[type] + '</span><br><span class="beat-sub">' + SUBS[type] + '</span></span>';
+      card.addEventListener("click", function(){
+        state.selected = i;
+        render();
+        speakHint();
+      });
+      grid.appendChild(card);
+    });
+    patternText.innerHTML = patternTokens(pat, '<span class="sep">•</span>');
+    pickerTitle.textContent = "Beat " + (state.selected+1) + " — pick a sound";
+    if(!state.playing){
+      nowPlaying.innerHTML = "Selected: <strong>Beat " + (state.selected+1) + " — " + LABELS[pat[state.selected]] + "</strong>";
+    }
+  }
+
+  function speakHint(){
+    // visual only — no speech synthesis, keeps classroom control with the teacher
+  }
+
+  function setBeat(value){
+    state.pattern[state.selected] = value;
+    // advance to next beat (wrap)
+    if(state.selected < state.length - 1) state.selected += 1;
+    render();
+    // little preview sound for the note just placed (only on user pick)
+    preview(value);
+  }
+
+  document.querySelectorAll(".choice-btn").forEach(function(btn){
+    btn.addEventListener("click", function(){ setBeat(btn.getAttribute("data-value")); });
+  });
+
+  // Length toggle
+  var len4 = document.getElementById("len4"), len8 = document.getElementById("len8");
+  function setLength(n){
+    stopPlayback();
+    state.length = n;
+    if(state.selected >= n) state.selected = 0;
+    len4.setAttribute("aria-pressed", n===4 ? "true":"false");
+    len8.setAttribute("aria-pressed", n===8 ? "true":"false");
+    render();
+    renderExamples();
+  }
+  len4.addEventListener("click", function(){ setLength(4); });
+  len8.addEventListener("click", function(){ setLength(8); });
+
+  // Tempo
+  function tempoName(bpm){
+    if(bpm < 76) return "Slow";
+    if(bpm < 104) return "Steady";
+    if(bpm < 120) return "Brisk";
+    return "Fast!";
+  }
+  tempoInput.addEventListener("input", function(){
+    state.tempo = parseInt(tempoInput.value, 10);
+    bpmVal.textContent = state.tempo;
+    tempoWord.textContent = tempoName(state.tempo);
+  });
+
+  // ---- Audio: woodblock-style clicks via Web Audio ----
+  var audioCtx = null;
+  function ensureAudio(){
+    if(!audioCtx){
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if(AC) audioCtx = new AC();
+    }
+    if(audioCtx && audioCtx.state === "suspended") audioCtx.resume();
+    return audioCtx;
+  }
+  function woodblock(when, freq){
+    if(!audioCtx) return;
+    var t = when || audioCtx.currentTime;
+    var osc = audioCtx.createOscillator();
+    var gain = audioCtx.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(freq || 880, t);
+    osc.frequency.exponentialRampToValueAtTime((freq||880)*0.55, t+0.09);
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.exponentialRampToValueAtTime(0.55, t+0.012);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t+0.16);
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start(t); osc.stop(t+0.18);
+    // add a short noise tick for a clap-like attack
+    try{
+      var len = Math.floor(audioCtx.sampleRate * 0.03);
+      var buffer = audioCtx.createBuffer(1, len, audioCtx.sampleRate);
+      var data = buffer.getChannelData(0);
+      for(var i=0;i<len;i++){ data[i] = (Math.random()*2-1) * (1 - i/len); }
+      var src = audioCtx.createBufferSource(); src.buffer = buffer;
+      var nf = audioCtx.createBiquadFilter(); nf.type="bandpass"; nf.frequency.value=1800; nf.Q.value=0.9;
+      var ng = audioCtx.createGain(); ng.gain.value = 0.22;
+      src.connect(nf); nf.connect(ng); ng.connect(audioCtx.destination);
+      src.start(t);
+    }catch(e){}
+  }
+  function preview(type){
+    if(!ensureAudio()) return;
+    var now = audioCtx.currentTime + 0.01;
+    if(type==="ta") woodblock(now, 760);
+    else if(type==="titi"){ woodblock(now, 980); woodblock(now+0.18, 980); }
+    // rest: intentionally silent
+  }
+
+  // ---- Playback ----
+  function beatDurationMs(){ return 60000 / state.tempo; }
+
+  function playBeat(index){
+    state.playIndex = index;
+    var pat = currentPattern();
+    var type = pat[index];
+    render();
+    nowPlaying.innerHTML = "Playing beat <strong>" + (index+1) + " of " + state.length + " — " + LABELS[type] + "</strong>" + (type==="rest" ? " &nbsp;(silent — feel the beat)" : "");
+    if(!audioCtx) return;
+    var now = audioCtx.currentTime + 0.02;
+    var beatSec = beatDurationMs()/1000;
+    if(type==="ta") woodblock(now, 760);
+    else if(type==="titi"){ woodblock(now, 980); woodblock(now + beatSec/2, 980); }
+  }
+
+  function scheduleNext(index){
+    var delay = beatDurationMs();
+    state.timer = setTimeout(function(){
+      var next = index + 1;
+      if(next >= state.length){
+        if(state.loop){
+          playBeat(0); scheduleNext(0);
+        } else {
+          stopPlayback(true);
+        }
+      } else {
+        playBeat(next); scheduleNext(next);
+      }
+    }, delay);
+  }
+
+  function startPlayback(){
+    if(!ensureAudio()){
+      nowPlaying.textContent = "Sound isn't available in this browser — you can still clap the pattern together!";
+      return;
+    }
+    state.playing = true;
+    playBtn.innerHTML = "■ &nbsp;Stop";
+    playBtn.classList.add("is-playing");
+    playBeat(0);
+    scheduleNext(0);
+  }
+  function stopPlayback(finished){
+    if(state.timer) clearTimeout(state.timer);
+    if(state.subTimer) clearTimeout(state.subTimer);
+    state.timer = null; state.playing = false; state.playIndex = -1;
+    playBtn.innerHTML = "▶ &nbsp;Play my rhythm";
+    playBtn.classList.remove("is-playing");
+    render();
+    if(finished) nowPlaying.innerHTML = "<strong>Great listening!</strong> Press Play to hear it again, or change a beat.";
+  }
+  playBtn.addEventListener("click", function(){
+    if(state.playing) stopPlayback(false);
+    else startPlayback();
+  });
+
+  var loopBtn = document.getElementById("loopBtn");
+  loopBtn.addEventListener("click", function(){
+    state.loop = !state.loop;
+    loopBtn.setAttribute("aria-pressed", state.loop ? "true":"false");
+  });
+
+  document.getElementById("randomBtn").addEventListener("click", function(){
+    stopPlayback(false);
+    var options = ["ta","ta","titi","titi","rest","ta","titi"];
+    for(var i=0;i<state.length;i++){
+      state.pattern[i] = options[Math.floor(Math.random()*options.length)];
+    }
+    // avoid an all-rest pattern
+    if(currentPattern().every(function(t){return t==="rest";})) state.pattern[0]="ta";
+    state.selected = 0;
+    render();
+  });
+  document.getElementById("clearBtn").addEventListener("click", function(){
+    stopPlayback(false);
+    for(var i=0;i<8;i++) state.pattern[i]="rest";
+    state.selected = 0;
+    render();
+  });
+
+  // Examples
+  var EXAMPLES_4 = [
+    { name:"Starter", sub:"Ta · Ti-Ti · Ta · Rest", pat:["ta","titi","ta","rest"] },
+    { name:"March", sub:"Ta · Ta · Ti-Ti · Ta", pat:["ta","ta","titi","ta"] },
+    { name:"Quiet End", sub:"Ti-Ti · Ta · Rest · Rest", pat:["titi","ta","rest","rest"] }
+  ];
+  var EXAMPLES_8 = [
+    { name:"Train", sub:"8 beats", pat:["ta","titi","ta","titi","ta","titi","ta","rest"] },
+    { name:"Question & Answer", sub:"8 beats", pat:["ta","ta","titi","ta","rest","titi","ta","rest"] },
+    { name:"Heartbeat", sub:"8 beats", pat:["ta","rest","ta","rest","titi","titi","ta","rest"] }
+  ];
+  var chipsWrap = document.getElementById("exampleChips");
+  function renderExamples(){
+    chipsWrap.innerHTML = "";
+    var list = state.length===4 ? EXAMPLES_4 : EXAMPLES_8;
+    list.forEach(function(ex){
+      var b = document.createElement("button");
+      b.type="button"; b.className="chip";
+      var sub = state.length===4 ? patternTokens(ex.pat, " · ") : ex.sub;
+      b.innerHTML = ex.name + " &nbsp;<small>" + sub + "</small>";
+      b.addEventListener("click", function(){
+        stopPlayback(false);
+        ex.pat.forEach(function(v,i){ state.pattern[i]=v; });
+        state.selected=0; render();
+      });
+      chipsWrap.appendChild(b);
+    });
+  }
+
+  // Keyboard: left/right to move selection, 1/2/3 to set sound, space to play/stop when not on a button
+  document.addEventListener("keydown", function(e){
+    if(e.target && (e.target.tagName==="INPUT")) return;
+    if(e.key==="ArrowRight"){ state.selected = Math.min(state.length-1, state.selected+1); render(); }
+    else if(e.key==="ArrowLeft"){ state.selected = Math.max(0, state.selected-1); render(); }
+    else if(e.key==="1") setBeat("ta");
+    else if(e.key==="2") setBeat("titi");
+    else if(e.key==="3") setBeat("rest");
+  });
+
+  render();
+  renderExamples();
+})();
+</script>
+</body>
+</html>
