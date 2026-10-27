@@ -639,14 +639,87 @@
           for (var i = 0; i < notes.length; i++) { tone(notes[i], i * 0.13, 0.28, "triangle", 0.26); }
           tone(1319, 0.8, 0.5, "triangle", 0.24);
         }
-        function speak(text) {
+        /* ---- Voice selection: most natural, human-sounding system voice ---- */
+        var cachedVoices = [];
+        var voicesReady = false;
+        var pendingSpeakText = null;
+        var waitingForVoices = false;
+        function refreshVoices() {
+          try {
+            if (!("speechSynthesis" in window)) return cachedVoices;
+            var v = window.speechSynthesis.getVoices();
+            if (v && v.length) { cachedVoices = v; voicesReady = true; }
+          } catch (e) {}
+          return cachedVoices;
+        }
+        function isNaturalVoice(v) {
+          var n = (v.name || "").toLowerCase();
+          return n.indexOf("natural") !== -1 || n.indexOf("neural") !== -1 || n.indexOf("google") !== -1;
+        }
+        function langMatches(v, code) {
+          var l = (v.lang || "").toLowerCase().replace(/_/g, "-");
+          return l === code || l.indexOf(code + "-") === 0;
+        }
+        function pickBestVoice() {
+          var voices = cachedVoices.length ? cachedVoices : refreshVoices();
+          if (!voices || !voices.length) return null;
+          var i, v;
+          for (i = 0; i < voices.length; i++) { v = voices[i]; if (langMatches(v, "en-ca") && isNaturalVoice(v)) return v; }
+          for (i = 0; i < voices.length; i++) { v = voices[i]; if (langMatches(v, "en-us") && isNaturalVoice(v)) return v; }
+          for (i = 0; i < voices.length; i++) { v = voices[i]; if (langMatches(v, "en-ca")) return v; }
+          for (i = 0; i < voices.length; i++) { v = voices[i]; if (langMatches(v, "en-us")) return v; }
+          return null;
+        }
+        if ("speechSynthesis" in window) {
+          refreshVoices();
+          try {
+            window.speechSynthesis.addEventListener("voiceschanged", function () {
+              refreshVoices();
+              if (waitingForVoices && pendingSpeakText) {
+                var t = pendingSpeakText;
+                pendingSpeakText = null;
+                waitingForVoices = false;
+                doSpeak(t);
+              }
+            });
+          } catch (e) {
+            window.speechSynthesis.onvoiceschanged = refreshVoices;
+          }
+        }
+        function doSpeak(text) {
           if (!soundOn || !interacted) return;
           try {
             if (!("speechSynthesis" in window)) return;
             window.speechSynthesis.cancel();
             var u = new SpeechSynthesisUtterance(text);
-            u.rate = 0.92; u.pitch = 1.05;
+            var voice = pickBestVoice();
+            if (voice) { u.voice = voice; u.lang = voice.lang; }
+            u.rate = 0.95; u.pitch = 1.0;
             window.speechSynthesis.speak(u);
+          } catch (e) {}
+        }
+        function speak(text) {
+          if (!soundOn || !interacted) return;
+          try {
+            if (!("speechSynthesis" in window)) return;
+            var voices = refreshVoices();
+            if (!voices.length && !voicesReady) {
+              pendingSpeakText = text;
+              if (!waitingForVoices) {
+                waitingForVoices = true;
+                setTimeout(function () {
+                  if (waitingForVoices && pendingSpeakText) {
+                    var t = pendingSpeakText;
+                    pendingSpeakText = null;
+                    waitingForVoices = false;
+                    refreshVoices();
+                    doSpeak(t);
+                  }
+                }, 800);
+              }
+              return;
+            }
+            doSpeak(text);
           } catch (e) {}
         }
 
