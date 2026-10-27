@@ -169,6 +169,7 @@
         text-transform: uppercase;
         letter-spacing: 0.06em;
       }
+      .target-label .case-letter { text-transform: none; }
       .target-letter {
         font-family: "Fredoka", sans-serif;
         font-weight: 700;
@@ -185,8 +186,6 @@
         box-shadow: 0 6px 0 var(--accent-dark), 0 12px 22px rgba(232, 95, 16, 0.3);
         text-shadow: 0 2px 0 rgba(0,0,0,0.15);
       }
-      .target-letter .t-up { font-size: clamp(44px, 6.2vw, 66px); line-height: 0.95; }
-      .target-letter .t-low { font-size: clamp(31px, 4.4vw, 47px); line-height: 0.95; margin-left: 8px; }
       .target-letter.pop { animation: popIn 0.35s ease; }
       @keyframes popIn {
         0% { transform: scale(0.6) rotate(-6deg); }
@@ -315,18 +314,15 @@
         position: absolute;
         left: 54%; top: 50%;
         transform: translate(-50%, -54%);
-        display: flex;
-        align-items: baseline;
-        gap: 5px;
         font-family: "Fredoka", sans-serif;
         font-weight: 700;
+        font-size: 50px;
+        line-height: 1;
         color: #fff;
         text-shadow: 0 2px 0 rgba(0,0,0,0.28), 0 0 10px rgba(0,0,0,0.12);
         pointer-events: none;
         white-space: nowrap;
       }
-      .fish .letter .up { font-size: 42px; line-height: 1; }
-      .fish .letter .low { font-size: 29px; line-height: 1; }
       .fish.caught { transition: transform 0.62s cubic-bezier(0.5, -0.1, 0.3, 1), opacity 0.62s ease; z-index: 30; pointer-events: none; }
 
       /* Hook */
@@ -463,8 +459,7 @@
         .page { padding: 10px 10px 18px; }
         .pond { height: clamp(330px, 50vh, 460px); }
         .fish { width: 100px; height: 66px; }
-        .fish .letter .up { font-size: 32px; }
-        .fish .letter .low { font-size: 22px; }
+        .fish .letter { font-size: 38px; }
         .target-right { align-items: flex-start; margin-left: 0; }
         .target-bar { padding: 12px 14px; gap: 12px; }
         .mode-btn { padding: 9px 15px; }
@@ -579,10 +574,12 @@
         var soundOn = true;
         var interacted = false;
         var targetLetter = "B";
+        var targetCase = "upper";
         var roundCaught = 0;
         var totalCaught = 0;
         var wordsDone = 0;
         var currentWord = "";
+        var wordCases = [];
         var wordIndex = 0;
         var lastWord = "";
         var busy = false;
@@ -659,30 +656,38 @@
         function pondW() { return pond.clientWidth; }
         function pondH() { return pond.clientHeight; }
         function neededLetter() { return mode === "catch" ? targetLetter : currentWord.charAt(wordIndex); }
+        function neededCase() { return mode === "catch" ? targetCase : wordCases[wordIndex]; }
+        function dispLetter(letter, cs) { return cs === "lower" ? letter.toLowerCase() : letter; }
+        function caseWord(cs) { return cs === "upper" ? "upper case" : "lower case"; }
+        function randomCase() { return Math.random() < 0.5 ? "upper" : "lower"; }
+        function targetSpeech() {
+          var verb = mode === "catch" ? "Catch" : "Find";
+          return verb + " the " + caseWord(neededCase()) + " " + dispLetter(neededLetter(), neededCase()) + ".";
+        }
         function countNeeded() {
-          var n = 0, need = neededLetter();
+          var n = 0, need = neededLetter(), nc = neededCase();
           for (var i = 0; i < fishes.length; i++) {
-            if (fishes[i].state === "swim" && fishes[i].letter === need) n++;
+            if (fishes[i].state === "swim" && fishes[i].letter === need && fishes[i].fishCase === nc) n++;
           }
           return n;
         }
-        function pickLetterForSpawn() {
-          var need = neededLetter();
+        function pickSpawn() {
+          var need = neededLetter(), nc = neededCase();
           var have = countNeeded();
-          if (have === 0) return need;
-          if (have < 2 && Math.random() < 0.22) return need;
-          if (mode === "spell" && Math.random() < 0.3) {
-            var rest = currentWord.slice(wordIndex);
-            if (rest.length) return rest.charAt(randInt(rest.length));
+          if (have === 0) return { letter: need, cs: nc };
+          if (have < 2 && Math.random() < 0.22) return { letter: need, cs: nc };
+          if (mode === "spell" && Math.random() < 0.3 && wordIndex < currentWord.length) {
+            var p = wordIndex + randInt(currentWord.length - wordIndex);
+            return { letter: currentWord.charAt(p), cs: wordCases[p] };
           }
-          return randomLetter();
+          return { letter: randomLetter(), cs: randomCase() };
         }
         function ensureNeededPresent() {
           if (countNeeded() > 0 || roundOver) return;
           var swimmers = fishes.filter(function (f) { return f.state === "swim"; });
           if (!swimmers.length) return;
           var f = swimmers[randInt(swimmers.length)];
-          setFishLetter(f, neededLetter());
+          setFishLetter(f, neededLetter(), neededCase());
           f.el.classList.remove("wiggling");
           var sh = f.el.querySelector(".shake");
           sh.style.animation = "none"; void sh.offsetWidth; sh.style.animation = "";
@@ -691,10 +696,11 @@
             { duration: 10 }
           );
         }
-        function setFishLetter(f, letter) {
+        function setFishLetter(f, letter, cs) {
           f.letter = letter;
-          f.letterEl.innerHTML = '<span class="up">' + letter + '</span><span class="low">' + letter.toLowerCase() + "</span>";
-          f.el.setAttribute("aria-label", "Fish with letter " + letter + " " + letter.toLowerCase());
+          f.fishCase = cs;
+          f.letterEl.textContent = dispLetter(letter, cs);
+          f.el.setAttribute("aria-label", "Fish with " + caseWord(cs) + " letter " + dispLetter(letter, cs));
         }
 
         /* ---------------- Fish ---------------- */
@@ -744,7 +750,8 @@
           };
           f.y = laneY(f);
           el.querySelector(".flip").style.transform = dir === 1 ? "scaleX(1)" : "scaleX(-1)";
-          setFishLetter(f, pickLetterForSpawn());
+          var sp = pickSpawn();
+          setFishLetter(f, sp.letter, sp.cs);
           el.addEventListener("click", function () { onFishClick(f); });
           el.addEventListener("keydown", function (ev) {
             if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); onFishClick(f); }
@@ -769,7 +776,8 @@
           f.speed = 26 + Math.random() * 30;
           f.el.querySelector(".flip").style.transform = f.dir === 1 ? "scaleX(1)" : "scaleX(-1)";
           f.letter = "\0"; /* exclude this fish from the needed-letter count while re-picking */
-          setFishLetter(f, pickLetterForSpawn());
+          var sp = pickSpawn();
+          setFishLetter(f, sp.letter, sp.cs);
         }
         var lastEnsure = 0;
         function step(now) {
@@ -820,7 +828,7 @@
           interacted = true;
           initAudio();
           if (roundOver || busy || f.state !== "swim") return;
-          if (f.letter === neededLetter()) { catchFish(f); }
+          if (f.letter === neededLetter() && f.fishCase === neededCase()) { catchFish(f); }
           else { wrongFish(f); }
         }
         function wrongFish(f) {
@@ -837,7 +845,7 @@
           var cx = f.x + f.w / 2;
           var cy = f.y + f.h / 2;
           sfxSplash();
-          speak(f.letter);
+          speak(caseWord(f.fishCase) + " " + dispLetter(f.letter, f.fishCase));
           splashAt(cx, cy + 8);
           /* hook drops */
           hook.style.left = cx + "px";
@@ -876,15 +884,16 @@
             hook.classList.remove("show");
             var color = f.color;
             var letter = f.letter;
+            var fcase = f.fishCase;
             removeFish(f);
             bucketWidget.classList.remove("bounce"); void bucketWidget.offsetWidth; bucketWidget.classList.add("bounce");
-            landCatch(letter, color);
+            landCatch(letter, fcase, color);
           }, 980);
         }
-        function landCatch(letter, color) {
+        function landCatch(letter, fcase, color) {
           totalCaught++;
           totalStarsEl.textContent = totalCaught;
-          addChip(letter, color);
+          addChip(letter, fcase, color);
           if (mode === "catch") {
             roundCaught++;
             renderProgress();
@@ -896,7 +905,7 @@
             renderProgress();
             if (wordIndex >= currentWord.length) { finishWord(); busy = false; return; }
             updateTargetUI(false);
-            speak("Find the letter " + neededLetter() + ".");
+            speak(targetSpeech());
           }
           spawnFish(true);
           ensureNeededPresent();
@@ -906,8 +915,9 @@
           var next = randomLetter();
           if (next === targetLetter) next = ALPHABET.charAt((ALPHABET.indexOf(next) + 7) % 26);
           targetLetter = next;
+          targetCase = randomCase();
           updateTargetUI(true);
-          speak("Catch the letter " + targetLetter + ".");
+          speak(targetSpeech());
         }
         function finishRound() {
           roundOver = true;
@@ -943,14 +953,14 @@
         }
 
         /* ---------------- UI rendering ---------------- */
-        function addChip(letter, color) {
+        function addChip(letter, fcase, color) {
           var empty = bucketChips.querySelector(".bucket-empty");
           if (empty) empty.remove();
           var chip = document.createElement("span");
           chip.className = "chip";
           chip.style.background = color;
           chip.style.borderLeftColor = color;
-          chip.textContent = letter + " " + letter.toLowerCase();
+          chip.textContent = dispLetter(letter, fcase);
           bucketChips.appendChild(chip);
           var n = bucketChips.querySelectorAll(".chip").length;
           bucketCount.textContent = n === 1 ? "1 fish in the bucket" : n + " fish in the bucket";
@@ -980,16 +990,18 @@
           for (var i = 0; i < currentWord.length; i++) {
             var t = document.createElement("div");
             t.className = "tile" + (i < wordIndex ? " filled" : (i === wordIndex ? " next" : ""));
-            t.textContent = i < wordIndex ? currentWord.charAt(i) : currentWord.charAt(i);
+            t.textContent = dispLetter(currentWord.charAt(i), wordCases[i]);
             if (i >= wordIndex) t.style.color = "transparent";
             if (i < wordIndex) t.style.color = "#fff";
             wordTiles.appendChild(t);
           }
         }
         function updateTargetUI(pop) {
-          var need = neededLetter();
-          targetLetterEl.innerHTML = '<span class="t-up">' + need + '</span><span class="t-low">' + need.toLowerCase() + "</span>";
-          targetLabelEl.textContent = mode === "catch" ? "Catch the letter" : "Find the letter";
+          var need = neededLetter(), nc = neededCase();
+          targetLetterEl.textContent = dispLetter(need, nc);
+          var verb = mode === "catch" ? "Catch" : "Find";
+          var caseTxt = nc === "upper" ? "UPPER" : "lower";
+          targetLabelEl.innerHTML = verb + " the " + caseTxt + ' case <span class="case-letter">' + dispLetter(need, nc) + "</span>!";
           if (pop) {
             targetLetterEl.classList.remove("pop"); void targetLetterEl.offsetWidth; targetLetterEl.classList.add("pop");
           }
@@ -1011,9 +1023,12 @@
           if (mode === "catch") {
             roundCaught = 0;
             targetLetter = randomLetter();
+            targetCase = randomCase();
             wordArea.hidden = true;
           } else {
             currentWord = pickWord();
+            wordCases = [];
+            for (var k = 0; k < currentWord.length; k++) wordCases.push(randomCase());
             wordIndex = 0;
             wordArea.hidden = false;
             renderWordTiles();
@@ -1028,8 +1043,8 @@
           document.getElementById("modeCatch").classList.toggle("active", m === "catch");
           document.getElementById("modeSpell").classList.toggle("active", m === "spell");
           resetGame();
-          if (m === "catch") speak("Catch the letter " + targetLetter + ".");
-          else speak("Spell the word " + currentWord + ". Find the letter " + neededLetter() + ".");
+          if (m === "catch") speak(targetSpeech());
+          else speak("Spell the word " + currentWord + ". " + targetSpeech());
         }
 
         /* ---------------- Controls ---------------- */
@@ -1039,8 +1054,8 @@
         celeBtn.addEventListener("click", function () { interacted = true; initAudio(); resetGame(); });
         document.getElementById("hearBtn").addEventListener("click", function () {
           interacted = true; initAudio();
-          if (mode === "catch") speak("Catch the letter " + targetLetter + ".");
-          else speak("Spell the word " + currentWord + ". Find the letter " + neededLetter() + ".");
+          if (mode === "catch") speak(targetSpeech());
+          else speak("Spell the word " + currentWord + ". " + targetSpeech());
         });
         var soundBtn = document.getElementById("soundBtn");
         soundBtn.addEventListener("click", function () {
