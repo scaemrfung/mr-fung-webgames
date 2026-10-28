@@ -230,6 +230,7 @@
       .nav-reading { background: var(--c-word); }
       .nav-math { background: var(--c-numbers); }
       .nav-thinking { background: var(--c-next); }
+      .nav-music { background: var(--c-music); }
       @media (prefers-color-scheme: dark) {
         .nav a { color: #14202e; }
       }
@@ -259,6 +260,19 @@
         height: 3px;
         border-radius: 999px;
         background: var(--card-line);
+      }
+      .group-title a {
+        color: inherit;
+        text-decoration: none;
+      }
+      .group-title a:hover {
+        text-decoration: underline;
+        text-underline-offset: 6px;
+      }
+      .group-title a:focus-visible {
+        outline: 4px solid var(--focus);
+        outline-offset: 3px;
+        border-radius: 6px;
       }
 
       .tag {
@@ -462,6 +476,10 @@
           <a class="nav-thinking" href="https://scaemrfung.github.io/mr-fung-webgames/thinking-and-classroom-tools/">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.8.7 1 1.5 1 2.5h6c0-1 .2-1.8 1-2.5A6 6 0 0 0 12 3z"/></svg>
             Thinking &amp; Classroom Tools
+          </a>
+          <a class="nav-music" href="music/">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+            Music Games
           </a>
         </nav>
       </header>
@@ -1114,7 +1132,7 @@
         </div>
 
         <div class="group">
-          <h2 class="group-title">Music</h2>
+          <h2 class="group-title"><a href="music/">Music</a></h2>
           <div class="grid">
 
             <section class="card">
