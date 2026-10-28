@@ -80,6 +80,8 @@
         --c-message-soft: #e3eefb;
         --c-music: #be3455;
         --c-music-soft: #fbe9ee;
+        --c-picture: #0e7490;
+        --c-picture-soft: #e6f4f8;
       }
       @media (prefers-color-scheme: dark) {
         :root {
@@ -152,6 +154,8 @@
           --c-message-soft: #26364d;
           --c-music: #ff8fab;
           --c-music-soft: #3d2630;
+          --c-picture: #7ac5d8;
+          --c-picture-soft: #223a42;
         }
       }
 
@@ -315,6 +319,7 @@
       .tag-picker { background: var(--c-picker); }
       .tag-message { background: var(--c-message); }
       .tag-music { background: var(--c-music); }
+      .tag-picture { background: var(--c-picture); }
       @media (prefers-color-scheme: dark) {
         .tag { color: #14202e; }
       }
@@ -371,6 +376,7 @@
       .art-picker { background: var(--c-picker-soft); }
       .art-message { background: var(--c-message-soft); }
       .art-music { background: var(--c-music-soft); }
+      .art-picture { background: var(--c-picture-soft); }
 
       h2 {
         font-family: "Fredoka", "Nunito", system-ui, sans-serif;
@@ -440,6 +446,7 @@
       .play-picker { background: var(--c-picker); }
       .play-message { background: var(--c-message); }
       .play-music { background: var(--c-music); }
+      .play-picture { background: var(--c-picture); }
       @media (prefers-color-scheme: dark) {
         .play { color: #14202e; }
       }
@@ -755,6 +762,30 @@
               <h2>Silly Sentence Reader</h2>
               <p class="desc">Read super silly sentences out loud — tap to hear them too!</p>
               <a class="play play-silly" href="https://scaemrfung.github.io/mr-fung-webgames/silly-sentence-reader/">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15c0 .8.9 1.3 1.6.9l12-7.5c.7-.4.7-1.4 0-1.8l-12-7.5C7.9 3.2 7 3.7 7 4.5z"/></svg>
+                Play
+              </a>
+            </section>
+
+            <section class="card">
+              <div class="art art-picture" aria-hidden="true">
+                <svg viewBox="0 0 160 120" role="img">
+                  <rect x="42" y="8" width="76" height="62" rx="10" fill="#ffffff" stroke="#0e7490" stroke-width="4"/>
+                  <circle cx="80" cy="32" r="10" fill="#e8912d"/>
+                  <path d="M52 62 q14 -18 28 -6 q10 -12 26 6 z" fill="#2e9e5b"/>
+                  <circle cx="62" cy="46" r="9" fill="#ffffff" stroke="#0e7490" stroke-width="3"/>
+                  <path d="M58 44 q4 -6 8 0 M57 49 q5 4 10 0" fill="none" stroke="#0e7490" stroke-width="2.5" stroke-linecap="round"/>
+                  <g font-family="Fredoka, sans-serif" font-weight="700" font-size="13" text-anchor="middle">
+                    <rect x="8" y="82" width="42" height="28" rx="8" fill="#ffffff" stroke="#0e7490" stroke-width="3.5"/><text x="29" y="101" fill="#0e7490">DOG</text>
+                    <rect x="59" y="82" width="42" height="28" rx="8" fill="#0e7490"/><text x="80" y="101" fill="#ffffff">CAT</text>
+                    <rect x="110" y="82" width="42" height="28" rx="8" fill="#ffffff" stroke="#0e7490" stroke-width="3.5"/><text x="131" y="101" fill="#0e7490">BIRD</text>
+                  </g>
+                </svg>
+              </div>
+              <span class="tag tag-picture">Reading</span>
+              <h2>Picture Word Match</h2>
+              <p class="desc">Look at the picture and tap the matching word!</p>
+              <a class="play play-picture" href="picture-word-match/">
                 <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15c0 .8.9 1.3 1.6.9l12-7.5c.7-.4.7-1.4 0-1.8l-12-7.5C7.9 3.2 7 3.7 7 4.5z"/></svg>
                 Play
               </a>
