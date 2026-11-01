@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="description" content="September to June plan: 35 Reading and Math games from the Fun Playground hub, month by month." />
+    <link rel="icon" href="data:," />
+    <title>September–June Plan · Fun Playground</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #fdf3e3;
+        --bg-soft: #fffaf0;
+        --card: #ffffff;
+        --ink: #2e2418;
+        --ink-soft: #6b5d4d;
+        --line: #ecd9b8;
+        --chip-bg: #ffffff;
+        --chip-ink: #2e2418;
+        --row-hover: #fff3d6;
+        --shadow: 0 2px 0 rgba(46, 36, 24, 0.12);
+        --focus: #1d6fd1;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #1d1913;
+          --bg-soft: #262019;
+          --card: #2b251c;
+          --ink: #fdf3e3;
+          --ink-soft: #cfc0a8;
+          --line: #4a4132;
+          --chip-bg: #2b251c;
+          --chip-ink: #fdf3e3;
+          --row-hover: #3a3122;
+          --shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
+          --focus: #8ec2ff;
+        }
+      }
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      @media (prefers-reduced-motion: reduce) {
+        html { scroll-behavior: auto; }
+      }
+      body {
+        margin: 0;
+        font-family: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+        background: var(--bg);
+        color: var(--ink);
+        line-height: 1.45;
+      }
+      .wrap {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 20px 18px 48px;
+      }
+
+      /* ---------- Top ---------- */
+      .back {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-family: "Fredoka", "Nunito", system-ui, sans-serif;
+        font-weight: 600;
+        font-size: 1.02rem;
+        color: #fff;
+        background: #2e7d5b;
+        border: 3px solid #1f5c42;
+        border-radius: 999px;
+        padding: 11px 20px;
+        text-decoration: none;
+        box-shadow: 0 4px 0 rgba(0, 0, 0, 0.18);
+        min-height: 48px;
+      }
+      .back:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0, 0, 0, 0.18); }
+      .back svg { flex: 0 0 auto; }
+      a:focus-visible {
+        outline: 3px solid var(--focus);
+        outline-offset: 3px;
+        border-radius: 8px;
+      }
+      .back:focus-visible { border-radius: 999px; }
+
+      h1 {
+        font-family: "Fredoka", "Nunito", system-ui, sans-serif;
+        font-weight: 700;
+        font-size: clamp(2.1rem, 6vw, 3.1rem);
+        line-height: 1.08;
+        letter-spacing: -0.01em;
+        margin: 26px 0 8px;
+      }
+      .lede {
+        font-size: 1.18rem;
+        font-weight: 700;
+        margin: 0 0 6px;
+        max-width: 34em;
+      }
+      .total {
+        margin: 0 0 20px;
+        color: var(--ink-soft);
+        font-weight: 700;
+        font-size: 1rem;
+      }
+
+      /* ---------- Month jump nav ---------- */
+      .jump {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 0 0 28px;
+        padding: 14px;
+        background: var(--bg-soft);
+        border: 2px solid var(--line);
+        border-radius: 16px;
+      }
+      .jump-label {
+        width: 100%;
+        font-family: "Fredoka", "Nunito", system-ui, sans-serif;
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: var(--ink-soft);
+        margin: 0 0 2px;
+      }
+      .jump a {
+        font-family: "Fredoka", "Nunito", system-ui, sans-serif;
+        font-weight: 600;
+        font-size: 1rem;
+        color: var(--chip-ink);
+        background: var(--chip-bg);
+        border: 2px solid var(--line);
+        border-radius: 999px;
+        padding: 9px 16px;
+        text-decoration: none;
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+      }
+      .jump a:hover { border-color: var(--ink-soft); }
+
+      /* ---------- Months ---------- */
+      .month {
+        background: var(--card);
+        border: 2px solid var(--line);
+        border-radius: 20px;
+        box-shadow: var(--shadow);
+        margin: 0 0 20px;
+        overflow: hidden;
+        scroll-margin-top: 16px;
+      }
+      .month-head {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 18px 20px 14px;
+        border-bottom: 2px solid var(--line);
+      }
+      .month-num {
+        flex: 0 0 auto;
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Fredoka", "Nunito", system-ui, sans-serif;
+        font-weight: 700;
+        font-size: 1.3rem;
+        color: #fff;
+        background: var(--accent);
+        border: 3px solid rgba(0, 0, 0, 0.18);
+      }
+      .month-head h2 {
+        font-family: "Fredoka", "Nunito", system-ui, sans-serif;
+        font-weight: 700;
+        font-size: clamp(1.5rem, 4.5vw, 1.8rem);
+        line-height: 1.1;
+        margin: 0;
+        flex: 1 1 auto;
+      }
+      .count {
+        flex: 0 0 auto;
+        font-weight: 800;
+        font-size: 0.92rem;
+        color: var(--ink-soft);
+        background: var(--bg-soft);
+        border: 2px solid var(--line);
+        border-radius: 999px;
+        padding: 6px 13px;
+        white-space: nowrap;
+      }
+      .games {
+        list-style: none;
+        margin: 0;
+        padding: 10px;
+      }
+      .games li { margin: 0; }
+      .games a {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-height: 64px;
+        padding: 14px 16px 14px 14px;
+        border-radius: 14px;
+        box-shadow: inset 6px 0 0 var(--accent);
+        color: var(--ink);
+        text-decoration: none;
+        font-family: "Fredoka", "Nunito", system-ui, sans-serif;
+        font-weight: 600;
+        font-size: 1.28rem;
+        line-height: 1.2;
+      }
+      .games a:hover { background: var(--row-hover); }
+      .games a:active { background: var(--row-hover); }
+      .games .name { flex: 1 1 auto; }
+      .games .arrow {
+        flex: 0 0 auto;
+        font-size: 1.4rem;
+        color: var(--accent);
+        line-height: 1;
+      }
+      .games li + li { margin-top: 4px; }
+
+      /* Month accents */
+      .m-sep { --accent: #e4572e; }
+      .m-oct { --accent: #d98a1d; }
+      .m-nov { --accent: #2e7d5b; }
+      .m-dec { --accent: #2e6da4; }
+      .m-jan { --accent: #c2455e; }
+      .m-feb { --accent: #d95f7e; }
+      .m-mar { --accent: #2f8f7b; }
+      .m-apr { --accent: #5b8c3e; }
+      .m-may { --accent: #c98a12; }
+      .m-jun { --accent: #e05a3a; }
+
+      /* ---------- Footer ---------- */
+      footer {
+        margin-top: 30px;
+        text-align: center;
+      }
+      footer p {
+        color: var(--ink-soft);
+        font-weight: 700;
+        margin: 0 0 16px;
+      }
+      footer .back { font-size: 1.08rem; }
+
+      @media (max-width: 480px) {
+        .wrap { padding: 16px 12px 40px; }
+        .games a { font-size: 1.18rem; min-height: 60px; padding: 13px 14px 13px 12px; }
+        .month-head { padding: 16px 16px 12px; gap: 11px; }
+        .month-num { width: 42px; height: 42px; font-size: 1.2rem; }
+        .count { font-size: 0.86rem; padding: 5px 11px; }
+        .jump { padding: 12px; }
+        .jump a { padding: 8px 14px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <a class="back" href="https://scaemrfung.github.io/mr-fung-webgames/" aria-label="Back to All Games">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 11.2 12 4l9 7.2" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 9.8V20h13V9.8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.5 20v-5.5h5V20" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to All Games
+        </a>
+        <h1>September to June</h1>
+        <p class="lede">Reading and Math games for the school year, month by month. Tap a game to play it.</p>
+        <p class="total">35 games &middot; 10 months</p>
+        <nav class="jump" aria-label="Jump to a month">
+          <p class="jump-label">Jump to a month</p>
+          <a href="#september">Sep</a>
+          <a href="#october">Oct</a>
+          <a href="#november">Nov</a>
+          <a href="#december">Dec</a>
+          <a href="#january">Jan</a>
+          <a href="#february">Feb</a>
+          <a href="#march">Mar</a>
+          <a href="#april">Apr</a>
+          <a href="#may">May</a>
+          <a href="#june">Jun</a>
+        </nav>
+      </header>
+
+      <main>
+        <section class="month m-sep" id="september" aria-labelledby="h-september">
+          <div class="month-head">
+            <span class="month-num" aria-hidden="true">1</span>
+            <h2 id="h-september">September</h2>
+            <span class="count">4 games</span>
+          </div>
+          <ul class="games">
+            <li><a href="alphabet-order/"><span class="name">Alphabet Order</span><span class="arrow" aria-hidden="true">&rarr;</span></a></li>
+            <li><a href="hooked-on-letters/"><span class="name">Hooked on Letters!</span><span class="arrow" aria-hidden="true">&rarr;</span></a></li>
+            <li><a href="hooked-on-numbers/"><span class="name">Hooked on Numbers!</span><span class="arrow" aria-hidden="true">&rarr;</span></a></li>
+            <li><a href="beginning-and-ending-sounds/"><span class="name">Beginning and Ending Sounds</span><span class="arrow" aria-hidden="true">&rarr;</span></a></li>
+          </ul>
+        </section>
+
+        <section class="month m-oct" id="october" aria-labelledby="h-october">
+          <div class="month-head">
+            <span class="month-num" aria-hidden="true">2</span>
+            <h2 id="h-october">October</h2>
+            <span class="count">4 games</span>
+          </div>
+          <ul class="games">
+            <li><a href="sight-word-bingo/"><span class="name">Sight Word Bingo</span><span class="arrow" aria-hidden="true">&rarr;</span></a></li>
+            <li><a href="counting-coins/"><span class="name">Counting Coins</span><span class="arrow" aria-hidden="true">&rarr;</span></a></li>
+            <li><a href="pattern-builder/"><span class="name">Pattern Builder</span><span class="arrow" aria-hidden="true">&rarr;</span></a></li>
+            <li><a href="word-builder/"><span class="name">Word Builder</span><span class="arrow" aria-hidden="true">&rarr;</span></a></li>
+          </ul>
+        </section>
+
+        <section class="month m-nov" id="november" aria-labelledby="h-november">
+          <div class="month-head">
+            <span class="month-num" aria-hidden="true">3</span>
+            <h2 id="h-november">November</h2>
+            <span class="count">4 games</span>
+          </div>
+          <ul class="games">
+            <li><a href="rhyming-match/"><span class="name">Rhyming Match</span><span class="arrow" aria-hidden="true">&rarr;</span></a></li>
+            <li><a href="number-order-place-value/"><span class="name">Number Order &amp; Place Value</span><span class="arrow" aria-hidden="true">&rarr;</span></a></li>
+            <li><a href="sight-word-memory/"><span class="name">Sight Word Memory</span><span class="arrow" aria-hidden="true">&rarr;</span></a></li>
+            <li><a href="word-family-builder/"><span class="name">Word Family Builder</span><span class="arrow" aria-hidden="true">&rarr;</span></a></li>
+          </ul>
+        </section>
+
+        <section class="month m-dec" id="december" aria-labelledby="h-december">
+          <div class="month-head">
+            <span class="month-num" aria-hidden="true">4</span>
+            <h2 id="h-december">December</h2>
+            <span class="count">4 games</span>
+          </div>
+          <ul class="games">
+            <li><a href="skip-counting-hop/"><span class="name">Skip Counting Hop</span><span class="arrow" aria-hidden="true">&rarr;</span></a></li>
+            <li><a href="vowel-detective/"><span class="name">Vowel Detective</span><span class="arrow" aria-hidden="true">&rarr;</span></a></li>
+            <li><a href="digraph-detective/"><span class="name">Digraph Detective</span><span class="arrow" aria-hidden="true">&rarr;</span></a></li>
+            <li><a href="double-trouble/"><span class="name">Double Trouble</span><span class="arrow" aria-hidden="true">&rarr;</span></a></li>
+          </ul>
+        </section>
+
+        <section class="month m-jan" id="january" aria-labelledby="h-january">
+          <div class="month-head">
+            <span class="month-num" aria-hidden="true">5</span>
+            <h2 id="h-january">January</h2>
+            <span class="count">4 games</span>
+          </div>
+          <ul class="games">
+            <li><a href="number-bonds-to-20/"><span class="name">Number Bonds to 20</span><span class="arrow" aria-hidden="true">&rarr;</span></a></li>
+            <li><a href="sentence-builder/"><span class="name">Sentence Builder</span><span class="arrow" aria-hidden="true">&rarr;</span></a></li>
+            <li><a href="silly-sentence-reader/"><span class="name">Silly Sentence Reader</span><span class="arrow" aria-hidden="true">&rarr;</span></a></li>
+            <li><a href="telling-time/"><span class="name">Telling Time</span><span class="arrow" aria-hidden="true">&rarr;</span></a></li>
+          </ul>
+        </section>
+
+        <section class="month m-feb" id="february" aria-labelledby="h-february">
+          <div class="month-head">
+            <span class="month-num" aria-hidden="true">6</span>
+            <h2 id="h-february">February</h2>
+            <span class="count">3 games</span>
+          </div>
+          <ul class="games">
+            <li><a href="odd-or-even/"><span class="name">Odd or Even</span><span class="arrow" aria-hidden="true">&rarr;</span></a></li>
+            <li><a href="word-search-fun/"><span class="name">Word Search Fun!</span><span class="arrow" aria-hidden="true">&rarr;</span></a></li>
+            <li><a href="my-word-remake/"><span class="name">My Word Remake</span><span class="arrow" aria-hidden="true">&rarr;</span></a></li>
+          </ul>
+        </section>
+
+        <section class="month m-mar" id="march" aria-labelledby="h-march">
+          <div class="month-head">
+            <span class="month-num" aria-hidden="true">7</span>
+            <h2 id="h-march">March</h2>
+            <span class="count">3 games</span>
+          </div>
+          <ul class="games">
+            <li><a href="money-shop/"><span class="name">Money Shop</span><span class="arrow" aria-hidden="true">&rarr;</span></a></li>
+            <li><a href="greater-less-equal/"><span class="name">Greater Less Equal</span><span class="arrow" aria-hidden="true">&rarr;</span></a></li>
+            <li><a href="picture-word-match/"><span class="name">Picture Word Match</span><span class="arrow" aria-hidden="true">&rarr;</span></a></li>
+          </ul>
+        </section>
+
+        <section class="month m-apr" id="april" aria-labelledby="h-april">
+          <div class="month-head">
+            <span class="month-num" aria-hidden="true">8</span>
+            <h2 id="h-april">April</h2>
+            <span class="count">3 games</span>
+          </div>
+          <ul class="games">
+            <li><a href="compound-words/"><span class="name">Compound Words</span><span class="arrow" aria-hidden="true">&rarr;</span></a></li>
+            <li><a href="measure-it/"><span class="name">Measure It</span><span class="arrow" aria-hidden="true">&rarr;</span></a></li>
+            <li><a href="shape-sorter/"><span class="name">Shape Sorter</span><span class="arrow" aria-hidden="true">&rarr;</span></a></li>
+          </ul>
+        </section>
+
+        <section class="month m-may" id="may" aria-labelledby="h-may">
+          <div class="month-head">
+            <span class="month-num" aria-hidden="true">9</span>
+            <h2 id="h-may">May</h2>
+            <span class="count">3 games</span>
+          </div>
+          <ul class="games">
+            <li><a href="plurals/"><span class="name">Plurals</span><span class="arrow" aria-hidden="true">&rarr;</span></a></li>
+            <li><a href="word-ladder/"><span class="name">Word Ladder</span><span class="arrow" aria-hidden="true">&rarr;</span></a></li>
+            <li><a href="fractions-halves-quarters/"><span class="name">Fractions Halves Quarters</span><span class="arrow" aria-hidden="true">&rarr;</span></a></li>
+          </ul>
+        </section>
+
+        <section class="month m-jun" id="june" aria-labelledby="h-june">
+          <div class="month-head">
+            <span class="month-num" aria-hidden="true">10</span>
+            <h2 id="h-june">June</h2>
+            <span class="count">3 games</span>
+          </div>
+          <ul class="games">
+            <li><a href="sharing/"><span class="name">Sharing</span><span class="arrow" aria-hidden="true">&rarr;</span></a></li>
+            <li><a href="tally-and-graph/"><span class="name">Tally and Graph</span><span class="arrow" aria-hidden="true">&rarr;</span></a></li>
+            <li><a href="memory-game/"><span class="name">Memory Game</span><span class="arrow" aria-hidden="true">&rarr;</span></a></li>
+          </ul>
+        </section>
+      </main>
+
+      <footer>
+        <p>Finished a month? Jump back up and pick the next one.</p>
+        <a class="back" href="https://scaemrfung.github.io/mr-fung-webgames/" aria-label="Back to All Games">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 11.2 12 4l9 7.2" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 9.8V20h13V9.8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.5 20v-5.5h5V20" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to All Games
+        </a>
+      </footer>
+    </div>
+  </body>
+</html>
