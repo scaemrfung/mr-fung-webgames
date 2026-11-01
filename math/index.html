@@ -39,6 +39,8 @@
   }
   *{box-sizing:border-box}
   html{ -webkit-text-size-adjust:100%; }
+  @media (prefers-reduced-motion: no-preference){ html{ scroll-behavior:smooth; } }
+  .group{ scroll-margin-top:16px; }
   body{
     margin:0;
     font-family:"Nunito", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
@@ -89,6 +91,25 @@
     margin:0 auto; max-width:620px;
   }
   .subtitle strong{ color:var(--text); }
+
+  /* Quick-link jump nav */
+  .quick-nav{ margin-top:24px; }
+  .quick-nav ul{
+    list-style:none; margin:0; padding:0;
+    display:flex; flex-wrap:wrap; gap:12px; justify-content:center;
+  }
+  .quick-nav li{ flex:1 1 170px; display:flex; }
+  .quick-nav a{
+    display:flex; align-items:center; justify-content:center; text-align:center;
+    flex:1; min-height:58px; padding:14px 18px;
+    background:var(--card); color:var(--text);
+    border:2px solid var(--card-border); border-radius:999px;
+    box-shadow:var(--shadow);
+    text-decoration:none; font-weight:900; font-size:1.12rem; line-height:1.25;
+  }
+  .quick-nav a:active{ transform:scale(.98); }
+  .quick-nav a:focus-visible{ outline:4px solid #facc15; outline-offset:3px; }
+  @media (min-width:680px){ .quick-nav a{ font-size:1.18rem; } }
 
   /* Grid */
   .grid{
@@ -195,6 +216,16 @@
     <h1><span class="m1">Math</span> <span class="m2">Games</span></h1>
     <p class="subtitle">Pick a game below and tap <strong>Play!</strong><br>Counting, time, coins, shapes &amp; patterns.</p>
   </header>
+
+  <nav class="quick-nav" aria-label="Jump to a math group">
+    <ul>
+      <li><a href="#group-counting-number-sense">Counting &amp; Number Sense</a></li>
+      <li><a href="#group-operations">Operations</a></li>
+      <li><a href="#group-money-time">Money &amp; Time</a></li>
+      <li><a href="#group-measurement-shapes-patterns">Measurement, Shapes &amp; Patterns</a></li>
+      <li><a href="#group-data">Data</a></li>
+    </ul>
+  </nav>
 
   <main aria-label="Math games list">
 

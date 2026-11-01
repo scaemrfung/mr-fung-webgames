@@ -55,6 +55,9 @@
       }
       a{ -webkit-tap-highlight-color: transparent; }
       a:focus-visible{ outline:4px solid var(--focus); outline-offset:3px; border-radius:999px; }
+      @media (prefers-reduced-motion: no-preference){
+        html{ scroll-behavior:smooth; }
+      }
 
       .wrap{
         width:100%;
@@ -111,6 +114,23 @@
         padding:8px 14px; border-radius:999px;
       }
 
+      /* Quick-link jump nav */
+      .quick-nav{
+        display:flex; flex-wrap:wrap; gap:10px; justify-content:center;
+        margin:24px auto 0; max-width:860px;
+      }
+      .quick-nav a{
+        flex:1 1 150px;
+        display:inline-flex; align-items:center; justify-content:center;
+        min-height:56px; padding:14px 20px;
+        background:var(--surface); border:2px solid var(--surface-border);
+        color:var(--ink); text-decoration:none; text-align:center;
+        font-family:"Fredoka","Nunito",sans-serif; font-weight:600; font-size:1.15rem; line-height:1.15;
+        border-radius:999px; box-shadow:var(--shadow);
+      }
+      .quick-nav a:hover{ border-color:var(--focus); color:var(--header-ink); }
+      .quick-nav a:active{ transform:translateY(1px); }
+
       /* Grid */
       .grid{
         display:grid;
@@ -127,7 +147,7 @@
 
 
       /* Skill groups */
-      .group{ margin-top:38px; }
+      .group{ margin-top:38px; scroll-margin-top:18px; }
       .group:first-child{ margin-top:30px; }
       .group-head{
         display:flex; align-items:baseline; gap:12px; flex-wrap:wrap;
@@ -247,9 +267,17 @@
 
       <main aria-label="Reading games list">
 
-        <section class="group" aria-labelledby="letters-heading">
+        <nav class="quick-nav" aria-label="Jump to a game type">
+          <a href="#letters">Letters</a>
+          <a href="#sounds-phonics">Sounds &amp; Phonics</a>
+          <a href="#words">Words</a>
+          <a href="#sentences-reading">Sentences &amp; Reading</a>
+          <a href="#mixed-practice">Mixed Practice</a>
+        </nav>
+
+        <section class="group" aria-labelledby="letters">
           <div class="group-head">
-            <h2 id="letters-heading">Letters</h2>
+            <h2 id="letters">Letters</h2>
             <span class="group-count">2 games</span>
           </div>
           <div class="grid">
@@ -281,9 +309,9 @@
           </div>
         </section>
 
-        <section class="group" aria-labelledby="sounds-heading">
+        <section class="group" aria-labelledby="sounds-phonics">
           <div class="group-head">
-            <h2 id="sounds-heading">Sounds &amp; Phonics</h2>
+            <h2 id="sounds-phonics">Sounds &amp; Phonics</h2>
             <span class="group-count">5 games</span>
           </div>
           <div class="grid">
@@ -354,9 +382,9 @@
           </div>
         </section>
 
-        <section class="group" aria-labelledby="words-heading">
+        <section class="group" aria-labelledby="words">
           <div class="group-head">
-            <h2 id="words-heading">Words</h2>
+            <h2 id="words">Words</h2>
             <span class="group-count">9 games</span>
           </div>
           <div class="grid">
@@ -479,9 +507,9 @@
           </div>
         </section>
 
-        <section class="group" aria-labelledby="sentences-heading">
+        <section class="group" aria-labelledby="sentences-reading">
           <div class="group-head">
-            <h2 id="sentences-heading">Sentences &amp; Reading</h2>
+            <h2 id="sentences-reading">Sentences &amp; Reading</h2>
             <span class="group-count">2 games</span>
           </div>
           <div class="grid">
@@ -513,9 +541,9 @@
           </div>
         </section>
 
-        <section class="group" aria-labelledby="mixed-heading">
+        <section class="group" aria-labelledby="mixed-practice">
           <div class="group-head">
-            <h2 id="mixed-heading">Mixed Practice</h2>
+            <h2 id="mixed-practice">Mixed Practice</h2>
             <span class="group-count">1 game</span>
           </div>
           <div class="grid">
