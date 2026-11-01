@@ -1,0 +1,755 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:," />
+<title>Alphabet Order</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#eaf2fb;
+    --card:#ffffff;
+    --card-2:#f3f7ff;
+    --ink:#17233b;
+    --muted:#5b6b88;
+    --line:#d7e2f2;
+    --red:#e94f37;
+    --blue:#2563eb;
+    --green:#1a9e5c;
+    --amber:#f2a007;
+    --teal:#0e9aa7;
+    --slot:#eef3fb;
+    --shadow:0 10px 30px rgba(23,35,59,.12);
+    --radius:20px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0f1c30;
+      --card:#182a44;
+      --card-2:#1e3454;
+      --ink:#f2f6ff;
+      --muted:#b7c4da;
+      --line:#2c4366;
+      --slot:#22395c;
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    font-family:"Nunito",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.45;
+  }
+  h1,h2,.display{font-family:"Baloo 2","Nunito",system-ui,sans-serif}
+  button{font:inherit;cursor:pointer}
+  :focus-visible{outline:3px solid var(--amber);outline-offset:2px;border-radius:8px}
+
+  .wrap{max-width:880px;margin:0 auto;padding:16px 16px 40px}
+  .topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:6px}
+  .home-link{
+    display:inline-flex;align-items:center;gap:8px;
+    background:var(--card);color:var(--ink);text-decoration:none;
+    border:2px solid var(--line);border-radius:999px;padding:9px 16px;
+    font-weight:900;font-size:16px;box-shadow:0 3px 0 var(--line);
+  }
+  .home-link svg{width:20px;height:20px}
+  .home-link:active{transform:translateY(2px);box-shadow:none}
+  .sound-btn{
+    display:inline-flex;align-items:center;gap:8px;
+    background:var(--card);color:var(--ink);
+    border:2px solid var(--line);border-radius:999px;padding:9px 16px;
+    font-weight:900;font-size:15px;box-shadow:0 3px 0 var(--line);
+  }
+  .sound-btn:active{transform:translateY(2px);box-shadow:none}
+  .sound-btn svg{width:20px;height:20px}
+  .sound-btn[aria-pressed="false"]{opacity:.72}
+
+  header{text-align:center;padding:8px 8px 4px}
+  h1{font-size:clamp(38px,7vw,56px);line-height:1.05;margin:6px 0 4px;letter-spacing:.2px}
+  h1 .a{color:var(--red)} h1 .b{color:var(--amber)} h1 .c{color:var(--green)} h1 .d{color:var(--blue)}
+  .subtitle{font-size:clamp(17px,2.6vw,20px);color:var(--muted);font-weight:700;margin:0 auto 16px;max-width:620px}
+
+  .controls{
+    background:var(--card);border:2px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:16px;display:grid;gap:14px;
+  }
+  .control-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+  .control-label{font-weight:900;font-size:15px;min-width:86px}
+  .segment{display:flex;background:var(--card-2);border:2px solid var(--line);border-radius:999px;padding:4px;gap:4px;flex-wrap:wrap}
+  .segment button{
+    border:0;background:transparent;color:var(--muted);border-radius:999px;
+    padding:9px 16px;font-weight:900;font-size:16px;
+  }
+  .segment button[aria-pressed="true"]{background:var(--blue);color:#fff;box-shadow:0 3px 0 rgba(0,0,0,.18)}
+  .pills{display:flex;gap:8px;flex-wrap:wrap}
+  .pill{
+    border:2px solid var(--line);background:var(--card);color:var(--ink);
+    border-radius:999px;padding:9px 18px;font-weight:900;font-size:16px;box-shadow:0 3px 0 var(--line);
+  }
+  .pill[aria-pressed="true"]{background:var(--green);border-color:var(--green);color:#fff;box-shadow:0 3px 0 rgba(0,0,0,.18)}
+  .pill:active{transform:translateY(2px);box-shadow:none}
+  .toggle-btn{
+    border:2px solid var(--line);background:var(--card);color:var(--ink);
+    border-radius:999px;padding:9px 16px;font-weight:900;font-size:15px;margin-left:auto;
+  }
+  .toggle-btn[aria-pressed="true"]{background:var(--amber);border-color:var(--amber);color:#231a00}
+
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
+  .stat{
+    background:var(--card);border:2px solid var(--line);border-radius:16px;
+    padding:10px 8px;text-align:center;
+  }
+  .stat b{display:block;font-family:"Baloo 2",sans-serif;font-size:28px;line-height:1.1}
+  .stat span{font-size:13px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+
+  .az-strip{
+    display:none;background:var(--card);border:2px solid var(--line);border-radius:16px;
+    padding:12px;margin:0 0 14px;
+  }
+  .az-strip.open{display:block}
+  .az-strip p{margin:0 0 8px;font-weight:900;font-size:14px;color:var(--muted)}
+  .az-letters{display:flex;flex-wrap:wrap;gap:6px}
+  .az-letters span{
+    width:30px;height:34px;display:grid;place-items:center;border-radius:8px;
+    background:var(--card-2);color:var(--muted);font-weight:900;font-size:17px;border:1px solid var(--line);
+  }
+  .az-letters span.in-round{background:var(--blue);color:#fff;border-color:var(--blue)}
+  .az-letters span.is-missing{background:var(--amber);color:#231a00;border-color:var(--amber)}
+
+  .play{
+    position:relative;overflow:hidden;
+    background:var(--card);border:2px solid var(--line);border-radius:24px;
+    box-shadow:var(--shadow);padding:20px 18px 22px;text-align:center;
+  }
+  .round-tag{
+    display:inline-block;background:var(--card-2);border:2px solid var(--line);
+    border-radius:999px;padding:6px 14px;font-weight:900;font-size:14px;color:var(--muted);margin-bottom:10px;
+  }
+  .prompt{font-family:"Baloo 2",sans-serif;font-size:clamp(22px,4vw,28px);line-height:1.25;margin:0 0 6px}
+  .hint-line{color:var(--muted);font-weight:700;margin:0 0 16px;font-size:16px}
+  .section-label{
+    font-size:13px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--muted);margin:14px 0 8px;
+  }
+  .tiles{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;min-height:78px}
+  .tile{
+    width:68px;height:72px;border-radius:16px;border:0;color:#fff;
+    font-family:"Baloo 2",sans-serif;font-weight:800;font-size:38px;line-height:1;
+    box-shadow:0 5px 0 rgba(0,0,0,.22);display:grid;place-items:center;
+    transition:transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+  }
+  .tile:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.22)}
+  .tile:disabled{opacity:.28;box-shadow:0 2px 0 rgba(0,0,0,.15);cursor:default}
+  .tile.c0{background:var(--red)} .tile.c1{background:var(--blue)} .tile.c2{background:var(--green)}
+  .tile.c3{background:var(--amber);color:#231a00} .tile.c4{background:var(--teal)} .tile.c5{background:#7c5cd6}
+  .tile.c6{background:#e85d9e} .tile.c7{background:#2f9e44}
+  .tile.is-hint{animation:pulse 1s ease infinite}
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+  .tile.is-wrong{animation:shake .35s ease}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+  .slots{display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
+  .slot{
+    width:68px;height:72px;border-radius:16px;border:3px dashed var(--line);
+    background:var(--slot);color:var(--ink);
+    font-family:"Baloo 2",sans-serif;font-weight:800;font-size:38px;
+    display:grid;place-items:center;position:relative;
+  }
+  .slot.filled{border-style:solid;border-color:var(--ink);background:var(--card)}
+  .slot .num{position:absolute;top:3px;left:7px;font-size:11px;font-family:"Nunito",sans-serif;font-weight:900;color:var(--muted)}
+  .slot.filled .num{display:none}
+  .slot .q{color:var(--amber);font-size:40px}
+  .slots.shake{animation:shake .35s ease}
+
+  .options{display:flex;flex-wrap:wrap;justify-content:center;gap:12px}
+  .option{
+    width:76px;height:80px;border-radius:18px;border:0;color:#fff;
+    font-family:"Baloo 2",sans-serif;font-weight:800;font-size:42px;
+    box-shadow:0 5px 0 rgba(0,0,0,.22);
+  }
+  .option:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.22)}
+  .option:disabled{opacity:.3;cursor:default}
+  .option.c0{background:var(--red)} .option.c1{background:var(--blue)} .option.c2{background:var(--green)}
+  .option.c3{background:var(--amber);color:#231a00} .option.c4{background:var(--teal)} .option.c5{background:#7c5cd6}
+  .option.c6{background:#e85d9e} .option.c7{background:#2f9e44}
+  .option.is-right{outline:4px solid var(--green);outline-offset:2px;opacity:1}
+
+  .feedback{
+    min-height:30px;margin:16px 0 4px;font-weight:900;font-size:19px;
+  }
+  .feedback.good{color:var(--green)}
+  .feedback.try{color:var(--muted)}
+  .answer-line{font-weight:800;color:var(--muted);min-height:24px;margin:0 0 6px;font-size:16px}
+  .answer-line b{color:var(--ink);letter-spacing:.12em}
+
+  .actions{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:14px}
+  .btn{
+    border:2px solid var(--line);background:var(--card);color:var(--ink);
+    border-radius:999px;padding:12px 20px;font-weight:900;font-size:16px;box-shadow:0 3px 0 var(--line);
+    display:inline-flex;align-items:center;gap:8px;
+  }
+  .btn:active{transform:translateY(2px);box-shadow:none}
+  .btn.primary{background:var(--green);border-color:var(--green);color:#fff;box-shadow:0 4px 0 #0f6b3e}
+  .btn.primary:active{box-shadow:none}
+  .btn.blue{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 4px 0 #1a46a8}
+  .btn.blue:active{box-shadow:none}
+  .btn svg{width:19px;height:19px}
+  .btn[hidden]{display:none}
+
+  .howto{
+    background:var(--card);border:2px solid var(--line);border-radius:var(--radius);
+    padding:18px 20px;margin-top:16px;
+  }
+  .howto h2{margin:0 0 8px;font-size:22px}
+  .howto ol{margin:0;padding-left:22px;font-weight:700;color:var(--muted);font-size:16px}
+  .howto li{margin:6px 0}
+  .howto li b{color:var(--ink)}
+  .foot-note{text-align:center;color:var(--muted);font-weight:700;font-size:14px;margin-top:16px}
+
+  .confetti{position:absolute;top:-12px;width:10px;height:16px;border-radius:2px;pointer-events:none;animation:fall 1.4s ease-in forwards;z-index:5}
+  @keyframes fall{to{transform:translateY(420px) rotate(540deg);opacity:0}}
+
+  @media (max-width:560px){
+    .wrap{padding:12px 12px 32px}
+    .tile,.slot{width:58px;height:62px;font-size:32px;border-radius:14px}
+    .option{width:66px;height:70px;font-size:36px}
+    .control-label{min-width:0}
+    .toggle-btn{margin-left:0}
+    .stats{gap:8px}
+    .stat b{font-size:24px}
+    .play{padding:16px 12px 20px}
+    .btn{padding:11px 16px;font-size:15px}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important;transition:none !important}
+  }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="topbar">
+    <a class="home-link" href="https://scaemrfung.github.io/mr-fung-webgames/">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9.5 21v-6h5v6"/></svg>
+      Home
+    </a>
+    <button class="sound-btn" id="soundBtn" type="button" aria-pressed="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18 6a8.5 8.5 0 0 1 0 12"/></svg>
+      <span id="soundLabel">Sound On</span>
+    </button>
+  </div>
+
+  <header>
+    <h1><span class="a">A</span><span class="b">l</span><span class="c">p</span><span class="d">h</span><span class="a">a</span><span class="b">b</span><span class="c">e</span><span class="d">t</span> Order</h1>
+    <p class="subtitle">Put the mixed-up letters back in A to Z order — and spot the missing letter.</p>
+  </header>
+
+  <section class="controls" aria-label="Game settings">
+    <div class="control-row">
+      <span class="control-label" id="modeLabel">Game</span>
+      <div class="segment" role="group" aria-labelledby="modeLabel">
+        <button type="button" id="modeOrder" aria-pressed="true">Put in Order</button>
+        <button type="button" id="modeMissing" aria-pressed="false">Missing Letter</button>
+      </div>
+    </div>
+    <div class="control-row">
+      <span class="control-label" id="lengthLabel">Letters</span>
+      <div class="pills" role="group" aria-labelledby="lengthLabel">
+        <button type="button" class="pill" data-length="4" aria-pressed="false">4 letters</button>
+        <button type="button" class="pill" data-length="6" aria-pressed="true">6 letters</button>
+        <button type="button" class="pill" data-length="8" aria-pressed="false">8 letters</button>
+      </div>
+      <button type="button" class="toggle-btn" id="azToggle" aria-pressed="false">Show A–Z</button>
+    </div>
+  </section>
+
+  <div class="stats" aria-label="Score">
+    <div class="stat"><b id="starCount">0 ★</b><span>Stars</span></div>
+    <div class="stat"><b id="roundCount">Round 1</b><span>Current round</span></div>
+    <div class="stat"><b id="streakCount">0</b><span>In a row</span></div>
+  </div>
+
+  <div class="az-strip" id="azStrip">
+    <p>The letters in this round are coloured. The missing letter is yellow.</p>
+    <div class="az-letters" id="azLetters" aria-hidden="true"></div>
+  </div>
+
+  <section class="play" id="playCard" aria-live="off">
+    <span class="round-tag" id="roundTag">Put in Order · 6 letters</span>
+    <p class="prompt" id="prompt">Tap the letters in A to Z order.</p>
+    <p class="hint-line" id="hintLine">Start with the letter that comes first in the alphabet.</p>
+
+    <!-- Order mode -->
+    <div id="orderView">
+      <p class="section-label">Your order</p>
+      <div class="slots" id="slots"></div>
+      <p class="section-label">Mixed-up letters — tap one to place it</p>
+      <div class="tiles" id="pool"></div>
+    </div>
+
+    <!-- Missing mode -->
+    <div id="missingView" hidden>
+      <p class="section-label">What letter is missing?</p>
+      <div class="slots" id="sequence"></div>
+      <p class="section-label">Choose the missing letter</p>
+      <div class="options" id="options"></div>
+    </div>
+
+    <p class="feedback" id="feedback" role="status" aria-live="polite"></p>
+    <p class="answer-line" id="answerLine"></p>
+
+    <div class="actions">
+      <button class="btn" type="button" id="hearBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg>
+        Hear It
+      </button>
+      <button class="btn" type="button" id="hintBtn">Hint</button>
+      <button class="btn" type="button" id="redoBtn">Start Over</button>
+      <button class="btn blue" type="button" id="nextBtn" hidden>Next Round →</button>
+      <button class="btn primary" type="button" id="newGameBtn">New Game</button>
+    </div>
+  </section>
+
+  <section class="howto">
+    <h2>How to play</h2>
+    <ol>
+      <li><b>Put in Order:</b> tap the mixed-up letters, first in the alphabet to last, to fill the row.</li>
+      <li><b>Missing Letter:</b> look at the row, work out which letter is missing, and tap it.</li>
+      <li>Tap a letter you placed to send it back. A star is earned for every round you finish — solve it on your first try to build a streak.</li>
+    </ol>
+  </section>
+
+  <p class="foot-note">Tip: say each letter out loud as you tap it. The yellow A–Z strip can help.</p>
+</main>
+
+<script>
+(function(){
+  "use strict";
+  var ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+  var COLORS = ["c0","c1","c2","c3","c4","c5","c6","c7"];
+
+  var mode = "order";
+  var length = 6;
+  var stars = 0, roundsPlayed = 0, streak = 0;
+  var soundOn = true;
+  var solved = false, firstTry = true;
+
+  var target = [];
+  var pool = [];      // order mode: {letter, id, used}
+  var placed = [];    // order mode: letter or null
+  var missingIndex = 0, missingLetter = "", options = [];
+
+  var $ = function(id){ return document.getElementById(id); };
+  var els = {
+    modeOrder: $("modeOrder"), modeMissing: $("modeMissing"),
+    roundTag: $("roundTag"), prompt: $("prompt"), hintLine: $("hintLine"),
+    orderView: $("orderView"), missingView: $("missingView"),
+    slots: $("slots"), pool: $("pool"), sequence: $("sequence"), options: $("options"),
+    feedback: $("feedback"), answerLine: $("answerLine"),
+    hearBtn: $("hearBtn"), hintBtn: $("hintBtn"), redoBtn: $("redoBtn"),
+    nextBtn: $("nextBtn"), newGameBtn: $("newGameBtn"),
+    starCount: $("starCount"), roundCount: $("roundCount"), streakCount: $("streakCount"),
+    azToggle: $("azToggle"), azStrip: $("azStrip"), azLetters: $("azLetters"),
+    soundBtn: $("soundBtn"), soundLabel: $("soundLabel"), playCard: $("playCard")
+  };
+
+  function shuffle(arr){
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--){
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+  function pickStart(n){
+    return Math.floor(Math.random() * (26 - n + 1));
+  }
+
+  function speak(text){
+    if (!soundOn || !("speechSynthesis" in window)) return;
+    try{
+      window.speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      u.rate = 0.9; u.lang = "en-CA";
+      window.speechSynthesis.speak(u);
+    }catch(e){}
+  }
+  var audioCtx = null;
+  function tone(freq, when, dur){
+    if (!soundOn) return;
+    try{
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === "suspended") audioCtx.resume();
+      var o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.type = "sine"; o.frequency.value = freq;
+      g.gain.setValueAtTime(0.0001, audioCtx.currentTime + when);
+      g.gain.exponentialRampToValueAtTime(0.18, audioCtx.currentTime + when + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + when + dur);
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(audioCtx.currentTime + when); o.stop(audioCtx.currentTime + when + dur + 0.05);
+    }catch(e){}
+  }
+  function happySound(){ tone(523, 0, .18); tone(659, .14, .18); tone(784, .28, .3); }
+  function gentleSound(){ tone(330, 0, .2); }
+
+  function updateStats(){
+    els.starCount.textContent = stars + " ★";
+    els.roundCount.textContent = "Round " + (roundsPlayed + 1);
+    els.streakCount.textContent = streak;
+  }
+
+  function renderAzStrip(){
+    var html = "";
+    for (var i = 0; i < ALPHABET.length; i++){
+      var cls = "";
+      if (target.indexOf(ALPHABET[i]) !== -1) cls = "in-round";
+      if (mode === "missing" && ALPHABET[i] === missingLetter) cls = "is-missing";
+      html += '<span class="' + cls + '">' + ALPHABET[i] + "</span>";
+    }
+    els.azLetters.innerHTML = html;
+  }
+
+  function setFeedback(text, kind){
+    els.feedback.textContent = text;
+    els.feedback.className = "feedback" + (kind ? " " + kind : "");
+  }
+
+  function confetti(){
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var colors = ["#e94f37","#2563eb","#1a9e5c","#f2a007","#0e9aa7","#e85d9e"];
+    for (var i = 0; i < 26; i++){
+      var s = document.createElement("span");
+      s.className = "confetti";
+      s.style.left = (4 + Math.random() * 92) + "%";
+      s.style.background = colors[i % colors.length];
+      s.style.animationDelay = (Math.random() * 0.35) + "s";
+      s.style.transform = "rotate(" + Math.floor(Math.random() * 360) + "deg)";
+      els.playCard.appendChild(s);
+      (function(el){ setTimeout(function(){ el.remove(); }, 2200); })(s);
+    }
+  }
+
+  function onSolved(){
+    solved = true;
+    roundsPlayed++;
+    stars++;
+    if (firstTry) streak++; else streak = 0;
+    updateStats();
+    happySound();
+    confetti();
+    els.nextBtn.hidden = false;
+    els.hintBtn.disabled = true;
+    els.redoBtn.disabled = true;
+  }
+
+  /* ---------- Order mode ---------- */
+  function newOrderRound(){
+    solved = false; firstTry = true;
+    var start = pickStart(length);
+    target = ALPHABET.slice(start, start + length);
+    var mixed = shuffle(target);
+    pool = mixed.map(function(letter, i){ return { letter: letter, id: i, used: false }; });
+    placed = target.map(function(){ return null; });
+    renderOrder();
+    renderAzStrip();
+    els.roundTag.textContent = "Put in Order · " + length + " letters";
+    els.prompt.textContent = "Tap the letters in A to Z order.";
+    els.hintLine.textContent = "It starts with the letter that comes first in the alphabet.";
+    setFeedback("", "");
+    els.answerLine.innerHTML = "";
+    els.nextBtn.hidden = true;
+    els.hintBtn.disabled = false;
+    els.redoBtn.disabled = false;
+  }
+
+  function renderOrder(){
+    // slots
+    els.slots.innerHTML = "";
+    placed.forEach(function(letter, i){
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "slot" + (letter ? " filled" : "");
+      b.setAttribute("aria-label", letter ? "Placed letter " + letter + ", tap to send it back" : "Empty space " + (i + 1));
+      if (letter){
+        b.textContent = letter;
+        b.classList.add(COLORS[target.indexOf(letter) % COLORS.length]);
+        b.style.color = "";
+      } else {
+        var n = document.createElement("span");
+        n.className = "num"; n.textContent = (i + 1);
+        b.appendChild(n);
+      }
+      b.addEventListener("click", function(){ returnTile(i); });
+      els.slots.appendChild(b);
+    });
+    // pool
+    els.pool.innerHTML = "";
+    pool.forEach(function(tile){
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "tile " + COLORS[target.indexOf(tile.letter) % COLORS.length];
+      b.textContent = tile.letter;
+      b.disabled = tile.used || solved;
+      b.setAttribute("aria-label", "Letter " + tile.letter);
+      b.addEventListener("click", function(){ placeTile(tile.id); });
+      els.pool.appendChild(b);
+    });
+  }
+
+  function placeTile(id){
+    if (solved) return;
+    var tile = null;
+    for (var i = 0; i < pool.length; i++) if (pool[i].id === id) tile = pool[i];
+    if (!tile || tile.used) return;
+    var slot = placed.indexOf(null);
+    if (slot === -1) return;
+    tile.used = true;
+    placed[slot] = tile.letter;
+    speak(tile.letter);
+    renderOrder();
+    if (placed.indexOf(null) === -1) checkOrder();
+  }
+
+  function returnTile(i){
+    if (solved) return;
+    var letter = placed[i];
+    if (!letter) return;
+    placed[i] = null;
+    for (var k = 0; k < pool.length; k++){
+      if (pool[k].letter === letter && pool[k].used){ pool[k].used = false; break; }
+    }
+    setFeedback("", "");
+    renderOrder();
+  }
+
+  function checkOrder(){
+    var ok = placed.join("") === target.join("");
+    if (ok){
+      setFeedback("Perfect! " + target.join(" ") + " — that's A to Z order! ★", "good");
+      els.answerLine.innerHTML = "In order: <b>" + target.join(" · ") + "</b>";
+      speak("Perfect! " + target.join(", ") + ".");
+      onSolved();
+    } else {
+      firstTry = false;
+      setFeedback("Not quite yet. Look at the row — which letter comes first?", "try");
+      speak("Not quite. Try again.");
+      gentleSound();
+      els.slots.classList.remove("shake");
+      void els.slots.offsetWidth;
+      els.slots.classList.add("shake");
+    }
+  }
+
+  /* ---------- Missing mode ---------- */
+  function newMissingRound(){
+    solved = false; firstTry = true;
+    var start = pickStart(length);
+    target = ALPHABET.slice(start, start + length);
+    missingIndex = Math.floor(Math.random() * length);
+    missingLetter = target[missingIndex];
+    var distract = [];
+    var before = ALPHABET[start - 1], after = ALPHABET[start + length];
+    if (before) distract.push(before);
+    if (after) distract.push(after);
+    while (distract.length < 2){
+      var r = ALPHABET[Math.floor(Math.random() * 26)];
+      if (target.indexOf(r) === -1 && distract.indexOf(r) === -1) distract.push(r);
+    }
+    options = shuffle([missingLetter].concat(distract.slice(0, 2)));
+    renderMissing();
+    renderAzStrip();
+    els.roundTag.textContent = "Missing Letter · " + length + " letters";
+    els.prompt.textContent = "What letter is missing?";
+    var prev = missingIndex > 0 ? target[missingIndex - 1] : null;
+    var next = missingIndex < length - 1 ? target[missingIndex + 1] : null;
+    els.hintLine.textContent = prev && next
+      ? "It comes after " + prev + " and before " + next + "."
+      : (next ? "It comes before " + next + "." : "It comes after " + prev + ".");
+    setFeedback("", "");
+    els.answerLine.innerHTML = "";
+    els.nextBtn.hidden = true;
+    els.hintBtn.disabled = false;
+    els.redoBtn.disabled = false;
+  }
+
+  function renderMissing(){
+    els.sequence.innerHTML = "";
+    target.forEach(function(letter, i){
+      var d = document.createElement("div");
+      if (i === missingIndex && !solved){
+        d.className = "slot";
+        d.innerHTML = '<span class="q">?</span>';
+        d.setAttribute("aria-label", "Missing letter");
+      } else {
+        d.className = "slot filled " + COLORS[i % COLORS.length];
+        d.textContent = letter;
+        d.setAttribute("aria-label", "Letter " + letter);
+      }
+      els.sequence.appendChild(d);
+    });
+    els.options.innerHTML = "";
+    options.forEach(function(letter, i){
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "option " + COLORS[(i + 1) % COLORS.length];
+      b.textContent = letter;
+      b.disabled = solved;
+      b.setAttribute("aria-label", "Choose letter " + letter);
+      b.addEventListener("click", function(){ chooseMissing(b, letter); });
+      els.options.appendChild(b);
+    });
+  }
+
+  function chooseMissing(btn, letter){
+    if (solved) return;
+    speak(letter);
+    if (letter === missingLetter){
+      btn.classList.add("is-right");
+      setFeedback("Yes! The missing letter is " + missingLetter + "! ★", "good");
+      els.answerLine.innerHTML = "The full row is: <b>" + target.join(" · ") + "</b>";
+      speak("Yes! The missing letter is " + missingLetter + ". " + target.join(", ") + ".");
+      renderMissingSolved();
+      onSolved();
+    } else {
+      firstTry = false;
+      btn.disabled = true;
+      btn.classList.add("is-wrong");
+      setFeedback("Good try — " + letter + " doesn't fit there. Listen to the letters around the gap and try again.", "try");
+      gentleSound();
+    }
+  }
+  function renderMissingSolved(){
+    els.sequence.innerHTML = "";
+    target.forEach(function(letter, i){
+      var d = document.createElement("div");
+      d.className = "slot filled " + COLORS[i % COLORS.length];
+      d.textContent = letter;
+      els.sequence.appendChild(d);
+    });
+    var btns = els.options.querySelectorAll("button");
+    for (var i = 0; i < btns.length; i++) btns[i].disabled = true;
+  }
+
+  /* ---------- Shared ---------- */
+  function newRound(){
+    if (mode === "order") newOrderRound(); else newMissingRound();
+  }
+
+  function setMode(next){
+    if (mode === next) return;
+    mode = next;
+    els.modeOrder.setAttribute("aria-pressed", mode === "order" ? "true" : "false");
+    els.modeMissing.setAttribute("aria-pressed", mode === "missing" ? "true" : "false");
+    els.orderView.hidden = mode !== "order";
+    els.missingView.hidden = mode !== "missing";
+    els.hintBtn.style.display = mode === "order" ? "" : "none";
+    newRound();
+  }
+
+  els.modeOrder.addEventListener("click", function(){ setMode("order"); });
+  els.modeMissing.addEventListener("click", function(){ setMode("missing"); });
+
+  var pillBtns = document.querySelectorAll(".pill");
+  pillBtns.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      length = parseInt(btn.getAttribute("data-length"), 10);
+      pillBtns.forEach(function(b){ b.setAttribute("aria-pressed", b === btn ? "true" : "false"); });
+      newRound();
+    });
+  });
+
+  els.azToggle.addEventListener("click", function(){
+    var open = els.azStrip.classList.toggle("open");
+    els.azToggle.setAttribute("aria-pressed", open ? "true" : "false");
+    els.azToggle.textContent = open ? "Hide A–Z" : "Show A–Z";
+  });
+
+  els.soundBtn.addEventListener("click", function(){
+    soundOn = !soundOn;
+    els.soundBtn.setAttribute("aria-pressed", soundOn ? "true" : "false");
+    els.soundLabel.textContent = soundOn ? "Sound On" : "Sound Off";
+    if (!soundOn && "speechSynthesis" in window){ try{ window.speechSynthesis.cancel(); }catch(e){} }
+  });
+
+  els.hearBtn.addEventListener("click", function(){
+    if (mode === "order"){
+      var left = pool.filter(function(t){ return !t.used; }).map(function(t){ return t.letter; });
+      speak(left.length ? "The letters left are " + left.join(", ") + "." : "All the letters are placed.");
+    } else {
+      var parts = target.map(function(l, i){ return i === missingIndex && !solved ? "missing" : l; });
+      speak("The row is " + parts.join(", ") + ".");
+    }
+  });
+
+  els.hintBtn.addEventListener("click", function(){
+    if (mode !== "order" || solved) return;
+    var slot = placed.indexOf(null);
+    if (slot === -1) return;
+    var want = target[slot];
+    firstTry = false;
+    var tiles = els.pool.querySelectorAll("button");
+    for (var i = 0; i < tiles.length; i++){
+      if (tiles[i].textContent === want && !tiles[i].disabled){
+        tiles[i].classList.add("is-hint");
+        (function(el){ setTimeout(function(){ el.classList.remove("is-hint"); }, 1600); })(tiles[i]);
+        break;
+      }
+    }
+    setFeedback("Hint: the next letter is " + want + ". It goes in space " + (slot + 1) + ".", "try");
+    speak("The next letter is " + want + ".");
+  });
+
+  els.redoBtn.addEventListener("click", function(){
+    if (solved) return;
+    if (mode === "order"){
+      placed = target.map(function(){ return null; });
+      pool.forEach(function(t){ t.used = false; });
+      renderOrder();
+    } else {
+      renderMissing();
+    }
+    firstTry = false;
+    setFeedback("Fresh start — take your time.", "try");
+    els.answerLine.innerHTML = "";
+  });
+
+  els.nextBtn.addEventListener("click", function(){ newRound(); });
+
+  els.newGameBtn.addEventListener("click", function(){
+    stars = 0; roundsPlayed = 0; streak = 0;
+    updateStats();
+    newRound();
+    setFeedback("New game — good luck!", "try");
+    els.answerLine.innerHTML = "";
+  });
+
+  // Keyboard: typing a letter places / chooses it.
+  document.addEventListener("keydown", function(e){
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    var key = (e.key || "").toUpperCase();
+    if (!/^[A-Z]$/.test(key)) return;
+    if (document.activeElement && /^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)) return;
+    if (mode === "order"){
+      for (var i = 0; i < pool.length; i++){
+        if (pool[i].letter === key && !pool[i].used){ placeTile(pool[i].id); return; }
+      }
+    } else {
+      var btns = els.options.querySelectorAll("button");
+      for (var j = 0; j < btns.length; j++){
+        if (btns[j].textContent === key && !btns[j].disabled){ btns[j].click(); return; }
+      }
+    }
+  });
+
+  updateStats();
+  newOrderRound();
+})();
+</script>
+</body>
+</html>

@@ -19,6 +19,7 @@
         --shadow: 0 10px 24px rgba(34, 48, 74, 0.10);
         --shadow-hover: 0 16px 32px rgba(34, 48, 74, 0.16);
         --focus: #1d6fe0;
+        --sidebar-hover: #f1e9d8;
 
         --c-search: #e2503a;
         --c-search-soft: #fdeee9;
@@ -82,6 +83,30 @@
         --c-music-soft: #fbe9ee;
         --c-picture: #0e7490;
         --c-picture-soft: #e6f4f8;
+        --c-digraph: #7b2cbf;
+        --c-digraph-soft: #f4e9f9;
+        --c-alphabet: #e8590c;
+        --c-alphabet-soft: #fdeee2;
+        --c-sight: #1098ad;
+        --c-sight-soft: #e3f4f6;
+        --c-ladder: #5f3dc4;
+        --c-ladder-soft: #ece9fa;
+        --c-compound: #d6336c;
+        --c-compound-soft: #fdeaf1;
+        --c-plurals: #2b8a3e;
+        --c-plurals-soft: #e7f4e9;
+        --c-bonds: #0ca678;
+        --c-bonds-soft: #e2f5ef;
+        --c-oddeven: #3b5bdb;
+        --c-oddeven-soft: #e9edfc;
+        --c-greater: #c2255c;
+        --c-greater-soft: #fbe9ef;
+        --c-fractions: #087f5b;
+        --c-fractions-soft: #e4f4ee;
+        --c-sharing: #f08c00;
+        --c-sharing-soft: #fdf0da;
+        --c-tally: #1971c2;
+        --c-tally-soft: #e6f0fa;
       }
       @media (prefers-color-scheme: dark) {
         :root {
@@ -93,6 +118,7 @@
           --shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
           --shadow-hover: 0 16px 32px rgba(0, 0, 0, 0.45);
           --focus: #7db8ff;
+          --sidebar-hover: #2e3850;
 
           --c-search: #ff7a63;
           --c-search-soft: #3a2b2c;
@@ -156,6 +182,30 @@
           --c-music-soft: #3d2630;
           --c-picture: #7ac5d8;
           --c-picture-soft: #223a42;
+          --c-digraph: #c77dff;
+          --c-digraph-soft: #33244a;
+          --c-alphabet: #ffa94d;
+          --c-alphabet-soft: #3d2c20;
+          --c-sight: #66d9e8;
+          --c-sight-soft: #22393d;
+          --c-ladder: #b197fc;
+          --c-ladder-soft: #2e2947;
+          --c-compound: #faa2c1;
+          --c-compound-soft: #3d2833;
+          --c-plurals: #69db7c;
+          --c-plurals-soft: #26382a;
+          --c-bonds: #63e6be;
+          --c-bonds-soft: #213a35;
+          --c-oddeven: #91a7ff;
+          --c-oddeven-soft: #2a3049;
+          --c-greater: #f783ac;
+          --c-greater-soft: #3d2833;
+          --c-fractions: #38d9a9;
+          --c-fractions-soft: #223a33;
+          --c-sharing: #ffd43b;
+          --c-sharing-soft: #3d3620;
+          --c-tally: #74c0fc;
+          --c-tally-soft: #223947;
         }
       }
 
@@ -170,7 +220,7 @@
       }
 
       .wrap {
-        max-width: 1080px;
+        max-width: 1320px;
         margin: 0 auto;
         padding: clamp(28px, 5vw, 56px) clamp(18px, 4vw, 40px) clamp(40px, 6vw, 64px);
       }
@@ -188,6 +238,12 @@
         font-weight: 700;
         color: var(--ink-soft);
         margin: 0;
+      }
+      .count {
+        font-size: clamp(18px, 2.6vw, 22px);
+        font-weight: 800;
+        color: var(--ink-soft);
+        margin: 12px 0 0;
       }
       .dots { margin-top: 18px; font-size: 0; }
       .dots span {
@@ -320,6 +376,18 @@
       .tag-message { background: var(--c-message); }
       .tag-music { background: var(--c-music); }
       .tag-picture { background: var(--c-picture); }
+      .tag-digraph { background: var(--c-digraph); }
+      .tag-alphabet { background: var(--c-alphabet); }
+      .tag-sight { background: var(--c-sight); }
+      .tag-ladder { background: var(--c-ladder); }
+      .tag-compound { background: var(--c-compound); }
+      .tag-plurals { background: var(--c-plurals); }
+      .tag-bonds { background: var(--c-bonds); }
+      .tag-oddeven { background: var(--c-oddeven); }
+      .tag-greater { background: var(--c-greater); }
+      .tag-fractions { background: var(--c-fractions); }
+      .tag-sharing { background: var(--c-sharing); }
+      .tag-tally { background: var(--c-tally); }
       @media (prefers-color-scheme: dark) {
         .tag { color: #14202e; }
       }
@@ -377,6 +445,18 @@
       .art-message { background: var(--c-message-soft); }
       .art-music { background: var(--c-music-soft); }
       .art-picture { background: var(--c-picture-soft); }
+      .art-digraph { background: var(--c-digraph-soft); }
+      .art-alphabet { background: var(--c-alphabet-soft); }
+      .art-sight { background: var(--c-sight-soft); }
+      .art-ladder { background: var(--c-ladder-soft); }
+      .art-compound { background: var(--c-compound-soft); }
+      .art-plurals { background: var(--c-plurals-soft); }
+      .art-bonds { background: var(--c-bonds-soft); }
+      .art-oddeven { background: var(--c-oddeven-soft); }
+      .art-greater { background: var(--c-greater-soft); }
+      .art-fractions { background: var(--c-fractions-soft); }
+      .art-sharing { background: var(--c-sharing-soft); }
+      .art-tally { background: var(--c-tally-soft); }
 
       h2 {
         font-family: "Fredoka", "Nunito", system-ui, sans-serif;
@@ -447,8 +527,200 @@
       .play-message { background: var(--c-message); }
       .play-music { background: var(--c-music); }
       .play-picture { background: var(--c-picture); }
+      .play-digraph { background: var(--c-digraph); }
+      .play-alphabet { background: var(--c-alphabet); }
+      .play-sight { background: var(--c-sight); }
+      .play-ladder { background: var(--c-ladder); }
+      .play-compound { background: var(--c-compound); }
+      .play-plurals { background: var(--c-plurals); }
+      .play-bonds { background: var(--c-bonds); }
+      .play-oddeven { background: var(--c-oddeven); }
+      .play-greater { background: var(--c-greater); }
+      .play-fractions { background: var(--c-fractions); }
+      .play-sharing { background: var(--c-sharing); }
+      .play-tally { background: var(--c-tally); }
       @media (prefers-color-scheme: dark) {
         .play { color: #14202e; }
+      }
+
+      /* Accessible sidebar layout */
+      :focus-visible {
+        outline: 4px solid var(--focus);
+        outline-offset: 3px;
+      }
+      .skip-link {
+        position: absolute;
+        top: 14px;
+        left: 14px;
+        z-index: 100;
+        background: var(--ink);
+        color: var(--bg);
+        font-size: 20px;
+        font-weight: 800;
+        padding: 14px 22px;
+        border-radius: 999px;
+        text-decoration: none;
+        transform: translateY(-260%);
+        transition: transform 0.15s ease;
+      }
+      .skip-link:focus-visible {
+        transform: none;
+      }
+      .layout {
+        display: flex;
+        align-items: flex-start;
+        gap: clamp(20px, 3vw, 32px);
+      }
+      .layout main {
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+      #apps:focus {
+        outline: none;
+      }
+      .sidebar {
+        flex: 0 0 280px;
+        width: 280px;
+        position: sticky;
+        top: 24px;
+        max-height: calc(100vh - 48px);
+        overflow-y: auto;
+        background: var(--card);
+        border: 2px solid var(--card-line);
+        border-radius: 24px;
+        padding: 24px 20px 8px;
+        box-shadow: var(--shadow);
+      }
+      .sidebar-heading {
+        font-family: "Fredoka", "Nunito", system-ui, sans-serif;
+        font-weight: 700;
+        font-size: 30px;
+        line-height: 1.15;
+        margin: 0 0 18px;
+      }
+      .sidebar-section {
+        margin-bottom: 22px;
+      }
+      .sidebar-section h3 {
+        font-family: "Fredoka", "Nunito", system-ui, sans-serif;
+        font-weight: 700;
+        font-size: 22px;
+        line-height: 1.2;
+        margin: 0 0 6px;
+      }
+      .sidebar-section ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .sidebar-section a {
+        display: block;
+        padding: 9px 12px;
+        border-radius: 12px;
+        font-size: 19px;
+        font-weight: 700;
+        line-height: 1.35;
+        color: var(--ink);
+        text-decoration: none;
+      }
+      .sidebar-section a:hover {
+        background: var(--sidebar-hover);
+        text-decoration: underline;
+        text-underline-offset: 4px;
+      }
+      .menu-toggle,
+      .sidebar-close,
+      .sidebar-scrim {
+        display: none;
+      }
+      @media (min-width: 900px) and (max-width: 1150px) {
+        .sidebar {
+          flex-basis: 250px;
+          width: 250px;
+        }
+      }
+      @media (max-width: 899px) {
+        .layout {
+          display: block;
+        }
+        .menu-toggle {
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          position: sticky;
+          top: 12px;
+          z-index: 45;
+          margin: 0 0 18px;
+          font-family: "Fredoka", "Nunito", system-ui, sans-serif;
+          font-weight: 600;
+          font-size: 22px;
+          letter-spacing: 0.02em;
+          color: var(--bg);
+          background: var(--ink);
+          border: 0;
+          padding: 14px 24px;
+          border-radius: 999px;
+          box-shadow: var(--shadow);
+          cursor: pointer;
+        }
+        .menu-toggle svg {
+          width: 24px;
+          height: 24px;
+          flex: none;
+        }
+        .sidebar {
+          position: fixed;
+          top: 0;
+          left: 0;
+          bottom: 0;
+          z-index: 60;
+          width: min(330px, 88vw);
+          max-height: none;
+          border-radius: 0 24px 24px 0;
+          transform: translateX(-105%);
+          visibility: hidden;
+          transition: transform 0.2s ease, visibility 0.2s ease;
+        }
+        body.sidebar-open .sidebar {
+          transform: none;
+          visibility: visible;
+        }
+        .sidebar-close {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          margin-bottom: 16px;
+          font-family: "Fredoka", "Nunito", system-ui, sans-serif;
+          font-weight: 600;
+          font-size: 19px;
+          color: var(--ink);
+          background: var(--card);
+          border: 2px solid var(--card-line);
+          padding: 12px 18px;
+          border-radius: 999px;
+          cursor: pointer;
+        }
+        .sidebar-scrim {
+          display: block;
+          position: fixed;
+          inset: 0;
+          z-index: 50;
+          background: rgba(20, 28, 44, 0.5);
+          opacity: 0;
+          visibility: hidden;
+          transition: opacity 0.2s ease, visibility 0.2s ease;
+        }
+        body.sidebar-open .sidebar-scrim {
+          opacity: 1;
+          visibility: visible;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .sidebar,
+        .sidebar-scrim,
+        .skip-link {
+          transition: none;
+        }
       }
 
       footer {
@@ -466,10 +738,12 @@
     </style>
   </head>
   <body>
+    <a class="skip-link" href="#apps">Skip to apps</a>
     <div class="wrap">
       <header>
         <h1>Fun Playground</h1>
         <p class="sub">Games for Kindergarten and Grade One — pick one and play!</p>
+        <p class="count">43 games to choose from</p>
         <div class="dots" aria-hidden="true"><span class="d1"></span><span class="d2"></span><span class="d3"></span><span class="d4"></span><span class="d5"></span><span class="d6"></span></div>
         <nav class="nav" aria-label="Games by subject">
           <a class="nav-reading" href="https://scaemrfung.github.io/mr-fung-webgames/reading/">
@@ -484,14 +758,86 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.8.7 1 1.5 1 2.5h6c0-1 .2-1.8 1-2.5A6 6 0 0 0 12 3z"/></svg>
             Thinking &amp; Classroom Tools
           </a>
-          <a class="nav-music" href="music/">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-            Music Games
-          </a>
         </nav>
       </header>
 
-      <main>
+      <button class="menu-toggle" id="menu-toggle" type="button" aria-expanded="false" aria-controls="sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        Menu: All games
+      </button>
+
+      <div class="layout">
+        <div class="sidebar-scrim" id="sidebar-scrim" aria-hidden="true"></div>
+        <aside class="sidebar" id="sidebar" aria-labelledby="sidebar-heading">
+          <button class="sidebar-close" id="sidebar-close" type="button">✕ Close menu</button>
+          <h2 class="sidebar-heading" id="sidebar-heading">All games</h2>
+          <nav aria-label="All games by section">
+            <div class="sidebar-section">
+              <h3>Reading</h3>
+              <ul>
+                <li><a href="https://scaemrfung.github.io/mr-fung-webgames/word-search-fun/">Word Search Fun!</a></li>
+                <li><a href="https://scaemrfung.github.io/mr-fung-webgames/my-word-remake/">My Word Remake</a></li>
+                <li><a href="https://scaemrfung.github.io/mr-fung-webgames/hooked-on-letters/">Hooked on Letters!</a></li>
+                <li><a href="https://scaemrfung.github.io/mr-fung-webgames/word-builder/">Word Builder</a></li>
+                <li><a href="https://scaemrfung.github.io/mr-fung-webgames/memory-game/">Memory Game</a></li>
+                <li><a href="https://scaemrfung.github.io/mr-fung-webgames/sight-word-bingo/">Sight Word Bingo</a></li>
+                <li><a href="https://scaemrfung.github.io/mr-fung-webgames/rhyming-match/">Rhyming Match</a></li>
+                <li><a href="https://scaemrfung.github.io/mr-fung-webgames/sentence-builder/">Sentence Builder</a></li>
+                <li><a href="https://scaemrfung.github.io/mr-fung-webgames/word-family-builder/">Word Family Builder</a></li>
+                <li><a href="https://scaemrfung.github.io/mr-fung-webgames/vowel-detective/">Vowel Detective</a></li>
+                <li><a href="https://scaemrfung.github.io/mr-fung-webgames/beginning-and-ending-sounds/">Beginning and Ending Sounds</a></li>
+                <li><a href="https://scaemrfung.github.io/mr-fung-webgames/silly-sentence-reader/">Silly Sentence Reader</a></li>
+                <li><a href="picture-word-match/">Picture Word Match</a></li>
+                <li><a href="digraph-detective/">Digraph Detective</a></li>
+                <li><a href="alphabet-order/">Alphabet Order</a></li>
+                <li><a href="sight-word-memory/">Sight Word Memory</a></li>
+                <li><a href="word-ladder/">Word Ladder</a></li>
+                <li><a href="compound-words/">Compound Words</a></li>
+                <li><a href="plurals/">Plurals</a></li>
+              </ul>
+            </div>
+            <div class="sidebar-section">
+              <h3>Math</h3>
+              <ul>
+                <li><a href="https://scaemrfung.github.io/mr-fung-webgames/hooked-on-numbers/">Hooked on Numbers!</a></li>
+                <li><a href="https://scaemrfung.github.io/mr-fung-webgames/telling-time/">Telling Time</a></li>
+                <li><a href="https://scaemrfung.github.io/mr-fung-webgames/counting-coins/">Counting Coins</a></li>
+                <li><a href="https://scaemrfung.github.io/mr-fung-webgames/number-order-place-value/">Number Order Place Value</a></li>
+                <li><a href="https://scaemrfung.github.io/mr-fung-webgames/shape-sorter/">Shape Sorter</a></li>
+                <li><a href="https://scaemrfung.github.io/mr-fung-webgames/pattern-builder/">Pattern Builder</a></li>
+                <li><a href="https://scaemrfung.github.io/mr-fung-webgames/skip-counting-hop/">Skip Counting Hop</a></li>
+                <li><a href="https://scaemrfung.github.io/mr-fung-webgames/double-trouble/">Double Trouble</a></li>
+                <li><a href="https://scaemrfung.github.io/mr-fung-webgames/money-shop/">Money Shop</a></li>
+                <li><a href="https://scaemrfung.github.io/mr-fung-webgames/measure-it/">Measure It</a></li>
+                <li><a href="number-bonds-to-20/">Number Bonds to 20</a></li>
+                <li><a href="odd-or-even/">Odd or Even</a></li>
+                <li><a href="greater-less-equal/">Greater Less Equal</a></li>
+                <li><a href="fractions-halves-quarters/">Fractions Halves Quarters</a></li>
+                <li><a href="sharing/">Sharing</a></li>
+                <li><a href="tally-and-graph/">Tally and Graph</a></li>
+              </ul>
+            </div>
+            <div class="sidebar-section">
+              <h3>Thinking &amp; Classroom Tools</h3>
+              <ul>
+                <li><a href="https://scaemrfung.github.io/mr-fung-webgames/odd-one-out/">Odd One Out</a></li>
+                <li><a href="https://scaemrfung.github.io/mr-fung-webgames/sorting-seasons/">Sorting Seasons</a></li>
+                <li><a href="https://scaemrfung.github.io/mr-fung-webgames/animal-homes/">Animal Homes</a></li>
+                <li><a href="https://scaemrfung.github.io/mr-fung-webgames/what-comes-next/">What Comes Next</a></li>
+                <li><a href="https://scaemrfung.github.io/mr-fung-webgames/class-timer/">Class Timer</a></li>
+                <li><a href="https://scaemrfung.github.io/mr-fung-webgames/random-name-picker/">Random Name Picker</a></li>
+                <li><a href="https://scaemrfung.github.io/mr-fung-webgames/morning-message-board/">Morning Message Board</a></li>
+              </ul>
+            </div>
+            <div class="sidebar-section">
+              <h3>Music</h3>
+              <ul>
+                <li><a href="rhythm-pattern-maker/">Rhythm Pattern Maker</a></li>
+              </ul>
+            </div>
+          </nav>
+        </aside>
+        <main id="apps" tabindex="-1">
         <div class="group">
           <h2 class="group-title">Reading</h2>
           <div class="grid">
@@ -791,6 +1137,136 @@
               </a>
             </section>
 
+            <section class="card">
+              <div class="art art-digraph" aria-hidden="true">
+                <svg viewBox="0 0 160 120" role="img">
+                  <g font-family="Fredoka, sans-serif" font-weight="700" font-size="22" text-anchor="middle">
+                    <rect x="14" y="24" width="62" height="36" rx="9" fill="#7b2cbf"/><text x="45" y="50" fill="#ffffff">CH</text>
+                    <rect x="84" y="24" width="62" height="36" rx="9" fill="#ffffff" stroke="#7b2cbf" stroke-width="4"/><text x="115" y="50" fill="#7b2cbf">SH</text>
+                    <rect x="14" y="68" width="62" height="36" rx="9" fill="#ffffff" stroke="#7b2cbf" stroke-width="4"/><text x="45" y="94" fill="#7b2cbf">TH</text>
+                    <rect x="84" y="68" width="62" height="36" rx="9" fill="#7b2cbf"/><text x="115" y="94" fill="#ffffff">WH</text>
+                  </g>
+                </svg>
+              </div>
+              <span class="tag tag-digraph">Reading</span>
+              <h2>Digraph Detective</h2>
+              <p class="desc">Hear a mystery word and find the digraph — ch, sh, th, or wh — it starts or ends with!</p>
+              <a class="play play-digraph" href="digraph-detective/">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15c0 .8.9 1.3 1.6.9l12-7.5c.7-.4.7-1.4 0-1.8l-12-7.5C7.9 3.2 7 3.7 7 4.5z"/></svg>
+                Play
+              </a>
+            </section>
+
+            <section class="card">
+              <div class="art art-alphabet" aria-hidden="true">
+                <svg viewBox="0 0 160 120" role="img">
+                  <g font-family="Fredoka, sans-serif" font-weight="700" font-size="20" text-anchor="middle">
+                    <rect x="8" y="34" width="34" height="34" rx="8" fill="#e8590c"/><text x="25" y="58" fill="#ffffff">A</text>
+                    <rect x="48" y="34" width="34" height="34" rx="8" fill="#ffffff" stroke="#e8590c" stroke-width="4"/><text x="65" y="58" fill="#e8590c">B</text>
+                    <rect x="88" y="34" width="34" height="34" rx="8" fill="#e8590c"/><text x="105" y="58" fill="#ffffff">C</text>
+                    <rect x="128" y="34" width="24" height="34" rx="8" fill="#ffffff" stroke="#e8590c" stroke-width="4" stroke-dasharray="6 5"/><text x="140" y="58" fill="#e8590c">?</text>
+                  </g>
+                  <path d="M24 86 h104" stroke="#e8590c" stroke-width="4" stroke-linecap="round"/>
+                  <path d="M118 78 l10 8 -10 8" fill="none" stroke="#e8590c" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                  <text x="76" y="106" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="14" fill="#e8590c">A &#8230; Z</text>
+                </svg>
+              </div>
+              <span class="tag tag-alphabet">Reading</span>
+              <h2>Alphabet Order</h2>
+              <p class="desc">Put letters in A to Z order and spot the missing letter!</p>
+              <a class="play play-alphabet" href="alphabet-order/">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15c0 .8.9 1.3 1.6.9l12-7.5c.7-.4.7-1.4 0-1.8l-12-7.5C7.9 3.2 7 3.7 7 4.5z"/></svg>
+                Play
+              </a>
+            </section>
+
+            <section class="card">
+              <div class="art art-sight" aria-hidden="true">
+                <svg viewBox="0 0 160 120" role="img">
+                  <rect x="14" y="26" width="58" height="76" rx="10" fill="#1098ad" transform="rotate(-8 43 64)"/>
+                  <text x="43" y="72" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="19" fill="#ffffff" transform="rotate(-8 43 64)">DOG</text>
+                  <rect x="88" y="26" width="58" height="76" rx="10" fill="#ffffff" stroke="#1098ad" stroke-width="5" transform="rotate(8 117 64)"/>
+                  <g transform="rotate(8 117 64)">
+                    <ellipse cx="104" cy="48" rx="8" ry="11" fill="#e8912d" transform="rotate(-18 104 48)"/>
+                    <ellipse cx="130" cy="48" rx="8" ry="11" fill="#e8912d" transform="rotate(18 130 48)"/>
+                    <circle cx="117" cy="62" r="17" fill="#e8912d"/>
+                    <circle cx="111" cy="59" r="2.4" fill="#22304a"/>
+                    <circle cx="123" cy="59" r="2.4" fill="#22304a"/>
+                    <ellipse cx="117" cy="67" rx="4.5" ry="3.5" fill="#22304a"/>
+                    <path d="M112 71 q5 4 10 0" fill="none" stroke="#22304a" stroke-width="2.5" stroke-linecap="round"/>
+                  </g>
+                </svg>
+              </div>
+              <span class="tag tag-sight">Reading</span>
+              <h2>Sight Word Memory</h2>
+              <p class="desc">Flip the cards and match each sight word to its picture!</p>
+              <a class="play play-sight" href="sight-word-memory/">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15c0 .8.9 1.3 1.6.9l12-7.5c.7-.4.7-1.4 0-1.8l-12-7.5C7.9 3.2 7 3.7 7 4.5z"/></svg>
+                Play
+              </a>
+            </section>
+
+            <section class="card">
+              <div class="art art-ladder" aria-hidden="true">
+                <svg viewBox="0 0 160 120" role="img">
+                  <g font-family="Fredoka, sans-serif" font-weight="700" font-size="18" text-anchor="middle">
+                    <rect x="52" y="12" width="56" height="28" rx="8" fill="#5f3dc4"/><text x="80" y="32" fill="#ffffff">CAT</text>
+                    <rect x="52" y="48" width="56" height="28" rx="8" fill="#ffffff" stroke="#5f3dc4" stroke-width="4"/><text x="80" y="68" fill="#5f3dc4">HAT</text>
+                    <rect x="52" y="84" width="56" height="28" rx="8" fill="#5f3dc4"/><text x="80" y="104" fill="#ffffff">HAM</text>
+                  </g>
+                  <path d="M80 40 v8 M80 76 v8" stroke="#5f3dc4" stroke-width="4" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <span class="tag tag-ladder">Reading</span>
+              <h2>Word Ladder</h2>
+              <p class="desc">Change one letter at a time to climb from one word to another!</p>
+              <a class="play play-ladder" href="word-ladder/">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15c0 .8.9 1.3 1.6.9l12-7.5c.7-.4.7-1.4 0-1.8l-12-7.5C7.9 3.2 7 3.7 7 4.5z"/></svg>
+                Play
+              </a>
+            </section>
+
+            <section class="card">
+              <div class="art art-compound" aria-hidden="true">
+                <svg viewBox="0 0 160 120" role="img">
+                  <g font-family="Fredoka, sans-serif" font-weight="700" font-size="18" text-anchor="middle">
+                    <rect x="10" y="30" width="58" height="34" rx="8" fill="#d6336c"/><text x="39" y="53" fill="#ffffff">CUP</text>
+                    <rect x="92" y="30" width="58" height="34" rx="8" fill="#ffffff" stroke="#d6336c" stroke-width="4"/><text x="121" y="53" fill="#d6336c">CAKE</text>
+                  </g>
+                  <text x="80" y="54" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="22" fill="#d6336c">+</text>
+                  <text x="80" y="96" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="20" fill="#d6336c">= CUPCAKE</text>
+                </svg>
+              </div>
+              <span class="tag tag-compound">Reading</span>
+              <h2>Compound Words</h2>
+              <p class="desc">Join two little words to make one big compound word!</p>
+              <a class="play play-compound" href="compound-words/">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15c0 .8.9 1.3 1.6.9l12-7.5c.7-.4.7-1.4 0-1.8l-12-7.5C7.9 3.2 7 3.7 7 4.5z"/></svg>
+                Play
+              </a>
+            </section>
+
+            <section class="card">
+              <div class="art art-plurals" aria-hidden="true">
+                <svg viewBox="0 0 160 120" role="img">
+                  <circle cx="44" cy="48" r="20" fill="#e2503a"/>
+                  <circle cx="80" cy="40" r="20" fill="#e2503a"/>
+                  <circle cx="116" cy="48" r="20" fill="#e2503a"/>
+                  <ellipse cx="44" cy="26" rx="9" ry="4.5" fill="#2b8a3e" transform="rotate(-24 44 26)"/>
+                  <ellipse cx="80" cy="18" rx="9" ry="4.5" fill="#2b8a3e" transform="rotate(-24 80 18)"/>
+                  <ellipse cx="116" cy="26" rx="9" ry="4.5" fill="#2b8a3e" transform="rotate(-24 116 26)"/>
+                  <text x="80" y="98" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="20" fill="#2b8a3e">APPLES</text>
+                </svg>
+              </div>
+              <span class="tag tag-plurals">Reading</span>
+              <h2>Plurals</h2>
+              <p class="desc">Look at the picture and pick the word that names more than one!</p>
+              <a class="play play-plurals" href="plurals/">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15c0 .8.9 1.3 1.6.9l12-7.5c.7-.4.7-1.4 0-1.8l-12-7.5C7.9 3.2 7 3.7 7 4.5z"/></svg>
+                Play
+              </a>
+            </section>
+
           </div>
         </div>
 
@@ -1023,6 +1499,142 @@
               </a>
             </section>
 
+            <section class="card">
+              <div class="art art-bonds" aria-hidden="true">
+                <svg viewBox="0 0 160 120" role="img">
+                  <text x="80" y="38" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="26" fill="#0ca678">7 + ? = 10</text>
+                  <g>
+                    <circle cx="18" cy="72" r="6.5" fill="#0ca678"/><circle cx="32" cy="72" r="6.5" fill="#0ca678"/><circle cx="46" cy="72" r="6.5" fill="#0ca678"/><circle cx="60" cy="72" r="6.5" fill="#0ca678"/><circle cx="74" cy="72" r="6.5" fill="#0ca678"/><circle cx="88" cy="72" r="6.5" fill="#0ca678"/><circle cx="102" cy="72" r="6.5" fill="#0ca678"/>
+                    <circle cx="116" cy="72" r="6.5" fill="#ffffff" stroke="#0ca678" stroke-width="3"/><circle cx="130" cy="72" r="6.5" fill="#ffffff" stroke="#0ca678" stroke-width="3"/><circle cx="144" cy="72" r="6.5" fill="#ffffff" stroke="#0ca678" stroke-width="3"/>
+                  </g>
+                  <text x="80" y="102" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="14" fill="#0ca678">HOW MANY MORE?</text>
+                </svg>
+              </div>
+              <span class="tag tag-bonds">Math</span>
+              <h2>Number Bonds to 20</h2>
+              <p class="desc">Find the missing part that makes 10 or 20!</p>
+              <a class="play play-bonds" href="number-bonds-to-20/">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15c0 .8.9 1.3 1.6.9l12-7.5c.7-.4.7-1.4 0-1.8l-12-7.5C7.9 3.2 7 3.7 7 4.5z"/></svg>
+                Play
+              </a>
+            </section>
+
+            <section class="card">
+              <div class="art art-oddeven" aria-hidden="true">
+                <svg viewBox="0 0 160 120" role="img">
+                  <g font-family="Fredoka, sans-serif" font-weight="700" text-anchor="middle">
+                    <rect x="10" y="28" width="64" height="56" rx="9" fill="#3b5bdb"/>
+                    <text x="42" y="56" font-size="26" fill="#ffffff">3</text>
+                    <text x="42" y="76" font-size="13" fill="#ffffff">ODD</text>
+                    <rect x="86" y="28" width="64" height="56" rx="9" fill="#ffffff" stroke="#3b5bdb" stroke-width="4"/>
+                    <text x="118" y="56" font-size="26" fill="#3b5bdb">4</text>
+                    <text x="118" y="76" font-size="13" fill="#3b5bdb">EVEN</text>
+                  </g>
+                  <path d="M30 98 q10 -7 20 0 M100 98 q10 -7 20 0" fill="none" stroke="#3b5bdb" stroke-width="3.5" stroke-linecap="round" opacity="0.55"/>
+                </svg>
+              </div>
+              <span class="tag tag-oddeven">Math</span>
+              <h2>Odd or Even</h2>
+              <p class="desc">Sort numbers into odd and even, and finish the patterns!</p>
+              <a class="play play-oddeven" href="odd-or-even/">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15c0 .8.9 1.3 1.6.9l12-7.5c.7-.4.7-1.4 0-1.8l-12-7.5C7.9 3.2 7 3.7 7 4.5z"/></svg>
+                Play
+              </a>
+            </section>
+
+            <section class="card">
+              <div class="art art-greater" aria-hidden="true">
+                <svg viewBox="0 0 160 120" role="img">
+                  <text x="80" y="68" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="42" fill="#c2255c">4 &gt; 2</text>
+                  <g font-family="Fredoka, sans-serif" font-weight="700" font-size="22" text-anchor="middle" fill="#c2255c">
+                    <text x="48" y="104">&lt;</text>
+                    <text x="80" y="104">=</text>
+                    <text x="112" y="104">&gt;</text>
+                  </g>
+                </svg>
+              </div>
+              <span class="tag tag-greater">Math</span>
+              <h2>Greater Less Equal</h2>
+              <p class="desc">Compare two numbers and pick &lt;, &gt;, or =!</p>
+              <a class="play play-greater" href="greater-less-equal/">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15c0 .8.9 1.3 1.6.9l12-7.5c.7-.4.7-1.4 0-1.8l-12-7.5C7.9 3.2 7 3.7 7 4.5z"/></svg>
+                Play
+              </a>
+            </section>
+
+            <section class="card">
+              <div class="art art-fractions" aria-hidden="true">
+                <svg viewBox="0 0 160 120" role="img">
+                  <path d="M60 22 A36 36 0 1 1 24 58 L60 58 Z" fill="#087f5b"/>
+                  <circle cx="60" cy="58" r="36" fill="none" stroke="#087f5b" stroke-width="4"/>
+                  <line x1="60" y1="22" x2="60" y2="94" stroke="#087f5b" stroke-width="3"/>
+                  <line x1="24" y1="58" x2="96" y2="58" stroke="#087f5b" stroke-width="3"/>
+                  <text x="126" y="68" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="28" fill="#087f5b">3/4</text>
+                  <text x="80" y="110" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="13" fill="#087f5b">THREE QUARTERS</text>
+                </svg>
+              </div>
+              <span class="tag tag-fractions">Math</span>
+              <h2>Fractions Halves Quarters</h2>
+              <p class="desc">Name halves and quarters, and shade shapes to match a fraction!</p>
+              <a class="play play-fractions" href="fractions-halves-quarters/">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15c0 .8.9 1.3 1.6.9l12-7.5c.7-.4.7-1.4 0-1.8l-12-7.5C7.9 3.2 7 3.7 7 4.5z"/></svg>
+                Play
+              </a>
+            </section>
+
+            <section class="card">
+              <div class="art art-sharing" aria-hidden="true">
+                <svg viewBox="0 0 160 120" role="img">
+                  <g fill="#ffffff" stroke="#f08c00" stroke-width="4">
+                    <circle cx="36" cy="62" r="24"/>
+                    <circle cx="80" cy="62" r="24"/>
+                    <circle cx="124" cy="62" r="24"/>
+                  </g>
+                  <g fill="#a05e2c">
+                    <circle cx="28" cy="54" r="5"/><circle cx="44" cy="54" r="5"/><circle cx="28" cy="70" r="5"/><circle cx="44" cy="70" r="5"/>
+                    <circle cx="72" cy="54" r="5"/><circle cx="88" cy="54" r="5"/><circle cx="72" cy="70" r="5"/><circle cx="88" cy="70" r="5"/>
+                    <circle cx="116" cy="54" r="5"/><circle cx="132" cy="54" r="5"/><circle cx="116" cy="70" r="5"/><circle cx="132" cy="70" r="5"/>
+                  </g>
+                  <text x="80" y="106" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="14" fill="#f08c00">EVERY PLATE THE SAME</text>
+                </svg>
+              </div>
+              <span class="tag tag-sharing">Math</span>
+              <h2>Sharing</h2>
+              <p class="desc">Share treats fairly so every plate has the same amount!</p>
+              <a class="play play-sharing" href="sharing/">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15c0 .8.9 1.3 1.6.9l12-7.5c.7-.4.7-1.4 0-1.8l-12-7.5C7.9 3.2 7 3.7 7 4.5z"/></svg>
+                Play
+              </a>
+            </section>
+
+            <section class="card">
+              <div class="art art-tally" aria-hidden="true">
+                <svg viewBox="0 0 160 120" role="img">
+                  <g fill="#1971c2">
+                    <rect x="28" y="56" width="26" height="40" rx="4"/>
+                    <rect x="67" y="36" width="26" height="60" rx="4"/>
+                    <rect x="106" y="46" width="26" height="50" rx="4"/>
+                  </g>
+                  <g font-family="Fredoka, sans-serif" font-weight="700" font-size="14" text-anchor="middle" fill="#1971c2">
+                    <text x="41" y="48">3</text>
+                    <text x="80" y="28">5</text>
+                    <text x="119" y="38">4</text>
+                  </g>
+                  <line x1="16" y1="96" x2="144" y2="96" stroke="#1971c2" stroke-width="4" stroke-linecap="round"/>
+                  <g stroke="#1971c2" stroke-width="3" stroke-linecap="round">
+                    <line x1="24" y1="112" x2="24" y2="100"/><line x1="30" y1="112" x2="30" y2="100"/><line x1="36" y1="112" x2="36" y2="100"/><line x1="42" y1="112" x2="42" y2="100"/>
+                  </g>
+                </svg>
+              </div>
+              <span class="tag tag-tally">Math</span>
+              <h2>Tally and Graph</h2>
+              <p class="desc">Count with tally marks and read the graph!</p>
+              <a class="play play-tally" href="tally-and-graph/">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15c0 .8.9 1.3 1.6.9l12-7.5c.7-.4.7-1.4 0-1.8l-12-7.5C7.9 3.2 7 3.7 7 4.5z"/></svg>
+                Play
+              </a>
+            </section>
+
           </div>
         </div>
 
@@ -1163,7 +1775,7 @@
         </div>
 
         <div class="group">
-          <h2 class="group-title"><a href="music/">Music</a></h2>
+          <h2 class="group-title">Music</h2>
           <div class="grid">
 
             <section class="card">
@@ -1203,8 +1815,64 @@
           </div>
         </div>
       </main>
+      </div>
 
       <footer>Made for Mr. Fung's class</footer>
     </div>
+    <script>
+      (function () {
+        var menuButton = document.getElementById("menu-toggle");
+        var sidebar = document.getElementById("sidebar");
+        var closeButton = document.getElementById("sidebar-close");
+        var scrim = document.getElementById("sidebar-scrim");
+        function openMenu() {
+          document.body.classList.add("sidebar-open");
+          menuButton.setAttribute("aria-expanded", "true");
+          closeButton.focus();
+        }
+        function closeMenu(restoreFocus) {
+          document.body.classList.remove("sidebar-open");
+          menuButton.setAttribute("aria-expanded", "false");
+          if (restoreFocus) {
+            menuButton.focus();
+          }
+        }
+        menuButton.addEventListener("click", function () {
+          if (document.body.classList.contains("sidebar-open")) {
+            closeMenu(false);
+          } else {
+            openMenu();
+          }
+        });
+        closeButton.addEventListener("click", function () {
+          closeMenu(true);
+        });
+        scrim.addEventListener("click", function () {
+          closeMenu(true);
+        });
+        sidebar.addEventListener("click", function (event) {
+          if (event.target.closest("a")) {
+            closeMenu(false);
+          }
+        });
+        document.addEventListener("keydown", function (event) {
+          if (event.key === "Escape" && document.body.classList.contains("sidebar-open")) {
+            closeMenu(true);
+          }
+        });
+        var wide = window.matchMedia("(min-width: 900px)");
+        function onWideChange() {
+          if (wide.matches) {
+            document.body.classList.remove("sidebar-open");
+            menuButton.setAttribute("aria-expanded", "false");
+          }
+        }
+        if (wide.addEventListener) {
+          wide.addEventListener("change", onWideChange);
+        } else if (wide.addListener) {
+          wide.addListener(onWideChange);
+        }
+      })();
+    </script>
   </body>
 </html>

@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:," />
+<title>Greater Less Equal</title>
+<style>
+  :root{
+    --bg:#eef6f3; --card:#ffffff; --ink:#17332e; --muted:#5b6f6a;
+    --teal:#0f766e; --teal-dark:#0b5c55; --amber:#f59e0b; --amber-soft:#fef3c7;
+    --coral:#e85d3f; --line:#d7e5e0; --num-bg:#e6f4f1; --wrong:#fdecea;
+    --right:#e7f7ec; --right-border:#34a853; --shadow:0 8px 28px rgba(15,60,55,.10);
+    --radius:22px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0e1b19; --card:#162825; --ink:#eaf4f1; --muted:#a7bcb6;
+      --teal:#2dd4bf; --teal-dark:#2dd4bf; --amber:#fbbf24; --amber-soft:#3a2f10;
+      --coral:#ff7a5c; --line:#2a423e; --num-bg:#1d3632; --wrong:#3a1e1c;
+      --right:#173527; --right-border:#4ade80; --shadow:0 8px 28px rgba(0,0,0,.35);
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:ui-rounded,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.45}
+  .wrap{max-width:920px;margin:0 auto;padding:14px 16px 36px}
+  .topbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
+  .home{display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:var(--ink);background:var(--card);border:2px solid var(--line);border-radius:999px;padding:9px 16px;font-weight:800;font-size:16px}
+  .home:hover{border-color:var(--teal)}
+  .home svg{width:20px;height:20px}
+  .sound-btn{border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:9px 16px;font:inherit;font-weight:800;font-size:16px;cursor:pointer}
+  .sound-btn[aria-pressed="false"]{opacity:.75}
+  h1{font-size:clamp(26px,4.5vw,36px);line-height:1.15;margin:2px 0 4px;text-align:center;letter-spacing:-.01em}
+  .subtitle{text-align:center;color:var(--muted);margin:0 0 16px;font-size:17px}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
+  .levels{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:14px}
+  .level{border:2px solid var(--line);background:transparent;color:var(--ink);border-radius:999px;padding:9px 16px;font:inherit;font-weight:800;font-size:16px;cursor:pointer}
+  .level[aria-pressed="true"]{background:var(--teal);border-color:var(--teal);color:#fff}
+  @media (prefers-color-scheme: dark){.level[aria-pressed="true"]{color:#0e1b19}}
+  .status{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+  .round-chip{font-weight:800;font-size:16px}
+  .stars{font-weight:800;font-size:17px;color:#b45309}
+  @media (prefers-color-scheme: dark){.stars{color:var(--amber)}}
+  .dots{display:flex;gap:6px;flex-wrap:wrap}
+  .dots span{width:14px;height:14px;border-radius:50%;border:2px solid var(--teal);background:transparent;display:inline-block}
+  .dots span.done{background:var(--teal)}
+  .dots span.starred{background:var(--amber);border-color:var(--amber)}
+  .compare{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:stretch;margin:6px 0 16px}
+  .num-card{background:var(--num-bg);border:2px solid var(--line);border-radius:18px;padding:14px 10px 16px;text-align:center;min-height:172px;display:flex;flex-direction:column;justify-content:flex-start}
+  .num{font-size:clamp(52px,12vw,76px);font-weight:900;line-height:1;letter-spacing:-.02em}
+  .visual{margin-top:12px;display:flex;flex-wrap:wrap;gap:5px;justify-content:center;align-content:flex-start;min-height:52px}
+  .dot{width:18px;height:18px;border-radius:50%;background:var(--teal);flex:0 0 auto}
+  .dot.tens{outline:3px solid var(--amber);outline-offset:1px}
+  .bar-wrap{width:100%;text-align:left}
+  .bar{height:20px;border-radius:999px;background:var(--teal);max-width:100%;min-width:10px}
+  .bar-label{font-size:14px;font-weight:700;color:var(--muted);margin-top:6px}
+  .qmark{width:74px;height:74px;border-radius:50%;background:var(--amber);color:#231303;display:flex;align-items:center;justify-content:center;font-size:52px;font-weight:900;align-self:center;box-shadow:0 4px 0 rgba(0,0,0,.15)}
+  .qmark.filled{background:var(--teal);color:#fff;font-size:56px}
+  @media (prefers-color-scheme: dark){.qmark.filled{color:#0e1b19}}
+  .prompt{text-align:center;font-weight:800;font-size:19px;margin:0 0 12px}
+  .signs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .sign{border:3px solid var(--line);background:var(--card);border-radius:18px;padding:16px 8px 12px;cursor:pointer;font:inherit;color:var(--ink);min-height:118px}
+  .sign .glyph{font-size:56px;font-weight:900;line-height:1;display:block}
+  .sign .word{font-size:16px;font-weight:800;display:block;margin-top:6px}
+  .sign .say{font-size:13px;color:var(--muted);display:block;font-weight:600}
+  .sign:hover:not(:disabled){border-color:var(--teal);transform:translateY(-2px)}
+  .sign:disabled{cursor:default;opacity:1}
+  .sign.wrong{border-color:var(--coral);background:var(--wrong);opacity:.65}
+  .sign.correct{border-color:var(--right-border);background:var(--right)}
+  .sign:disabled:not(.correct):not(.wrong){opacity:.55}
+  .feedback{min-height:64px;margin-top:14px;border-radius:14px;padding:12px 14px;font-size:18px;font-weight:700;text-align:center}
+  .feedback.good{background:var(--right);border:2px solid var(--right-border)}
+  .feedback.try{background:var(--amber-soft);border:2px solid var(--amber)}
+  .feedback:empty{display:none}
+  .actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:14px}
+  .btn{border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:11px 20px;font:inherit;font-weight:800;font-size:17px;cursor:pointer}
+  .btn.primary{background:var(--teal);border-color:var(--teal);color:#fff}
+  @media (prefers-color-scheme: dark){.btn.primary{color:#0e1b19}}
+  .btn:hover{border-color:var(--teal)}
+  .legend{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:18px}
+  .legend span{background:var(--card);border:2px solid var(--line);border-radius:999px;padding:7px 13px;font-weight:700;font-size:15px}
+  .tip{text-align:center;color:var(--muted);margin:12px 0 0;font-size:16px}
+  .tip strong{color:var(--ink)}
+  .end{text-align:center;padding:10px 4px}
+  .end h2{font-size:30px;margin:6px 0}
+  .end p{font-size:19px;margin:6px 0 16px}
+  .big-stars{font-size:40px;letter-spacing:4px}
+  .confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:20}
+  .confetti i{position:absolute;top:-18px;width:11px;height:16px;border-radius:3px;animation:fall 1.15s ease-in forwards}
+  @keyframes fall{to{transform:translateY(105vh) rotate(540deg);opacity:.85}}
+  @media (prefers-reduced-motion: reduce){.confetti i{animation:none;display:none}.sign:hover{transform:none}}
+  @media (max-width:520px){
+    .wrap{padding:10px 10px 28px}
+    .compare{gap:7px}
+    .qmark{width:58px;height:58px;font-size:40px}
+    .qmark.filled{font-size:44px}
+    .num-card{min-height:158px;padding:12px 6px 14px}
+    .sign{min-height:104px;padding:12px 4px 10px}
+    .sign .glyph{font-size:46px}
+    .card{padding:14px 12px}
+  }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="topbar">
+    <a class="home" href="https://scaemrfung.github.io/mr-fung-webgames/" aria-label="Home — back to Fun Playground">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9.5 21v-6h5v6"/></svg>
+      Home
+    </a>
+    <button class="sound-btn" id="soundBtn" type="button" aria-pressed="true">🔊 Sound On</button>
+  </div>
+
+  <h1>Which sign goes between the numbers?</h1>
+  <p class="subtitle">Look at the two numbers. Tap <b>&lt;</b>, <b>&gt;</b>, or <b>=</b> to make it true.</p>
+
+  <section class="card" aria-label="Greater, less, equal game">
+    <div class="levels" role="group" aria-label="Number range">
+      <button class="level" type="button" data-level="10" aria-pressed="true">Numbers to 10</button>
+      <button class="level" type="button" data-level="20" aria-pressed="false">Numbers to 20</button>
+      <button class="level" type="button" data-level="100" aria-pressed="false">Numbers to 100</button>
+    </div>
+
+    <div id="gameArea">
+      <div class="status">
+        <span class="round-chip" id="roundLabel">Round 1 of 10</span>
+        <div class="dots" id="progressDots" aria-label="Progress"></div>
+        <span class="stars" id="starCount">⭐ 0</span>
+      </div>
+
+      <div class="compare">
+        <div class="num-card">
+          <div class="num" id="numA">–</div>
+          <div class="visual" id="visualA" aria-hidden="true"></div>
+        </div>
+        <div class="qmark" id="qmark" aria-label="Missing sign">?</div>
+        <div class="num-card">
+          <div class="num" id="numB">–</div>
+          <div class="visual" id="visualB" aria-hidden="true"></div>
+        </div>
+      </div>
+
+      <p class="prompt">Tap the sign that makes it true:</p>
+
+      <div class="signs" role="group" aria-label="Choose a sign">
+        <button class="sign" type="button" data-sign="&lt;" aria-label="Less than">
+          <span class="glyph" aria-hidden="true">&lt;</span>
+          <span class="word">Less than</span>
+          <span class="say">smaller number</span>
+        </button>
+        <button class="sign" type="button" data-sign="&gt;" aria-label="Greater than">
+          <span class="glyph" aria-hidden="true">&gt;</span>
+          <span class="word">Greater than</span>
+          <span class="say">bigger number</span>
+        </button>
+        <button class="sign" type="button" data-sign="=" aria-label="Equal to">
+          <span class="glyph" aria-hidden="true">=</span>
+          <span class="word">Equal to</span>
+          <span class="say">the same</span>
+        </button>
+      </div>
+
+      <div class="feedback" id="feedback" aria-live="polite"></div>
+
+      <div class="actions">
+        <button class="btn" id="hearBtn" type="button">👂 Hear It</button>
+        <button class="btn" id="nextBtn" type="button" hidden>Next →</button>
+        <button class="btn" id="newGameBtn" type="button">↻ New Game</button>
+      </div>
+    </div>
+
+    <div id="endArea" class="end" hidden>
+      <div class="big-stars" aria-hidden="true">⭐ ⭐ ⭐</div>
+      <h2>Great comparing!</h2>
+      <p id="endText">You earned 0 out of 10 stars.</p>
+      <div class="actions">
+        <button class="btn primary" id="playAgainBtn" type="button">Play Again</button>
+      </div>
+    </div>
+
+    <div class="legend" aria-label="What the signs mean">
+      <span>&lt; &nbsp;less than</span>
+      <span>&gt; &nbsp;greater than</span>
+      <span>= &nbsp;equal to</span>
+    </div>
+    <p class="tip">🐊 <strong>Hungry-sign tip:</strong> the sign opens its mouth to the <strong>bigger</strong> number. When the numbers are the same, use <strong>=</strong>.</p>
+  </section>
+</main>
+
+<div class="confetti" id="confetti" aria-hidden="true"></div>
+
+<script>
+(function(){
+  "use strict";
+  var TOTAL = 10;
+  var levelMax = 10;
+  var rounds = [];
+  var index = 0;
+  var stars = 0;
+  var firstTry = true;
+  var answered = false;
+  var soundOn = true;
+
+  var numAEl = document.getElementById("numA");
+  var numBEl = document.getElementById("numB");
+  var visualA = document.getElementById("visualA");
+  var visualB = document.getElementById("visualB");
+  var qmark = document.getElementById("qmark");
+  var feedback = document.getElementById("feedback");
+  var roundLabel = document.getElementById("roundLabel");
+  var progressDots = document.getElementById("progressDots");
+  var starCount = document.getElementById("starCount");
+  var nextBtn = document.getElementById("nextBtn");
+  var gameArea = document.getElementById("gameArea");
+  var endArea = document.getElementById("endArea");
+  var endText = document.getElementById("endText");
+  var signBtns = Array.prototype.slice.call(document.querySelectorAll(".sign"));
+
+  function randInt(min, max){ return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+  function rangeFor(max){
+    if (max === 10) return [1, 10];
+    if (max === 20) return [1, 20];
+    return [10, 100];
+  }
+
+  function makePair(prev){
+    var lo = rangeFor(levelMax)[0], hi = rangeFor(levelMax)[1];
+    var roll = Math.random(), a, b, tries = 0;
+    if (roll < 0.25){
+      a = randInt(lo, hi);
+      b = a;
+    } else if (roll < 0.55){
+      a = randInt(lo, hi);
+      var diffs = [-3,-2,-1,1,2,3];
+      b = a + diffs[randInt(0, diffs.length - 1)];
+      while ((b < lo || b > hi || b === a) && tries < 20){
+        b = a + diffs[randInt(0, diffs.length - 1)];
+        tries++;
+      }
+      if (b < lo || b > hi || b === a) b = (a === hi) ? a - 1 : a + 1;
+    } else {
+      a = randInt(lo, hi);
+      b = randInt(lo, hi);
+      while (b === a) b = randInt(lo, hi);
+    }
+    if (prev && a === prev[0] && b === prev[1]){
+      var tmp = a; a = b; b = tmp;
+      if (a === prev[0] && b === prev[1]) a = (a === hi) ? a - 1 : a + 1;
+    }
+    return [a, b];
+  }
+
+  function correctSign(a, b){
+    if (a < b) return "<";
+    if (a > b) return ">";
+    return "=";
+  }
+  function signWord(sign){
+    return sign === "<" ? "less than" : sign === ">" ? "greater than" : "equal to";
+  }
+  function sentence(a, sign, b){
+    if (sign === "=") return a + " is equal to " + b + ".";
+    if (sign === "<") return a + " is less than " + b + ".";
+    return a + " is greater than " + b + ".";
+  }
+
+  function renderVisual(el, n){
+    el.innerHTML = "";
+    if (n <= 20){
+      for (var i = 0; i < n; i++){
+        var d = document.createElement("span");
+        d.className = "dot" + ((i % 10 === 9) ? " tens" : "");
+        el.appendChild(d);
+      }
+    } else {
+      var wrap = document.createElement("div");
+      wrap.className = "bar-wrap";
+      var bar = document.createElement("div");
+      bar.className = "bar";
+      bar.style.width = n + "%";
+      wrap.appendChild(bar);
+      var tens = Math.floor(n / 10), ones = n % 10;
+      var label = document.createElement("div");
+      label.className = "bar-label";
+      label.textContent = ones === 0 ? tens + " tens" : tens + " tens and " + ones + " ones";
+      wrap.appendChild(label);
+      el.appendChild(wrap);
+    }
+  }
+
+  function renderProgress(){
+    progressDots.innerHTML = "";
+    for (var i = 0; i < TOTAL; i++){
+      var s = document.createElement("span");
+      if (i < index) s.className = "done";
+      if (rounds[i] && rounds[i].starred) s.className = "starred";
+      progressDots.appendChild(s);
+    }
+    roundLabel.textContent = "Round " + Math.min(index + 1, TOTAL) + " of " + TOTAL;
+    starCount.textContent = "⭐ " + stars;
+  }
+
+  function showRound(){
+    var pair = rounds[index];
+    var a = pair.a, b = pair.b;
+    numAEl.textContent = a;
+    numBEl.textContent = b;
+    renderVisual(visualA, a);
+    renderVisual(visualB, b);
+    qmark.textContent = "?";
+    qmark.classList.remove("filled");
+    qmark.setAttribute("aria-label", "Missing sign");
+    feedback.textContent = "";
+    feedback.className = "feedback";
+    firstTry = true;
+    answered = false;
+    nextBtn.hidden = true;
+    signBtns.forEach(function(btn){
+      btn.disabled = false;
+      btn.classList.remove("correct", "wrong");
+    });
+    renderProgress();
+  }
+
+  function newGame(){
+    rounds = [];
+    var prevPair = null;
+    for (var i = 0; i < TOTAL; i++){
+      var p = makePair(prevPair);
+      rounds.push({ a: p[0], b: p[1], starred: false });
+      prevPair = p;
+    }
+    index = 0; stars = 0;
+    endArea.hidden = true;
+    gameArea.hidden = false;
+    showRound();
+  }
+
+  function pickVoice(){
+    var voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
+    function find(pred){ for (var i=0;i<voices.length;i++){ if (pred(voices[i])) return voices[i]; } return null; }
+    return find(function(v){ return /en-CA/i.test(v.lang) && /natural|neural|google/i.test(v.name); })
+      || find(function(v){ return /en-CA/i.test(v.lang); })
+      || find(function(v){ return /en-US/i.test(v.lang) && /natural|neural|google/i.test(v.name); })
+      || find(function(v){ return /^en/i.test(v.lang); })
+      || null;
+  }
+  function speak(text){
+    if (!soundOn || !("speechSynthesis" in window)) return;
+    try{
+      window.speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      var v = pickVoice();
+      if (v) u.voice = v;
+      u.rate = 0.95;
+      window.speechSynthesis.speak(u);
+    }catch(e){}
+  }
+
+  function confetti(){
+    var box = document.getElementById("confetti");
+    var colors = ["#0f766e","#f59e0b","#e85d3f","#2dd4bf","#fbbf24","#34a853"];
+    for (var i = 0; i < 26; i++){
+      var piece = document.createElement("i");
+      piece.style.left = (Math.random() * 100) + "%";
+      piece.style.background = colors[i % colors.length];
+      piece.style.animationDelay = (Math.random() * 0.25) + "s";
+      piece.style.transform = "rotate(" + (Math.random()*360) + "deg)";
+      box.appendChild(piece);
+      (function(p){ setTimeout(function(){ p.remove(); }, 1600); })(piece);
+    }
+  }
+
+  signBtns.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      if (answered) return;
+      var pair = rounds[index];
+      var a = pair.a, b = pair.b;
+      var right = correctSign(a, b);
+      var picked = btn.getAttribute("data-sign");
+      if (picked === right){
+        answered = true;
+        btn.classList.add("correct");
+        signBtns.forEach(function(x){ if (x !== btn) x.disabled = true; });
+        qmark.textContent = right;
+        qmark.classList.add("filled");
+        qmark.setAttribute("aria-label", "The sign is " + signWord(right));
+        var msg = "Yes! That's right! ⭐ " + sentence(a, right, b);
+        feedback.textContent = msg;
+        feedback.className = "feedback good";
+        if (firstTry){
+          stars++;
+          rounds[index].starred = true;
+          confetti();
+        }
+        renderProgress();
+        speak(msg);
+        nextBtn.hidden = false;
+        nextBtn.textContent = (index === TOTAL - 1) ? "See My Stars →" : "Next →";
+        nextBtn.focus();
+      } else {
+        firstTry = false;
+        btn.classList.add("wrong");
+        btn.disabled = true;
+        var hint = (a === b)
+          ? "Try again — the two numbers are the same. Which sign means \"the same\"?"
+          : "Try again — count the dots (or check the bars). Which number is bigger?";
+        feedback.textContent = hint;
+        feedback.className = "feedback try";
+        speak("Try again.");
+      }
+    });
+  });
+
+  nextBtn.addEventListener("click", function(){
+    index++;
+    if (index >= TOTAL){
+      gameArea.hidden = true;
+      endArea.hidden = false;
+      endText.textContent = "You earned " + stars + " out of " + TOTAL + " stars for first-try answers." + (stars === TOTAL ? " Perfect comparing!" : stars >= 7 ? " Wonderful work!" : " Good trying — play again to earn more stars!");
+      speak("Great comparing! You earned " + stars + " out of " + TOTAL + " stars.");
+    } else {
+      showRound();
+    }
+  });
+
+  document.getElementById("hearBtn").addEventListener("click", function(){
+    var pair = rounds[index];
+    if (!pair) return;
+    if (answered){
+      speak(sentence(pair.a, correctSign(pair.a, pair.b), pair.b));
+    } else {
+      speak(pair.a + " and " + pair.b + ". Pick less than, greater than, or equal to.");
+    }
+  });
+  document.getElementById("newGameBtn").addEventListener("click", function(){ newGame(); });
+  document.getElementById("playAgainBtn").addEventListener("click", function(){ newGame(); });
+
+  document.querySelectorAll(".level").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      document.querySelectorAll(".level").forEach(function(x){ x.setAttribute("aria-pressed","false"); });
+      btn.setAttribute("aria-pressed","true");
+      levelMax = parseInt(btn.getAttribute("data-level"), 10);
+      newGame();
+    });
+  });
+
+  var soundBtn = document.getElementById("soundBtn");
+  soundBtn.addEventListener("click", function(){
+    soundOn = !soundOn;
+    soundBtn.setAttribute("aria-pressed", String(soundOn));
+    soundBtn.textContent = soundOn ? "🔊 Sound On" : "🔇 Sound Off";
+    if (!soundOn && "speechSynthesis" in window){ try{ window.speechSynthesis.cancel(); }catch(e){} }
+  });
+
+  newGame();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:," />
+<title>Fractions: Halves &amp; Quarters</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#fff8ec; --card:#ffffff; --ink:#173f3d; --ink-soft:#4a6b68;
+  --teal:#0f766e; --teal-dark:#0b5a54; --coral:#ff6b4a; --coral-dark:#d94f30;
+  --sun:#ffc93c; --mint:#d9f2e3; --sky:#dbeafe; --line:#eadfc8;
+  --choice:#fffdf6; --shadow:0 10px 30px rgba(23,63,61,.12);
+  --radius:22px;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --paper:#0e1f1e; --card:#16302e; --ink:#f2f7f5; --ink-soft:#b8cfcb;
+    --teal:#2dd4bf; --teal-dark:#5eead4; --coral:#ff7a59; --coral-dark:#ff8a6b;
+    --sun:#ffd166; --mint:#1d423c; --sky:#1e3a4a; --line:#2a4a47;
+    --choice:#1d3a37; --shadow:0 10px 30px rgba(0,0,0,.35);
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;font-weight:700;line-height:1.45}
+button{font:inherit;cursor:pointer}
+a{color:inherit}
+.wrap{max-width:980px;margin:0 auto;padding:16px 16px 44px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:6px}
+.home-btn{display:inline-flex;align-items:center;gap:8px;text-decoration:none;background:var(--card);border:2px solid var(--line);border-radius:999px;padding:9px 16px;font-weight:900;font-size:16px;box-shadow:0 3px 0 var(--line)}
+.home-btn:hover{border-color:var(--teal)}
+.home-btn svg{width:20px;height:20px}
+.sound-btn{border:2px solid var(--line);background:var(--card);border-radius:999px;padding:9px 16px;font-weight:900;font-size:15px;box-shadow:0 3px 0 var(--line)}
+.sound-btn[aria-pressed="false"]{opacity:.65}
+header{text-align:center;margin:10px 0 16px}
+h1{font-family:"Fredoka",system-ui,sans-serif;font-size:clamp(38px,6vw,58px);line-height:.95;margin:0;letter-spacing:.2px;color:var(--teal)}
+h1 .half{color:var(--coral)}
+.subtitle{margin:8px auto 0;font-size:clamp(17px,2.6vw,21px);color:var(--ink-soft);max-width:620px;font-weight:800}
+.scorebar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;background:var(--card);border:2px solid var(--line);border-radius:18px;padding:12px 16px;box-shadow:var(--shadow);margin-bottom:14px}
+.scorebar .stars{font-size:22px;letter-spacing:3px;color:var(--sun);text-shadow:0 1px 0 rgba(0,0,0,.08)}
+.scorebar .stars .empty{color:var(--line)}
+.pill{background:var(--mint);border-radius:999px;padding:7px 13px;font-size:15px;font-weight:900}
+.new-btn{background:var(--teal);color:#fff;border:none;border-radius:999px;padding:10px 18px;font-weight:900;box-shadow:0 4px 0 var(--teal-dark)}
+.new-btn:active{transform:translateY(2px);box-shadow:0 2px 0 var(--teal-dark)}
+.tabs{display:flex;gap:8px;margin-bottom:14px}
+.tab{flex:1;border:2px solid var(--line);background:var(--card);border-radius:16px;padding:13px 10px;font-size:17px;font-weight:900;color:var(--ink-soft)}
+.tab[aria-selected="true"]{background:var(--ink);color:#fff;border-color:var(--ink);box-shadow:0 4px 0 rgba(0,0,0,.2)}
+.tab small{display:block;font-size:13px;font-weight:800;opacity:.75;margin-top:2px}
+.learn{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.learn figure{margin:0;background:var(--card);border:2px solid var(--line);border-radius:16px;padding:10px 8px 9px;text-align:center}
+.learn svg{width:72px;height:72px;max-width:100%}
+.learn figcaption{font-size:14px;font-weight:900;margin-top:2px}
+.learn figcaption span{display:block;font-size:13px;color:var(--ink-soft);font-weight:800}
+.game{background:var(--card);border:2px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;position:relative;overflow:hidden}
+.progress{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.dot{width:16px;height:16px;border-radius:50%;background:var(--line);border:2px solid var(--line)}
+.dot.done{background:var(--sun);border-color:#e0a800}
+.dot.now{outline:3px solid var(--teal);outline-offset:2px}
+.game-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:22px;align-items:start}
+.stage{background:var(--paper);border:2px dashed var(--line);border-radius:18px;padding:14px;text-align:center}
+.stage svg{width:100%;max-width:330px;height:auto;display:block;margin:0 auto}
+.stage-label{font-size:15px;color:var(--ink-soft);font-weight:800;margin-top:8px}
+.seg{cursor:default;stroke:var(--ink);stroke-width:3;transition:fill .15s}
+.seg.clickable{cursor:pointer}
+.seg.clickable:focus-visible{outline:4px solid var(--sun);outline-offset:2px}
+.seg.shaded{fill:var(--coral)}
+.seg.unshaded{fill:#fffdf6}
+@media (prefers-color-scheme: dark){.seg.unshaded{fill:#243f3c}}
+.seg.clickable:hover{opacity:.85}
+.question{font-family:"Fredoka",system-ui,sans-serif;font-size:clamp(24px,3.6vw,31px);line-height:1.15;margin:2px 0 6px}
+.question em{font-style:normal;color:var(--coral)}
+.help{color:var(--ink-soft);font-size:16px;margin:0 0 14px;font-weight:800}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.frac-btn{background:var(--choice);border:3px solid var(--ink);border-radius:16px;padding:12px 8px;min-height:96px;box-shadow:0 4px 0 var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
+.frac-btn .num{font-family:"Fredoka",sans-serif;font-size:30px}
+.frac-btn .bar{width:44px;height:4px;background:var(--ink);border-radius:2px;margin:5px 0}
+.frac-btn .den{font-family:"Fredoka",sans-serif;font-size:30px}
+.frac-btn .word{display:none}
+.frac-btn:hover{background:var(--sky)}
+.frac-btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.frac-btn.correct{background:#d1fae5;border-color:#047857;box-shadow:0 4px 0 #047857}
+.frac-btn.wrong{background:#fee2e2;border-color:#b91c1c;box-shadow:0 4px 0 #b91c1c;animation:shake .3s}
+.frac-btn:disabled{cursor:default;opacity:1}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.tool-btn{border:2px solid var(--line);background:var(--card);border-radius:999px;padding:10px 15px;font-weight:900;font-size:15px}
+.tool-btn.primary{background:var(--sun);border-color:#d99e00;color:#3d2b00;box-shadow:0 4px 0 #d99e00}
+.tool-btn.check{background:var(--teal);color:#fff;border-color:var(--teal-dark);box-shadow:0 4px 0 var(--teal-dark)}
+.feedback{border-radius:14px;padding:13px 15px;margin-top:14px;font-size:17px;font-weight:900;display:none}
+.feedback.show{display:block}
+.feedback.good{background:#d1fae5;color:#065f46}
+.feedback.try{background:#fef3c7;color:#92400e}
+.feedback.info{background:var(--sky);color:#1e3a5f}
+@media (prefers-color-scheme: dark){.feedback.good{background:#134e3a;color:#a7f3d0}.feedback.try{background:#4a3410;color:#fde68a}.feedback.info{background:#1e3a4a;color:#bfdbfe}}
+.shade-count{font-size:19px;font-weight:900;margin:0 0 12px}
+.shade-count b{color:var(--coral);font-size:24px}
+.next-btn{display:none;width:100%;margin-top:14px;background:var(--coral);color:#fff;border:none;border-radius:14px;padding:15px;font-size:19px;font-weight:900;box-shadow:0 5px 0 var(--coral-dark)}
+.next-btn.show{display:block}
+.next-btn:active{transform:translateY(3px);box-shadow:0 2px 0 var(--coral-dark)}
+.end{text-align:center;padding:14px 6px}
+.end h2{font-family:"Fredoka",sans-serif;font-size:34px;margin:6px 0}
+.end .big-stars{font-size:44px;letter-spacing:6px;color:var(--sun)}
+.end p{font-size:18px;color:var(--ink-soft)}
+.note{margin-top:14px;background:var(--card);border:2px solid var(--line);border-left:8px solid var(--sun);border-radius:14px;padding:14px 16px;font-size:16px;font-weight:800}
+.note b{color:var(--teal)}
+.confetti{position:absolute;width:11px;height:16px;top:-18px;pointer-events:none;z-index:5;animation:fall 1.15s ease-in forwards}
+@keyframes fall{to{transform:translateY(560px) rotate(540deg);opacity:.2}}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+@media (max-width:640px){
+  .game-grid{grid-template-columns:1fr}
+  .learn svg{width:58px;height:58px}
+  .tab{font-size:15px}
+  .wrap{padding:12px 12px 36px}
+  .game{padding:16px}
+}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <a class="home-btn" href="https://scaemrfung.github.io/mr-fung-webgames/" aria-label="Home — back to Fun Playground">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 11.5 12 3l9 8.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 10.5V20h13v-9.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Home
+    </a>
+    <button class="sound-btn" id="soundBtn" type="button" aria-pressed="true">🔊 Sound On</button>
+  </div>
+
+  <header>
+    <h1>Fractions: <span class="half">Halves &amp; Quarters</span></h1>
+    <p class="subtitle">Shade a shape, count the equal parts, and pick the fraction that matches.</p>
+  </header>
+
+  <div class="scorebar" aria-live="polite">
+    <div><span class="stars" id="stars" aria-label="0 stars">☆☆☆☆☆☆☆☆☆☆</span></div>
+    <div class="pill" id="roundPill">Round 1 of 10</div>
+    <button class="new-btn" id="newGameBtn" type="button">New Game</button>
+  </div>
+
+  <div class="tabs" role="tablist" aria-label="Game mode">
+    <button class="tab" id="tabName" type="button" role="tab" aria-selected="true">Name the Fraction<small>Look at the shading, pick the fraction</small></button>
+    <button class="tab" id="tabShade" type="button" role="tab" aria-selected="false">Shade It Yourself<small>Tap parts to shade the fraction</small></button>
+  </div>
+
+  <section class="learn" aria-label="Fraction reminders">
+    <figure>
+      <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="44" fill="#ff6b4a" stroke="#173f3d" stroke-width="3"/></svg>
+      <figcaption>1 whole <span>all of it — 1</span></figcaption>
+    </figure>
+    <figure>
+      <svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 6 A44 44 0 0 0 50 94 Z" fill="#ff6b4a" stroke="#173f3d" stroke-width="3"/><path d="M50 6 A44 44 0 0 1 50 94 Z" fill="#fffdf6" stroke="#173f3d" stroke-width="3"/></svg>
+      <figcaption>1/2 — one half <span>1 of 2 equal parts</span></figcaption>
+    </figure>
+    <figure>
+      <svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 50 L50 6 A44 44 0 0 1 94 50 Z" fill="#ff6b4a" stroke="#173f3d" stroke-width="3"/><path d="M50 50 L94 50 A44 44 0 0 1 50 94 Z" fill="#fffdf6" stroke="#173f3d" stroke-width="3"/><path d="M50 50 L50 94 A44 44 0 0 1 6 50 Z" fill="#fffdf6" stroke="#173f3d" stroke-width="3"/><path d="M50 50 L6 50 A44 44 0 0 1 50 6 Z" fill="#fffdf6" stroke="#173f3d" stroke-width="3"/></svg>
+      <figcaption>1/4 — one quarter <span>1 of 4 equal parts</span></figcaption>
+    </figure>
+  </section>
+
+  <main class="game" id="gameCard">
+    <div class="progress" id="dots" aria-hidden="true"></div>
+
+    <!-- NAME MODE -->
+    <section id="namePanel" role="tabpanel" aria-labelledby="tabName">
+      <div class="game-grid">
+        <div>
+          <div class="stage"><div id="nameStage"></div><p class="stage-label">The shape is split into equal parts.</p></div>
+        </div>
+        <div>
+          <p class="question" id="nameQuestion">What fraction is shaded?</p>
+          <p class="help">Count the shaded parts. That number goes on top.</p>
+          <div class="choices" id="choices"></div>
+          <div class="actions">
+            <button class="tool-btn" id="hearBtn" type="button">🔊 Hear It</button>
+            <button class="tool-btn" id="hintBtn" type="button">💡 Hint</button>
+          </div>
+          <div class="feedback" id="nameFeedback" role="status" aria-live="polite"></div>
+          <button class="next-btn" id="nameNext" type="button">Next Shape →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SHADE MODE -->
+    <section id="shadePanel" role="tabpanel" aria-labelledby="tabShade" hidden>
+      <div class="game-grid">
+        <div>
+          <div class="stage"><div id="shadeStage"></div><p class="stage-label">Tap a part to shade it. Tap it again to unshade it.</p></div>
+        </div>
+        <div>
+          <p class="question" id="shadeQuestion">Shade <em>1/4</em> of the shape.</p>
+          <p class="shade-count">You shaded <b id="shadeCount">0</b> of <span id="shadeTotal">4</span> parts.</p>
+          <div class="actions" style="margin-top:0">
+            <button class="tool-btn check" id="checkBtn" type="button">Check It ✓</button>
+            <button class="tool-btn" id="clearBtn" type="button">Clear</button>
+            <button class="tool-btn" id="hearShadeBtn" type="button">🔊 Hear It</button>
+          </div>
+          <div class="feedback" id="shadeFeedback" role="status" aria-live="polite"></div>
+          <button class="next-btn" id="shadeNext" type="button">Next Shape →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- END -->
+    <section id="endPanel" class="end" hidden>
+      <div class="big-stars" id="endStars">⭐⭐⭐⭐⭐</div>
+      <h2 id="endTitle">Great fraction work!</h2>
+      <p id="endText">You earned stars for first-try answers. Play again for a brand-new set of shapes.</p>
+      <button class="next-btn show" id="playAgainBtn" type="button" style="max-width:340px;margin-left:auto;margin-right:auto">Play Again</button>
+    </section>
+  </main>
+
+  <p class="note"><b>Same amount, different name:</b> 2/4 is the same amount as 1/2 — two quarters fill exactly one half. Watch for it: sometimes the shaded parts make a half, even when the shape is cut into quarters!</p>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var HUB = "https://scaemrfung.github.io/mr-fung-webgames/";
+  var NAMES = {"1/2":"one half","2/2":"two halves, one whole","1/4":"one quarter","2/4":"two quarters","3/4":"three quarters","4/4":"four quarters, one whole"};
+  var WORDS = {"1/2":"one half","2/2":"one whole","1/4":"one quarter","2/4":"two quarters","3/4":"three quarters","4/4":"one whole"};
+
+  var state = { mode:"name", round:0, stars:0, firstTry:true, sound:true, deck:[], shadeDeck:[], current:null, shadeCurrent:null, shaded:new Set(), answered:false };
+
+  var $ = function(id){ return document.getElementById(id); };
+  var starsEl=$("stars"), roundPill=$("roundPill"), dotsEl=$("dots");
+
+  function speak(text){
+    if(!state.sound || !("speechSynthesis" in window)) return;
+    try{
+      window.speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      u.rate = 0.92; u.lang = "en-CA";
+      var voices = window.speechSynthesis.getVoices() || [];
+      var v = voices.find(function(v){ return /natural|neural|google/i.test(v.name) && /^en(-CA|-US)?$/i.test(v.lang); })
+        || voices.find(function(v){ return v.lang === "en-CA"; })
+        || voices.find(function(v){ return v.lang && v.lang.indexOf("en")==0; });
+      if(v) u.voice = v;
+      window.speechSynthesis.speak(u);
+    }catch(e){}
+  }
+
+  function shuffle(a){
+    a = a.slice();
+    for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; }
+    return a;
+  }
+
+  function buildDecks(){
+    var pool = [
+      {shape:"circle", parts:2, shaded:1}, {shape:"square", parts:2, shaded:1},
+      {shape:"rect", parts:2, shaded:1}, {shape:"circle", parts:4, shaded:1},
+      {shape:"square", parts:4, shaded:1}, {shape:"rect", parts:4, shaded:1},
+      {shape:"circle", parts:4, shaded:2}, {shape:"square", parts:4, shaded:2},
+      {shape:"rect", parts:4, shaded:3}, {shape:"circle", parts:4, shaded:3},
+      {shape:"square", parts:4, shaded:3}, {shape:"rect", parts:4, shaded:4},
+      {shape:"circle", parts:4, shaded:4}, {shape:"square", parts:4, shaded:4}
+    ];
+    state.deck = shuffle(pool).slice(0,10);
+    var shadePool = [
+      {shape:"circle", parts:2, target:1}, {shape:"square", parts:4, target:1},
+      {shape:"rect", parts:4, target:3}, {shape:"circle", parts:4, target:2},
+      {shape:"square", parts:2, target:1}, {shape:"rect", parts:4, target:1},
+      {shape:"circle", parts:4, target:3}, {shape:"square", parts:4, target:4},
+      {shape:"rect", parts:2, target:1}, {shape:"circle", parts:4, target:1}
+    ];
+    state.shadeDeck = shuffle(shadePool).slice(0,8);
+  }
+
+  /* ---- SVG shapes ---- */
+  function polar(cx,cy,r,deg){ var rad=(deg-90)*Math.PI/180; return [cx+r*Math.cos(rad), cy+r*Math.sin(rad)]; }
+  function wedge(cx,cy,r,a0,a1){
+    var p0=polar(cx,cy,r,a0), p1=polar(cx,cy,r,a1);
+    var large = (a1-a0)>180 ? 1:0;
+    return "M"+cx+" "+cy+" L"+p0[0].toFixed(1)+" "+p0[1].toFixed(1)+" A"+r+" "+r+" 0 "+large+" 1 "+p1[0].toFixed(1)+" "+p1[1].toFixed(1)+" Z";
+  }
+  function segmentsFor(cfg){
+    var segs=[];
+    if(cfg.shape==="circle"){
+      var n=cfg.parts, step=360/n;
+      for(var i=0;i<n;i++) segs.push({d:wedge(150,150,118,i*step,(i+1)*step), kind:"path"});
+    } else if(cfg.shape==="square"){
+      if(cfg.parts===2){ segs=[{x:20,y:20,w:130,h:260},{x:150,y:20,w:130,h:260}]; }
+      else { segs=[{x:20,y:20,w:130,h:130},{x:150,y:20,w:130,h:130},{x:20,y:150,w:130,h:130},{x:150,y:150,w:130,h:130}]; }
+      segs.forEach(function(s){ s.kind="rect"; });
+    } else { /* rect */
+      if(cfg.parts===2){ segs=[{x:10,y:70,w:140,h:160},{x:150,y:70,w:140,h:160}]; }
+      else { segs=[{x:10,y:70,w:70,h:160},{x:80,y:70,w:70,h:160},{x:150,y:70,w:70,h:160},{x:220,y:70,w:70,h:160}]; }
+      segs.forEach(function(s){ s.kind="rect"; });
+    }
+    return segs;
+  }
+  function renderShape(container, cfg, shadedSet, interactive, onToggle){
+    var NS="http://www.w3.org/2000/svg";
+    var svg=document.createElementNS(NS,"svg");
+    svg.setAttribute("viewBox","0 0 300 300");
+    svg.setAttribute("role","img");
+    svg.setAttribute("aria-label","Shape divided into "+cfg.parts+" equal parts");
+    var segs=segmentsFor(cfg);
+    segs.forEach(function(s,i){
+      var el;
+      if(s.kind==="path"){ el=document.createElementNS(NS,"path"); el.setAttribute("d",s.d); }
+      else { el=document.createElementNS(NS,"rect"); el.setAttribute("x",s.x); el.setAttribute("y",s.y); el.setAttribute("width",s.w); el.setAttribute("height",s.h); }
+      el.setAttribute("class","seg "+(shadedSet.has(i)?"shaded":"unshaded")+(interactive?" clickable":""));
+      if(interactive){
+        el.setAttribute("tabindex","0");
+        el.setAttribute("role","button");
+        el.setAttribute("aria-pressed", shadedSet.has(i)?"true":"false");
+        el.setAttribute("aria-label","Part "+(i+1)+" of "+cfg.parts+(shadedSet.has(i)?", shaded":", not shaded"));
+        var toggle=function(){ onToggle(i); };
+        el.addEventListener("click",toggle);
+        el.addEventListener("keydown",function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); toggle(); } });
+      }
+      svg.appendChild(el);
+    });
+    container.innerHTML="";
+    container.appendChild(svg);
+  }
+
+  function fracKey(n,d){ return n+"/"+d; }
+  function choicesFor(cfg){
+    var correct=fracKey(cfg.shaded,cfg.parts);
+    var pool;
+    if(correct==="1/2") pool=["1/2","1/4","3/4","2/2"];
+    else if(correct==="2/2") pool=["2/2","1/2","3/4","1/4"];
+    else if(correct==="1/4") pool=["1/4","2/4","3/4","1/2"];
+    else if(correct==="2/4") pool=["2/4","1/4","3/4","4/4"];
+    else if(correct==="3/4") pool=["3/4","1/4","2/4","4/4"];
+    else pool=["4/4","1/4","2/4","3/4"];
+    return shuffle(pool.map(function(k){ var p=k.split("/"); return {n:+p[0], d:+p[1], key:k}; }));
+  }
+
+  function renderDots(total){
+    dotsEl.innerHTML="";
+    for(var i=0;i<total;i++){
+      var d=document.createElement("span");
+      d.className="dot"+(i<state.round?" done":i===state.round?" now":"");
+      dotsEl.appendChild(d);
+    }
+  }
+  function updateScore(){
+    var total = state.mode==="name"?10:8;
+    roundPill.textContent = state.round>=total ? "All done!" : "Round "+(state.round+1)+" of "+total;
+    var filled="", empty="";
+    for(var i=0;i<state.stars;i++) filled+="★";
+    for(var j=state.stars;j<total;j++) empty+="☆";
+    starsEl.textContent = filled+empty;
+    starsEl.setAttribute("aria-label", state.stars+" stars");
+  }
+
+  function confetti(){
+    var card=$("gameCard");
+    var colors=["#ff6b4a","#ffc93c","#0f766e","#60a5fa","#f472b6"];
+    for(var i=0;i<26;i++){
+      var c=document.createElement("span");
+      c.className="confetti";
+      c.style.left=(8+Math.random()*84)+"%";
+      c.style.background=colors[i%colors.length];
+      c.style.animationDelay=(Math.random()*0.25)+"s";
+      c.style.transform="rotate("+(Math.random()*360)+"deg)";
+      card.appendChild(c);
+      (function(el){ setTimeout(function(){ el.remove(); },1800); })(c);
+    }
+  }
+
+  /* ---- NAME MODE ---- */
+  function showNameRound(){
+    state.answered=false; state.firstTry=true;
+    var cfg=state.deck[state.round];
+    state.current=cfg;
+    var shaded=new Set();
+    var idx=shuffle([0,1,2,3].slice(0,cfg.parts)).slice(0,cfg.shaded);
+    idx.forEach(function(i){ shaded.add(i); });
+    cfg._shaded=shaded;
+    renderShape($("nameStage"), cfg, shaded, false);
+    $("nameQuestion").textContent="What fraction is shaded?";
+    var fb=$("nameFeedback"); fb.className="feedback"; fb.textContent="";
+    $("nameNext").classList.remove("show");
+    var box=$("choices"); box.innerHTML="";
+    choicesFor(cfg).forEach(function(ch){
+      var b=document.createElement("button");
+      b.type="button"; b.className="frac-btn";
+      b.setAttribute("aria-label", NAMES[ch.key]+", "+ch.n+" over "+ch.d);
+      b.innerHTML='<span class="num">'+ch.n+'</span><span class="bar" aria-hidden="true"></span><span class="den">'+ch.d+'</span>';
+      b.addEventListener("click",function(){ answerName(b,ch,cfg); });
+      box.appendChild(b);
+    });
+    renderDots(10); updateScore();
+  }
+  function answerName(btn,ch,cfg){
+    if(state.answered) return;
+    var fb=$("nameFeedback");
+    var correct=fracKey(cfg.shaded,cfg.parts);
+    if(ch.key===correct){
+      state.answered=true;
+      btn.classList.add("correct");
+      Array.prototype.forEach.call($("choices").children,function(b){ b.disabled=true; });
+      if(state.firstTry){ state.stars++; }
+      var extra = correct==="2/4" ? " And guess what — 2/4 is the same amount as 1/2!" : correct==="4/4" ? " That's the whole shape!" : "";
+      fb.className="feedback show good";
+      fb.textContent="Yes! "+NAMES[correct]+" is shaded."+extra+" ⭐";
+      speak("Yes! "+WORDS[correct]+" is shaded.");
+      confetti(); updateScore();
+      $("nameNext").textContent = state.round===9 ? "See My Stars →" : "Next Shape →";
+      $("nameNext").classList.add("show");
+      $("nameNext").focus();
+    } else {
+      state.firstTry=false;
+      btn.classList.add("wrong"); btn.disabled=true;
+      fb.className="feedback show try";
+      fb.textContent="Not quite — try again! Count the shaded parts, then count all the equal parts.";
+      speak("Not quite. Try again.");
+    }
+  }
+
+  /* ---- SHADE MODE ---- */
+  function showShadeRound(){
+    state.answered=false; state.firstTry=true;
+    var cfg=state.shadeDeck[state.round];
+    state.shadeCurrent=cfg; state.shaded=new Set();
+    $("shadeQuestion").innerHTML="Shade <em>"+cfg.target+"/"+cfg.parts+"</em> of the shape.";
+    $("shadeTotal").textContent=cfg.parts;
+    $("shadeCount").textContent="0";
+    var fb=$("shadeFeedback"); fb.className="feedback"; fb.textContent="";
+    $("shadeNext").classList.remove("show");
+    $("checkBtn").disabled=false;
+    drawShade();
+    renderDots(8); updateScore();
+  }
+  function drawShade(){
+    var cfg=state.shadeCurrent;
+    renderShape($("shadeStage"), cfg, state.shaded, !state.answered, function(i){
+      if(state.shaded.has(i)) state.shaded.delete(i); else state.shaded.add(i);
+      $("shadeCount").textContent=state.shaded.size;
+      drawShade();
+    });
+  }
+  function checkShade(){
+    if(state.answered) return;
+    var cfg=state.shadeCurrent, fb=$("shadeFeedback");
+    if(state.shaded.size===cfg.target){
+      state.answered=true;
+      if(state.firstTry) state.stars++;
+      fb.className="feedback show good";
+      fb.textContent="Perfect! You shaded "+NAMES[fracKey(cfg.target,cfg.parts)]+". ⭐";
+      speak("Perfect! You shaded "+WORDS[fracKey(cfg.target,cfg.parts)]+".");
+      confetti(); updateScore();
+      $("shadeNext").textContent = state.round===7 ? "See My Stars →" : "Next Shape →";
+      $("shadeNext").classList.add("show");
+      drawShade(); $("checkBtn").disabled=true;
+      $("shadeNext").focus();
+    } else {
+      state.firstTry=false;
+      var need = cfg.target - state.shaded.size;
+      fb.className="feedback show try";
+      fb.textContent = need>0 ? "You need "+need+" more shaded part"+(need>1?"s":"")+". Tap a plain part to shade it." : "That's too many shaded parts. Tap a shaded part to unshade it.";
+      speak(need>0 ? "You need more shaded parts." : "That is too many shaded parts.");
+    }
+  }
+
+  function showEnd(){
+    $("namePanel").hidden=true; $("shadePanel").hidden=true;
+    var end=$("endPanel"); end.hidden=false;
+    var total = state.mode==="name"?10:8;
+    $("endStars").textContent = "★".repeat(Math.max(1,Math.min(5,Math.round(state.stars/total*5)))) + "☆".repeat(5-Math.max(1,Math.min(5,Math.round(state.stars/total*5))));
+    $("endTitle").textContent = state.stars===total ? "Perfect score — fraction star!" : state.stars>=Math.ceil(total*0.7) ? "Great fraction work!" : "Good trying — play again!";
+    $("endText").textContent="You earned "+state.stars+" star"+(state.stars===1?"":"s")+" for first-try answers out of "+total+" rounds. Play again for a brand-new set of shapes.";
+    speak("Great fraction work! You earned "+state.stars+" stars.");
+    renderDots(total); updateScore();
+  }
+
+  function startGame(){
+    buildDecks(); state.round=0; state.stars=0;
+    $("endPanel").hidden=true;
+    if(state.mode==="name"){ $("namePanel").hidden=false; $("shadePanel").hidden=true; showNameRound(); }
+    else { $("shadePanel").hidden=false; $("namePanel").hidden=true; showShadeRound(); }
+  }
+  function nextRound(){
+    state.round++;
+    var total = state.mode==="name"?10:8;
+    if(state.round>=total){ showEnd(); return; }
+    if(state.mode==="name") showNameRound(); else showShadeRound();
+  }
+
+  function setMode(mode){
+    state.mode=mode;
+    $("tabName").setAttribute("aria-selected", mode==="name"?"true":"false");
+    $("tabShade").setAttribute("aria-selected", mode==="shade"?"true":"false");
+    startGame();
+  }
+
+  /* ---- wiring ---- */
+  $("tabName").addEventListener("click",function(){ setMode("name"); });
+  $("tabShade").addEventListener("click",function(){ setMode("shade"); });
+  $("newGameBtn").addEventListener("click",function(){ startGame(); });
+  $("playAgainBtn").addEventListener("click",function(){ startGame(); });
+  $("nameNext").addEventListener("click",nextRound);
+  $("shadeNext").addEventListener("click",nextRound);
+  $("checkBtn").addEventListener("click",checkShade);
+  $("clearBtn").addEventListener("click",function(){
+    if(state.answered) return;
+    state.shaded=new Set(); $("shadeCount").textContent="0"; drawShade();
+  });
+  $("hearBtn").addEventListener("click",function(){
+    var cfg=state.current; if(!cfg) return;
+    speak("What fraction is shaded? The shape has "+cfg.parts+" equal parts.");
+  });
+  $("hearShadeBtn").addEventListener("click",function(){
+    var cfg=state.shadeCurrent; if(!cfg) return;
+    speak("Shade "+WORDS[fracKey(cfg.target,cfg.parts)]+" of the shape.");
+  });
+  $("hintBtn").addEventListener("click",function(){
+    var cfg=state.current; if(!cfg) return;
+    var fb=$("nameFeedback");
+    fb.className="feedback show info";
+    fb.textContent=cfg.shaded+" out of "+cfg.parts+" equal parts are shaded. The top number is "+cfg.shaded+" and the bottom number is "+cfg.parts+".";
+    speak(cfg.shaded+" out of "+cfg.parts+" parts are shaded.");
+  });
+  $("soundBtn").addEventListener("click",function(){
+    state.sound=!state.sound;
+    var b=$("soundBtn");
+    b.setAttribute("aria-pressed", state.sound?"true":"false");
+    b.textContent = state.sound ? "🔊 Sound On" : "🔇 Sound Off";
+    if(!state.sound && "speechSynthesis" in window){ try{ window.speechSynthesis.cancel(); }catch(e){} }
+  });
+
+  startGame();
+})();
+</script>
+</body>
+</html>

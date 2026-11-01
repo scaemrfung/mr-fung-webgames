@@ -1,0 +1,729 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:," />
+<title>Sharing — Share Treats Equally</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --page:#eef6f3;
+    --card:#ffffff;
+    --ink:#20302e;
+    --muted:#5b6f6b;
+    --teal:#0e7c6b;
+    --teal-dark:#0a5f52;
+    --coral:#e4572e;
+    --coral-dark:#c7431f;
+    --sun:#f4b400;
+    --sun-soft:#fff3c4;
+    --plate:#ffffff;
+    --plate-rim:#d7e3df;
+    --line:#d9e5e1;
+    --good:#1a8a4a;
+    --good-bg:#e3f6e8;
+    --warn-bg:#fff1e6;
+    --shadow:0 8px 24px rgba(20,60,50,.12);
+    --radius:20px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --page:#101f1c;
+      --card:#1a2e29;
+      --ink:#f0f7f4;
+      --muted:#a8bdb7;
+      --teal:#2ec4a6;
+      --teal-dark:#2ec4a6;
+      --coral:#ff7a4d;
+      --coral-dark:#ff7a4d;
+      --sun:#f4b400;
+      --sun-soft:#3a2f08;
+      --plate:#eef4f1;
+      --plate-rim:#b9ccc5;
+      --line:#33504a;
+      --good:#4ddb82;
+      --good-bg:#143324;
+      --warn-bg:#3a2415;
+      --shadow:0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    font-family:"Nunito",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    background:var(--page);
+    color:var(--ink);
+    line-height:1.45;
+  }
+  .wrap{max-width:980px;margin:0 auto;padding:14px 16px 40px}
+  /* Top bar */
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+  .home{
+    display:inline-flex;align-items:center;gap:8px;
+    background:var(--card);color:var(--ink);text-decoration:none;
+    font-weight:900;font-size:16px;padding:9px 16px;border-radius:999px;
+    border:2px solid var(--line);box-shadow:0 2px 0 var(--line);
+  }
+  .home svg{width:20px;height:20px}
+  .home:focus-visible,.choice-btn:focus-visible,button:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+  .score-chips{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{
+    background:var(--card);border:2px solid var(--line);border-radius:999px;
+    padding:7px 13px;font-weight:900;font-size:15px;display:inline-flex;align-items:center;gap:6px;
+  }
+  .chip .star{color:var(--sun);font-size:18px}
+  .sound-btn{
+    border:2px solid var(--line);background:var(--card);color:var(--ink);
+    border-radius:999px;padding:7px 13px;font:inherit;font-weight:900;font-size:15px;cursor:pointer;
+  }
+  /* Heading */
+  h1{
+    font-family:"Baloo 2","Nunito",system-ui,sans-serif;
+    font-size:clamp(38px,6vw,54px);line-height:1.05;margin:10px 0 2px;font-weight:800;letter-spacing:-.01em;
+  }
+  h1 .accent{color:var(--teal)}
+  .subtitle{font-size:clamp(17px,2.6vw,20px);font-weight:700;color:var(--muted);margin:0 0 16px;max-width:640px}
+  /* Control card */
+  .card{background:var(--card);border:2px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
+  .controls{display:grid;gap:14px}
+  .control-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .control-label{font-weight:900;font-size:16px;min-width:86px}
+  .picker{display:flex;gap:8px;flex-wrap:wrap}
+  .pick{
+    display:inline-flex;align-items:center;gap:8px;cursor:pointer;
+    border:2px solid var(--line);background:var(--page);color:var(--ink);
+    border-radius:14px;padding:8px 13px;font:inherit;font-weight:800;font-size:16px;
+  }
+  .pick svg{width:30px;height:30px;flex:none}
+  .pick[aria-pressed="true"]{border-color:var(--teal);background:var(--sun-soft);box-shadow:0 0 0 2px var(--teal) inset}
+  .pick.plate-pick{padding:9px 16px}
+  .pick.plate-pick .mini-plate{width:30px;height:30px;border-radius:50%;background:var(--plate);border:3px solid var(--plate-rim);display:inline-block;box-shadow:inset 0 0 0 3px #fff}
+  .btn{
+    font:inherit;font-weight:900;cursor:pointer;border-radius:999px;border:none;
+    padding:12px 20px;font-size:17px;display:inline-flex;align-items:center;gap:8px;justify-content:center;
+  }
+  .btn-primary{background:var(--coral);color:#fff;box-shadow:0 4px 0 var(--coral-dark)}
+  .btn-primary:active{transform:translateY(2px);box-shadow:0 2px 0 var(--coral-dark)}
+  .btn-teal{background:var(--teal);color:#fff;box-shadow:0 4px 0 var(--teal-dark)}
+  .btn-teal:active{transform:translateY(2px);box-shadow:0 2px 0 var(--teal-dark)}
+  .btn-ghost{background:var(--card);color:var(--ink);border:2px solid var(--line);box-shadow:0 3px 0 var(--line)}
+  .btn-ghost:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
+  .btn:disabled{opacity:.5;cursor:default;transform:none}
+  /* Problem banner */
+  .problem{
+    margin-top:16px;background:var(--teal);color:#fff;border-radius:var(--radius);
+    padding:16px 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;box-shadow:var(--shadow);
+  }
+  .problem .big{font-family:"Baloo 2",sans-serif;font-size:clamp(22px,4vw,30px);font-weight:800;line-height:1.15}
+  .problem .big .num{background:#fff;color:var(--teal-dark);border-radius:10px;padding:0 9px;margin:0 2px;white-space:nowrap}
+  .problem .hint{font-size:15px;font-weight:700;opacity:.95}
+  /* Stage */
+  .stage{margin-top:16px;position:relative;overflow:hidden}
+  .stage-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+  .stage-head h2{font-family:"Baloo 2",sans-serif;font-size:24px;margin:0}
+  .left-count{font-weight:900;font-size:17px;color:var(--teal)}
+  .pile{
+    display:flex;flex-wrap:wrap;gap:8px;min-height:64px;
+    background:var(--sun-soft);border:2px dashed var(--sun);border-radius:16px;padding:12px;
+  }
+  .pile-empty{font-weight:800;color:var(--muted);padding:10px 4px}
+  .treat-btn{
+    border:none;background:transparent;padding:2px;cursor:pointer;border-radius:12px;line-height:0;
+    transition:transform .12s ease;
+  }
+  .treat-btn:hover{transform:scale(1.12) rotate(-4deg)}
+  .treat-btn:active{transform:scale(.94)}
+  .treat-btn svg{width:52px;height:52px;display:block}
+  .treat-btn svg.plate-treat{width:44px;height:44px}
+  .deal-row{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 4px}
+  .deal-row .btn{flex:1 1 150px}
+  .fineprint{font-size:14px;font-weight:700;color:var(--muted);margin:8px 2px 0}
+  /* Plates */
+  .plates{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:14px;margin-top:14px}
+  .plate-card{text-align:center}
+  .plate{
+    position:relative;width:100%;aspect-ratio:1/1;max-width:230px;margin:0 auto;
+    background:var(--plate);border:5px solid var(--plate-rim);border-radius:50%;
+    box-shadow:inset 0 -10px 0 rgba(0,0,0,.05),0 6px 14px rgba(20,60,50,.15);
+    display:flex;align-items:center;justify-content:center;cursor:pointer;padding:14%;
+  }
+  .plate.next{border-color:var(--sun);box-shadow:0 0 0 5px var(--sun-soft),0 0 0 8px var(--sun),0 6px 14px rgba(20,60,50,.15)}
+  .plate .treats{display:flex;flex-wrap:wrap;gap:4px;align-items:center;justify-content:center;max-width:100%}
+  .plate .empty-note{font-weight:800;color:#8aa39d;font-size:15px;padding:0 10px}
+  .plate-tag{
+    position:absolute;top:-9px;left:50%;transform:translateX(-50%);
+    background:var(--sun);color:#3a2a00;font-weight:900;font-size:13px;
+    padding:3px 11px;border-radius:999px;white-space:nowrap;
+  }
+  .plate-name{font-weight:900;font-size:18px;margin:12px 0 2px}
+  .plate-count{font-weight:800;color:var(--muted);font-size:15px;margin:0}
+  .plate-count b{color:var(--ink);font-size:18px}
+  /* Feedback + question */
+  .feedback{
+    margin-top:16px;border-radius:16px;padding:14px 16px;font-weight:800;font-size:18px;
+    background:var(--warn-bg);border:2px solid var(--line);min-height:56px;
+  }
+  .feedback.good{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+  .question{margin-top:16px;text-align:center;padding:20px 16px}
+  .question h2{font-family:"Baloo 2",sans-serif;font-size:clamp(24px,4vw,30px);margin:0 0 4px}
+  .question p{margin:0 0 14px;font-weight:700;color:var(--muted)}
+  .answers{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .answer-btn{
+    font-family:"Baloo 2",sans-serif;font-size:34px;font-weight:800;min-width:86px;min-height:70px;
+    border-radius:18px;border:3px solid var(--line);background:var(--page);color:var(--ink);cursor:pointer;
+    box-shadow:0 4px 0 var(--line);
+  }
+  .answer-btn:hover{border-color:var(--teal)}
+  .answer-btn:active{transform:translateY(2px);box-shadow:0 2px 0 var(--line)}
+  .answer-btn.wrong{border-color:var(--coral);background:#ffe9e2;animation:shake .3s ease}
+  .answer-btn.right{border-color:var(--good);background:var(--good-bg);color:var(--good)}
+  @keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+  .equation{
+    font-family:"Baloo 2",sans-serif;font-size:clamp(26px,5vw,36px);font-weight:800;
+    background:var(--sun-soft);border-radius:14px;padding:10px 16px;display:inline-block;margin:6px 0 4px;
+  }
+  .equation .op{color:var(--coral)}
+  .celebrate-note{font-weight:800;font-size:18px;margin:6px 0 12px}
+  [hidden]{display:none !important}
+  /* Confetti */
+  .confetti{position:absolute;width:11px;height:16px;top:-18px;border-radius:2px;pointer-events:none;animation:fall 1.6s ease-in forwards;z-index:5}
+  @keyframes fall{to{transform:translateY(560px) rotate(540deg);opacity:.15}}
+  /* How to play */
+  .howto{margin-top:16px}
+  .howto h2{font-family:"Baloo 2",sans-serif;font-size:24px;margin:0 0 10px}
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .step{background:var(--page);border:2px solid var(--line);border-radius:14px;padding:13px 14px}
+  .step .n{
+    display:inline-flex;width:30px;height:30px;border-radius:50%;background:var(--teal);color:#fff;
+    align-items:center;justify-content:center;font-weight:900;margin-bottom:6px;
+  }
+  .step p{margin:0;font-weight:700;font-size:15px}
+  .step p b{font-weight:900}
+  @media (max-width:640px){
+    .steps{grid-template-columns:1fr}
+    .control-label{min-width:0;width:100%}
+    .treat-btn svg{width:46px;height:46px}
+    .treat-btn svg.plate-treat{width:40px;height:40px}
+    .deal-row .btn{flex:1 1 100%}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.01ms !important;transition-duration:.01ms !important}
+  }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="topbar">
+    <a class="home" href="https://scaemrfung.github.io/mr-fung-webgames/" aria-label="Home — back to Fun Playground">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 11.5 12 3l9 8.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 10.5V20h13v-9.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.5 20v-5.5h5V20" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Home
+    </a>
+    <div class="score-chips">
+      <span class="chip"><span class="star" aria-hidden="true">★</span> <span id="starCount">0</span> stars</span>
+      <span class="chip">Problem <span id="roundCount">1</span></span>
+      <button class="sound-btn" id="soundBtn" type="button" aria-pressed="true">🔊 Sound On</button>
+    </div>
+  </div>
+
+  <h1>Sharing <span class="accent">treats equally</span></h1>
+  <p class="subtitle">Share the treats so every plate gets the same number. Then tell how many are on each plate!</p>
+
+  <section class="card controls" aria-label="Choose your sharing problem">
+    <div class="control-row">
+      <span class="control-label" id="treatLabel">Treats:</span>
+      <div class="picker" role="group" aria-labelledby="treatLabel" id="treatPicker"></div>
+    </div>
+    <div class="control-row">
+      <span class="control-label" id="plateLabel">Plates:</span>
+      <div class="picker" role="group" aria-labelledby="plateLabel" id="platePicker"></div>
+    </div>
+    <div class="control-row">
+      <button class="btn btn-primary" id="newBtn" type="button">🎲 New Sharing Problem</button>
+      <button class="btn btn-ghost" id="sayBtn" type="button">🗣️ Say It</button>
+    </div>
+  </section>
+
+  <section class="problem" aria-live="polite">
+    <div>
+      <div class="big" id="problemText">Share <span class="num">12</span> cookies on <span class="num">3</span> plates.</div>
+      <div class="hint">Tap a treat in the pile — it goes to the glowing plate. Tap a plate to give it a treat. Tap a treat on a plate to take it back.</div>
+    </div>
+  </section>
+
+  <section class="card stage" aria-label="Sharing table">
+    <div class="stage-head">
+      <h2>Treats to share</h2>
+      <span class="left-count" id="leftCount">12 left</span>
+    </div>
+    <div class="pile" id="pile"></div>
+    <div class="deal-row">
+      <button class="btn btn-teal" id="roundBtn" type="button">Give one to each plate</button>
+      <button class="btn btn-teal" id="allBtn" type="button">Share them all</button>
+      <button class="btn btn-ghost" id="resetBtn" type="button">Start over</button>
+    </div>
+    <p class="fineprint">Sharing fairly means going one at a time, round and round — just like dealing cards.</p>
+
+    <div class="plates" id="plates"></div>
+
+    <div class="feedback" id="feedback" aria-live="polite">Tap a treat to start sharing!</div>
+
+    <div class="question" id="questionPanel" hidden>
+      <h2>How many treats are on each plate?</h2>
+      <p>Count the treats on one plate.</p>
+      <div class="answers" id="answers"></div>
+    </div>
+
+    <div class="question" id="donePanel" hidden>
+      <div aria-hidden="true" style="font-size:40px">🎉</div>
+      <h2>Fair shares! Every plate has the same!</h2>
+      <div class="equation" id="equation"></div>
+      <p class="celebrate-note" id="celebrateNote"></p>
+      <button class="btn btn-primary" id="nextBtn" type="button">Next Sharing Problem →</button>
+    </div>
+  </section>
+
+  <section class="card howto">
+    <h2>How to play</h2>
+    <div class="steps">
+      <div class="step"><span class="n">1</span><p><b>Pick treats and plates.</b> Try 2, 3, or 4 plates.</p></div>
+      <div class="step"><span class="n">2</span><p><b>Share one at a time.</b> Go round and round until the pile is empty.</p></div>
+      <div class="step"><span class="n">3</span><p><b>Answer:</b> how many treats on each plate? Earn a star!</p></div>
+    </div>
+  </section>
+</main>
+
+<script>
+(function(){
+  "use strict";
+  var TREATS = [
+    {id:"cookie", plural:"cookies", singular:"cookie"},
+    {id:"strawberry", plural:"strawberries", singular:"strawberry"},
+    {id:"cupcake", plural:"cupcakes", singular:"cupcake"},
+    {id:"apple", plural:"apples", singular:"apple"}
+  ];
+  var PLATE_OPTIONS = [2,3,4];
+
+  var state = {
+    treat:"cookie",
+    plates:3,
+    total:12,
+    quotient:4,
+    pile:12,
+    counts:[0,0,0],
+    next:0,
+    phase:"sharing", // sharing | question | done
+    stars:0,
+    round:1,
+    sound:true,
+    dealing:false,
+    lastKey:""
+  };
+
+  var pileEl = document.getElementById("pile");
+  var platesEl = document.getElementById("plates");
+  var feedbackEl = document.getElementById("feedback");
+  var problemTextEl = document.getElementById("problemText");
+  var leftCountEl = document.getElementById("leftCount");
+  var questionPanel = document.getElementById("questionPanel");
+  var donePanel = document.getElementById("donePanel");
+  var answersEl = document.getElementById("answers");
+  var equationEl = document.getElementById("equation");
+  var celebrateNoteEl = document.getElementById("celebrateNote");
+  var stageEl = document.querySelector(".stage");
+
+  function treatSVG(type, cls){
+    var c = cls ? ' class="'+cls+'"' : "";
+    if(type==="cookie"){
+      return '<svg'+c+' viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="27" fill="#e0a458" stroke="#8a5a2b" stroke-width="3.5"/><circle cx="23" cy="24" r="4.5" fill="#6b3f1d"/><circle cx="40" cy="22" r="4" fill="#6b3f1d"/><circle cx="32" cy="38" r="4.5" fill="#6b3f1d"/><circle cx="43" cy="42" r="3.5" fill="#6b3f1d"/><circle cx="20" cy="41" r="3.5" fill="#6b3f1d"/></svg>';
+    }
+    if(type==="strawberry"){
+      return '<svg'+c+' viewBox="0 0 64 64" aria-hidden="true"><path d="M32 54C20 43 12 34 12 25c0-7 5-12 11-12 4 0 7 2 9 5 2-3 5-5 9-5 6 0 11 5 11 12 0 9-8 18-20 29z" fill="#e63946" stroke="#8f1d27" stroke-width="3"/><path d="M32 14c-2-4-6-6-10-6M32 14c2-4 6-6 10-6" fill="none" stroke="#2f7d32" stroke-width="3.5" stroke-linecap="round"/><ellipse cx="24" cy="28" rx="2.2" ry="3" fill="#fff3c4"/><ellipse cx="34" cy="32" rx="2.2" ry="3" fill="#fff3c4"/><ellipse cx="29" cy="42" rx="2.2" ry="3" fill="#fff3c4"/><ellipse cx="40" cy="27" rx="2.2" ry="3" fill="#fff3c4"/></svg>';
+    }
+    if(type==="cupcake"){
+      return '<svg'+c+' viewBox="0 0 64 64" aria-hidden="true"><path d="M18 30h28l-4 24H22z" fill="#f4b400" stroke="#9a6b00" stroke-width="3" stroke-linejoin="round"/><path d="M26 32l2 20M32 32v20M38 32l-2 20" stroke="#9a6b00" stroke-width="2"/><path d="M14 30c-2-8 6-14 12-11 1-6 7-9 12-6 6-3 12 1 12 7 2 5-1 9-5 10z" fill="#ff8fab" stroke="#a4133c" stroke-width="3" stroke-linejoin="round"/><circle cx="32" cy="12" r="4" fill="#e63946" stroke="#8f1d27" stroke-width="2.5"/></svg>';
+    }
+    return '<svg'+c+' viewBox="0 0 64 64" aria-hidden="true"><path d="M32 56C20 48 13 39 13 29c0-9 6-15 13-15 3 0 5 1 6 3 1-2 3-3 6-3 7 0 13 6 13 15 0 10-7 19-19 27z" fill="#e63946" stroke="#8f1d27" stroke-width="3"/><path d="M32 16c0-5 3-8 7-9" fill="none" stroke="#6b3f1d" stroke-width="3.5" stroke-linecap="round"/><path d="M36 9c5-3 9-2 11 1-3 3-8 3-11-1z" fill="#2f7d32" stroke="#1e5421" stroke-width="2"/></svg>';
+  }
+  function treatName(){
+    var t = TREATS.filter(function(x){return x.id===state.treat;})[0];
+    return t;
+  }
+  function quotientRange(plates){
+    if(plates===2) return [2,6];
+    if(plates===3) return [2,5];
+    return [2,4];
+  }
+  function pickQuotient(){
+    var r = quotientRange(state.plates);
+    var choices = [];
+    for(var q=r[0]; q<=r[1]; q++){ choices.push(q); }
+    var pick = choices[Math.floor(Math.random()*choices.length)];
+    var key = state.plates + "x" + pick;
+    if(key===state.lastKey && choices.length>1){
+      pick = choices[(choices.indexOf(pick)+1)%choices.length];
+      key = state.plates + "x" + pick;
+    }
+    state.lastKey = key;
+    return pick;
+  }
+  function newProblem(){
+    state.quotient = pickQuotient();
+    state.total = state.plates * state.quotient;
+    state.pile = state.total;
+    state.counts = [];
+    for(var i=0;i<state.plates;i++){ state.counts.push(0); }
+    state.next = 0;
+    state.phase = "sharing";
+    state.dealing = false;
+    renderAll();
+    setFeedback("Tap a treat to start sharing!", false);
+    speakProblem();
+  }
+  function renderPickers(){
+    var tp = document.getElementById("treatPicker");
+    tp.innerHTML = "";
+    TREATS.forEach(function(t){
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "pick";
+      b.setAttribute("aria-pressed", state.treat===t.id ? "true" : "false");
+      b.innerHTML = treatSVG(t.id) + "<span>"+cap(t.plural)+"</span>";
+      b.setAttribute("aria-label", t.plural);
+      b.addEventListener("click", function(){
+        if(state.treat!==t.id){ state.treat=t.id; renderPickers(); newProblem(); }
+      });
+      tp.appendChild(b);
+    });
+    var pp = document.getElementById("platePicker");
+    pp.innerHTML = "";
+    PLATE_OPTIONS.forEach(function(n){
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "pick plate-pick";
+      b.setAttribute("aria-pressed", state.plates===n ? "true" : "false");
+      b.innerHTML = '<span class="mini-plate" aria-hidden="true"></span><span>'+n+' plates</span>';
+      b.setAttribute("aria-label", n+" plates");
+      b.addEventListener("click", function(){
+        if(state.plates!==n){ state.plates=n; renderPickers(); newProblem(); }
+      });
+      pp.appendChild(b);
+    });
+  }
+  function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+  function renderProblem(){
+    var t = treatName();
+    problemTextEl.innerHTML = "Share <span class=\"num\">"+state.total+"</span> "+t.plural+" on <span class=\"num\">"+state.plates+"</span> "+(state.plates===1?"plate":"plates")+".";
+    leftCountEl.textContent = state.pile + (state.pile===1 ? " left" : " left");
+  }
+  function renderPile(){
+    pileEl.innerHTML = "";
+    if(state.pile===0){
+      var em = document.createElement("span");
+      em.className = "pile-empty";
+      em.textContent = "All shared! 🎉";
+      pileEl.appendChild(em);
+      return;
+    }
+    var t = treatName();
+    for(var i=0;i<state.pile;i++){
+      (function(idx){
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "treat-btn";
+        b.innerHTML = treatSVG(state.treat);
+        b.setAttribute("aria-label", "Give one "+t.singular+" to Plate "+(state.next+1));
+        b.addEventListener("click", function(){ giveTo(state.next); });
+        pileEl.appendChild(b);
+      })(i);
+    }
+  }
+  function renderPlates(){
+    platesEl.innerHTML = "";
+    var t = treatName();
+    for(var i=0;i<state.plates;i++){
+      (function(idx){
+        var card = document.createElement("div");
+        card.className = "plate-card";
+        var plate = document.createElement("div");
+        plate.className = "plate" + (state.phase==="sharing" && state.pile>0 && state.next===idx ? " next" : "");
+        plate.setAttribute("role","button");
+        plate.setAttribute("tabindex","0");
+        plate.setAttribute("aria-label", "Plate "+(idx+1)+", "+state.counts[idx]+" "+t.plural+". Tap to give it a treat.");
+        var inner = document.createElement("div");
+        inner.className = "treats";
+        if(state.counts[idx]===0){
+          var note = document.createElement("span");
+          note.className = "empty-note";
+          note.textContent = "Empty plate";
+          inner.appendChild(note);
+        } else {
+          for(var k=0;k<state.counts[idx];k++){
+            var tb = document.createElement("button");
+            tb.type = "button";
+            tb.className = "treat-btn";
+            tb.innerHTML = treatSVG(state.treat, "plate-treat");
+            tb.setAttribute("aria-label", "Take one "+t.singular+" back from Plate "+(idx+1));
+            tb.addEventListener("click", function(ev){ ev.stopPropagation(); takeBack(idx); });
+            inner.appendChild(tb);
+          }
+        }
+        plate.appendChild(inner);
+        if(state.phase==="sharing" && state.pile>0 && state.next===idx){
+          var tag = document.createElement("span");
+          tag.className = "plate-tag";
+          tag.textContent = "Next ➜";
+          plate.appendChild(tag);
+        }
+        plate.addEventListener("click", function(){ giveTo(idx); });
+        plate.addEventListener("keydown", function(ev){ if(ev.key==="Enter"||ev.key===" "){ ev.preventDefault(); giveTo(idx); } });
+        var name = document.createElement("p");
+        name.className = "plate-name";
+        name.textContent = "Plate "+(idx+1);
+        var count = document.createElement("p");
+        count.className = "plate-count";
+        count.innerHTML = "<b>"+state.counts[idx]+"</b> "+(state.counts[idx]===1 ? t.singular : t.plural);
+        card.appendChild(plate);
+        card.appendChild(name);
+        card.appendChild(count);
+        platesEl.appendChild(card);
+      })(i);
+    }
+  }
+  function renderAll(){
+    renderPickers();
+    renderProblem();
+    renderPile();
+    renderPlates();
+    document.getElementById("starCount").textContent = state.stars;
+    document.getElementById("roundCount").textContent = state.round;
+    var dealing = state.dealing;
+    document.getElementById("roundBtn").disabled = dealing || state.pile===0 || state.phase!=="sharing";
+    document.getElementById("allBtn").disabled = dealing || state.pile===0 || state.phase!=="sharing";
+    document.getElementById("resetBtn").disabled = dealing;
+    if(state.phase==="question"){
+      questionPanel.hidden = false;
+      donePanel.hidden = true;
+    } else if(state.phase==="done"){
+      questionPanel.hidden = true;
+      donePanel.hidden = false;
+    } else {
+      questionPanel.hidden = true;
+      donePanel.hidden = true;
+    }
+  }
+  function setFeedback(msg, good){
+    feedbackEl.textContent = msg;
+    feedbackEl.classList.toggle("good", !!good);
+  }
+  function allEqual(){
+    for(var i=1;i<state.counts.length;i++){ if(state.counts[i]!==state.counts[0]) return false; }
+    return true;
+  }
+  function afterShare(){
+    renderAll();
+    if(state.pile===0){
+      if(allEqual()){
+        state.phase = "question";
+        renderAll();
+        buildAnswers();
+        setFeedback("All shared! Every plate looks the same. Now — how many on each plate?", true);
+        speak("All shared. How many treats are on each plate?");
+      } else {
+        setFeedback("Hmm, the plates are not equal yet. Count each plate. Tap a treat on a plate with too many to take it back, then share it again.", false);
+        speak("The plates are not equal yet. Can you fix it?");
+      }
+    } else {
+      var t = treatName();
+      setFeedback("Good sharing! "+state.pile+" "+(state.pile===1?t.singular:t.plural)+" left. Next: Plate "+(state.next+1)+".", false);
+    }
+  }
+  function giveTo(idx){
+    if(state.phase!=="sharing" || state.dealing || state.pile<=0) return;
+    state.counts[idx]++;
+    state.pile--;
+    state.next = (idx+1) % state.plates;
+    pop();
+    afterShare();
+  }
+  function takeBack(idx){
+    if(state.phase!=="sharing" || state.dealing || state.counts[idx]<=0) return;
+    state.counts[idx]--;
+    state.pile++;
+    state.next = idx;
+    pop();
+    renderAll();
+    setFeedback("Taken back. Now Plate "+(idx+1)+" is waiting for the next treat.", false);
+  }
+  function dealRound(){
+    if(state.phase!=="sharing" || state.dealing || state.pile<=0) return;
+    state.dealing = true;
+    renderAll();
+    var steps = Math.min(state.plates, state.pile);
+    var done = 0;
+    var startNext = state.next;
+    function step(){
+      if(done>=steps || state.pile<=0){
+        state.dealing = false;
+        afterShare();
+        return;
+      }
+      var idx = (startNext+done) % state.plates;
+      state.counts[idx]++;
+      state.pile--;
+      state.next = (idx+1) % state.plates;
+      pop();
+      renderPile(); renderPlates(); renderProblem();
+      done++;
+      setTimeout(step, 260);
+    }
+    step();
+  }
+  function shareAll(){
+    if(state.phase!=="sharing" || state.dealing || state.pile<=0) return;
+    state.dealing = true;
+    renderAll();
+    function step(){
+      if(state.pile<=0){
+        state.dealing = false;
+        afterShare();
+        return;
+      }
+      var idx = state.next;
+      state.counts[idx]++;
+      state.pile--;
+      state.next = (idx+1) % state.plates;
+      pop();
+      renderPile(); renderPlates(); renderProblem();
+      setTimeout(step, 220);
+    }
+    step();
+  }
+  function resetSharing(){
+    if(state.dealing) return;
+    state.pile = state.total;
+    state.counts = [];
+    for(var i=0;i<state.plates;i++){ state.counts.push(0); }
+    state.next = 0;
+    state.phase = "sharing";
+    renderAll();
+    setFeedback("Fresh start! Tap a treat to start sharing!", false);
+  }
+  function buildAnswers(){
+    var correct = state.quotient;
+    var opts = [correct];
+    if(correct-1>=1) opts.push(correct-1);
+    opts.push(correct+1);
+    if(opts.length<3) opts.push(correct+2);
+    opts = opts.slice(0,3);
+    // shuffle
+    for(var i=opts.length-1;i>0;i--){
+      var j = Math.floor(Math.random()*(i+1));
+      var tmp = opts[i]; opts[i]=opts[j]; opts[j]=tmp;
+    }
+    answersEl.innerHTML = "";
+    opts.forEach(function(val){
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "answer-btn";
+      b.textContent = val;
+      b.setAttribute("aria-label", val+" treats on each plate");
+      b.addEventListener("click", function(){ answer(val, b); });
+      answersEl.appendChild(b);
+    });
+  }
+  function answer(val, btn){
+    if(state.phase!=="question") return;
+    if(val===state.quotient){
+      btn.classList.add("right");
+      state.phase = "done";
+      state.stars++;
+      var t = treatName();
+      equationEl.innerHTML = state.total+" <span class=\"op\">÷</span> "+state.plates+" <span class=\"op\">=</span> "+state.quotient;
+      celebrateNoteEl.textContent = state.plates+" plates × "+state.quotient+" "+t.plural+" = "+state.total+" "+t.plural+". You shared fairly!";
+      renderAll();
+      setFeedback("Yes! "+state.quotient+" on each plate! ⭐", true);
+      confetti();
+      speak("Yes! "+state.quotient+" on each plate. "+state.total+" divided by "+state.plates+" equals "+state.quotient+". Great sharing!");
+      // disable other answer buttons visually by hiding panel (done panel shows)
+    } else {
+      btn.classList.add("wrong");
+      setTimeout(function(){ btn.classList.remove("wrong"); }, 600);
+      setFeedback("Not quite — count the treats on just one plate and try again. You can do it!", false);
+      speak("Try again. Count the treats on one plate.");
+    }
+  }
+  function confetti(){
+    var colors = ["#e4572e","#f4b400","#0e7c6b","#ff8fab","#4a90e2","#7c5cd6"];
+    for(var i=0;i<28;i++){
+      var c = document.createElement("span");
+      c.className = "confetti";
+      c.style.left = (4+Math.random()*92)+"%";
+      c.style.background = colors[i%colors.length];
+      c.style.animationDelay = (Math.random()*0.4)+"s";
+      c.style.transform = "rotate("+(Math.random()*360)+"deg)";
+      stageEl.appendChild(c);
+      (function(el){ setTimeout(function(){ el.remove(); }, 2400); })(c);
+    }
+  }
+  /* Sound: speech + tiny pop */
+  var audioCtx = null;
+  function pop(){
+    if(!state.sound) return;
+    try{
+      if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+      if(audioCtx.state==="suspended") audioCtx.resume();
+      var o = audioCtx.createOscillator();
+      var g = audioCtx.createGain();
+      o.type = "sine"; o.frequency.value = 620;
+      g.gain.setValueAtTime(0.12, audioCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.12);
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(); o.stop(audioCtx.currentTime+0.13);
+    }catch(e){}
+  }
+  function speak(text){
+    if(!state.sound) return;
+    try{
+      if(!("speechSynthesis" in window)) return;
+      window.speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      u.rate = 0.95; u.lang = "en-CA";
+      var voices = window.speechSynthesis.getVoices();
+      var v = null;
+      for(var i=0;i<voices.length;i++){
+        if(/en-CA/i.test(voices[i].lang) && /natural|neural|google/i.test(voices[i].name)){ v=voices[i]; break; }
+      }
+      if(!v){ for(var j=0;j<voices.length;j++){ if(/^en/i.test(voices[j].lang)){ v=voices[j]; break; } } }
+      if(v) u.voice = v;
+      window.speechSynthesis.speak(u);
+    }catch(e){}
+  }
+  function speakProblem(){
+    var t = treatName();
+    speak("Share "+state.total+" "+t.plural+" equally on "+state.plates+" plates.");
+  }
+
+  document.getElementById("newBtn").addEventListener("click", function(){ state.round++; newProblem(); });
+  document.getElementById("nextBtn").addEventListener("click", function(){ state.round++; newProblem(); });
+  document.getElementById("sayBtn").addEventListener("click", function(){ speakProblem(); });
+  document.getElementById("roundBtn").addEventListener("click", dealRound);
+  document.getElementById("allBtn").addEventListener("click", shareAll);
+  document.getElementById("resetBtn").addEventListener("click", resetSharing);
+  var soundBtn = document.getElementById("soundBtn");
+  soundBtn.addEventListener("click", function(){
+    state.sound = !state.sound;
+    soundBtn.textContent = state.sound ? "🔊 Sound On" : "🔇 Sound Off";
+    soundBtn.setAttribute("aria-pressed", state.sound ? "true" : "false");
+    if(!state.sound){ try{ window.speechSynthesis.cancel(); }catch(e){} }
+  });
+
+  newProblem();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,847 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:," />
+<title>Word Ladder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#eaf3ef;
+    --card:#ffffff;
+    --card-2:#f2f7f4;
+    --ink:#1c2b25;
+    --muted:#51635b;
+    --line:#cfe0d8;
+    --teal:#0f766e;
+    --teal-dark:#0b5c55;
+    --teal-soft:#d7efeb;
+    --amber:#f59e0b;
+    --amber-dark:#92400e;
+    --amber-soft:#fef0d5;
+    --red:#c2410c;
+    --red-soft:#fde8df;
+    --green:#15803d;
+    --green-soft:#dcf5e3;
+    --shadow:0 10px 30px rgba(20,50,40,.12);
+    --radius:20px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0e1a16;
+      --card:#182824;
+      --card-2:#1f322c;
+      --ink:#edf6f1;
+      --muted:#a9bfb5;
+      --line:#2e463d;
+      --teal:#2dd4bf;
+      --teal-dark:#5eead4;
+      --teal-soft:#143d38;
+      --amber:#fbbf24;
+      --amber-dark:#fde68a;
+      --amber-soft:#42330a;
+      --red:#fb923c;
+      --red-soft:#431b0d;
+      --green:#4ade80;
+      --green-soft:#12351f;
+      --shadow:0 10px 30px rgba(0,0,0,.45);
+    }
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    font-family:"Nunito",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.5;
+  }
+  h1,h2,h3,.display{font-family:"Fredoka","Nunito",system-ui,sans-serif}
+  button{font:inherit;color:inherit}
+  :focus-visible{outline:4px solid var(--amber);outline-offset:3px;border-radius:8px}
+
+  .wrap{max-width:980px;margin:0 auto;padding:16px 16px 48px}
+  .topbar{
+    display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;
+    margin-bottom:14px;
+  }
+  .topbar .group{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .home-link,.pill-btn{
+    display:inline-flex;align-items:center;gap:8px;
+    background:var(--card);border:2px solid var(--line);border-radius:999px;
+    padding:10px 16px;font-weight:800;text-decoration:none;color:var(--ink);
+    box-shadow:0 3px 0 var(--line);cursor:pointer;min-height:48px;
+  }
+  .home-link:active,.pill-btn:active{transform:translateY(2px);box-shadow:none}
+  .home-link svg{width:20px;height:20px;flex:none}
+  .session-stars{font-weight:900;font-size:1.05rem;background:var(--amber-soft);border:2px solid var(--amber);border-radius:999px;padding:8px 14px}
+
+  header.game-head{
+    background:var(--card);border:2px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:18px 20px 16px;text-align:center;margin-bottom:14px;
+  }
+  header.game-head h1{margin:0;font-size:clamp(1.7rem,5vw,2.4rem);letter-spacing:.01em}
+  header.game-head p{margin:6px auto 0;max-width:620px;color:var(--muted);font-weight:700}
+
+  .challenge{
+    display:flex;align-items:stretch;justify-content:center;gap:10px;flex-wrap:wrap;
+    margin-top:16px;
+  }
+  .word-card{
+    background:var(--card-2);border:2px solid var(--line);border-radius:16px;
+    padding:10px 16px;min-width:150px;flex:1 1 180px;max-width:260px;
+  }
+  .word-card .label{font-size:.8rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .word-card .word{font-family:"Fredoka",sans-serif;font-size:clamp(1.9rem,7vw,2.6rem);font-weight:700;letter-spacing:.14em;line-height:1.1}
+  .word-card.target-card{background:var(--teal-soft);border-color:var(--teal)}
+  .arrow{align-self:center;font-size:2rem;font-weight:900;color:var(--teal);line-height:1}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:14px}
+  .chip{
+    background:var(--card-2);border:2px solid var(--line);border-radius:999px;
+    padding:7px 13px;font-weight:800;font-size:.95rem;
+  }
+  .chip strong{color:var(--teal)}
+
+  .layout{display:grid;grid-template-columns:1fr;gap:14px}
+  @media (min-width:860px){ .layout{grid-template-columns:minmax(0,1fr) 290px;align-items:start} }
+
+  .panel{
+    background:var(--card);border:2px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:18px;
+  }
+  .panel h2{margin:0 0 6px;font-size:1.35rem}
+  .panel h3{margin:0 0 8px;font-size:1.1rem}
+  .panel p{margin:0 0 10px;color:var(--muted);font-weight:700}
+  .panel p:last-child{margin-bottom:0}
+
+  .ladder{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column;align-items:center;gap:2px}
+  .rung{display:flex;gap:8px;align-items:center}
+  .rung .mini{font-weight:900;font-size:.8rem;color:var(--muted);width:52px;text-align:right;letter-spacing:.04em}
+  .rung .mini.left{text-align:right}
+  .rung .mini.right{text-align:left}
+  .mini-tiles{display:flex;gap:6px}
+  .mini-tile{
+    width:46px;height:52px;display:grid;place-items:center;border-radius:12px;
+    border:2px solid var(--line);background:var(--card-2);
+    font-family:"Fredoka",sans-serif;font-size:1.5rem;font-weight:700;
+  }
+  .mini-tile.changed{background:var(--amber);border-color:var(--amber);color:#231303}
+  .mini-tile.ghost{background:transparent;border-style:dashed;color:var(--muted);font-size:1.1rem}
+  .mini-tile.target-tile{background:var(--teal-soft);border-color:var(--teal)}
+  .down-arrow{color:var(--teal);font-weight:900;font-size:1.2rem;line-height:1.4}
+  .down-arrow.dim{color:var(--muted);opacity:.6}
+
+  .editor{margin-top:18px;border-top:2px dashed var(--line);padding-top:16px;text-align:center}
+  .editor .your{font-weight:900;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;font-size:.85rem}
+  .tiles{display:flex;gap:10px;justify-content:center;margin:10px 0 6px;flex-wrap:wrap}
+  .tile{
+    width:clamp(58px,15vw,72px);height:clamp(64px,16vw,80px);
+    border-radius:16px;border:3px solid var(--line);background:var(--card-2);
+    font-family:"Fredoka",sans-serif;font-size:clamp(1.9rem,7vw,2.4rem);font-weight:700;
+    cursor:pointer;box-shadow:0 4px 0 var(--line);
+  }
+  .tile.selected{border-color:var(--amber);background:var(--amber-soft);box-shadow:0 4px 0 var(--amber);transform:translateY(-2px)}
+  .tile.changed-now{background:var(--amber);border-color:var(--amber);color:#231303}
+  .warmth{font-weight:800;color:var(--muted);min-height:1.5em}
+  .warmth b{color:var(--teal)}
+
+  .feedback{
+    margin:12px auto 0;max-width:560px;border-radius:14px;padding:12px 14px;
+    font-weight:800;font-size:1.05rem;min-height:3.2em;display:flex;align-items:center;justify-content:center;text-align:center;
+    background:var(--card-2);border:2px solid var(--line);
+  }
+  .feedback.good{background:var(--green-soft);border-color:var(--green);color:var(--ink)}
+  .feedback.try{background:var(--red-soft);border-color:var(--red);color:var(--ink)}
+  .feedback.hint-note{background:var(--amber-soft);border-color:var(--amber);color:var(--ink)}
+
+  .actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:14px}
+  .btn{
+    border:none;border-radius:999px;padding:13px 22px;font-weight:900;font-size:1.05rem;cursor:pointer;min-height:52px;
+    display:inline-flex;align-items:center;gap:8px;
+  }
+  .btn-primary{background:var(--teal);color:#fff;box-shadow:0 4px 0 var(--teal-dark)}
+  @media (prefers-color-scheme: dark){ .btn-primary{color:#062a26} }
+  .btn-amber{background:var(--amber);color:#231303;box-shadow:0 4px 0 #b45309}
+  .btn-ghost{background:var(--card);border:2px solid var(--line);box-shadow:0 3px 0 var(--line)}
+  .btn:active{transform:translateY(2px);box-shadow:none}
+  .btn[disabled]{opacity:.5;cursor:not-allowed;transform:none}
+
+  .keyboard{margin-top:18px;border-top:2px dashed var(--line);padding-top:16px}
+  .keyboard .row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+  .key{
+    flex:1 1 46px;max-width:62px;height:54px;border-radius:12px;border:2px solid var(--line);
+    background:var(--card-2);font-family:"Fredoka",sans-serif;font-size:1.3rem;font-weight:700;cursor:pointer;
+    box-shadow:0 3px 0 var(--line);
+  }
+  .key:active{transform:translateY(2px);box-shadow:none}
+  .key.wide{flex:1 1 96px;max-width:150px;font-family:"Nunito",sans-serif;font-size:.95rem;font-weight:900}
+
+  .win{
+    display:none;margin-top:16px;border-radius:16px;padding:16px;text-align:center;
+    background:var(--green-soft);border:3px solid var(--green);
+  }
+  .win.show{display:block}
+  .win h3{font-size:1.5rem;margin:0 0 6px}
+  .win .stars-big{font-size:2.2rem;letter-spacing:.2em}
+  .win p{color:var(--ink)}
+
+  .picker h2{margin-bottom:4px}
+  .picker-group{margin-top:14px}
+  .picker-group h3{color:var(--teal)}
+  .picker-grid{display:flex;flex-wrap:wrap;gap:8px}
+  .pick{
+    border:2px solid var(--line);background:var(--card-2);border-radius:14px;padding:10px 12px;
+    font-weight:900;cursor:pointer;text-align:left;min-height:52px;
+  }
+  .pick .ladder-name{font-family:"Fredoka",sans-serif;font-size:1.05rem;letter-spacing:.06em}
+  .pick .meta{font-size:.8rem;color:var(--muted);font-weight:800}
+  .pick.current{border-color:var(--teal);background:var(--teal-soft);box-shadow:0 3px 0 var(--teal)}
+  .pick.done .ladder-name::after{content:" ⭐";color:var(--amber)}
+
+  .howto ol{margin:0;padding-left:22px;font-weight:700;color:var(--muted)}
+  .howto li{margin-bottom:8px}
+  .howto li b,.howto li strong{color:var(--ink)}
+  .example{
+    margin-top:12px;background:var(--card-2);border:2px solid var(--line);border-radius:14px;padding:12px;text-align:center;
+  }
+  .example .ex-word{font-family:"Fredoka",sans-serif;font-size:1.4rem;font-weight:700;letter-spacing:.14em}
+  .example .ex-word b{color:var(--amber-dark);background:var(--amber-soft);border-radius:6px;padding:0 4px}
+  @media (prefers-color-scheme: dark){ .example .ex-word b{color:var(--amber-dark)} }
+  .example .ex-arrow{color:var(--teal);font-weight:900}
+  .example p{margin:8px 0 0;font-size:.95rem}
+
+  #confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:50}
+  .confetti-piece{position:absolute;top:-14px;width:11px;height:16px;border-radius:3px;opacity:.95;animation:fall linear forwards}
+  @keyframes fall{to{transform:translateY(105vh) rotate(720deg);opacity:.85}}
+  @media (prefers-reduced-motion: reduce){
+    .confetti-piece{animation:none;display:none}
+    *{scroll-behavior:auto !important}
+  }
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  @media (max-width:520px){
+    .challenge{flex-direction:column;align-items:center}
+    .challenge .word-card{width:100%;max-width:320px;flex:none}
+    .challenge .arrow{transform:rotate(90deg);margin:2px 0}
+  }
+  footer{margin-top:18px;text-align:center;color:var(--muted);font-weight:700}
+</style>
+</head>
+<body>
+<div id="confetti" aria-hidden="true"></div>
+<div class="wrap">
+
+  <div class="topbar">
+    <div class="group">
+      <a class="home-link" href="https://scaemrfung.github.io/mr-fung-webgames/">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-6h6v6"/></svg>
+        Home
+      </a>
+      <button class="pill-btn" id="soundBtn" type="button" aria-pressed="true">🔊 Sound On</button>
+    </div>
+    <div class="group">
+      <span class="session-stars" id="sessionStars" aria-label="Stars earned this session">⭐ 0 stars</span>
+      <button class="pill-btn" id="hearBtn" type="button">👂 Hear It</button>
+    </div>
+  </div>
+
+  <header class="game-head">
+    <h1>Word Ladder</h1>
+    <p>Change just one letter at a time to climb from the first word to the last word. Every step must be a real word!</p>
+
+    <div class="challenge" aria-live="polite">
+      <div class="word-card">
+        <div class="label">Start word</div>
+        <div class="word" id="startWord">CAT</div>
+      </div>
+      <div class="arrow" aria-hidden="true">→</div>
+      <div class="word-card target-card">
+        <div class="label">Target word</div>
+        <div class="word" id="targetWord">HAM</div>
+      </div>
+    </div>
+
+    <div class="chips">
+      <span class="chip">Steps left: <strong id="stepsLeft">5</strong></span>
+      <span class="chip">Shortest way: <strong id="shortestWay">2 steps</strong></span>
+      <span class="chip">Hints used: <strong id="hintsUsed">0</strong></span>
+    </div>
+  </header>
+
+  <div class="layout">
+    <main>
+      <section class="panel" aria-label="Word ladder game">
+        <h2 id="ladderHeading">Your ladder</h2>
+        <p>Tap a letter below, then pick a new letter. The changed letter lights up gold.</p>
+
+        <ol class="ladder" id="ladder" aria-label="Ladder so far"></ol>
+
+        <div class="editor">
+          <div class="your">Your next word — tap a letter, then tap a key</div>
+          <div class="tiles" id="tiles" role="group" aria-label="Letters of your next word"></div>
+          <p class="warmth" id="warmth"></p>
+
+          <div class="feedback" id="feedback" role="status" aria-live="polite">
+            Change one letter in CAT to make a new word. What will you try?
+          </div>
+
+          <div class="actions">
+            <button class="btn btn-primary" id="checkBtn" type="button">✓ Check Word</button>
+            <button class="btn btn-amber" id="hintBtn" type="button">💡 Hint</button>
+            <button class="btn btn-ghost" id="undoBtn" type="button">↩ Undo</button>
+            <button class="btn btn-ghost" id="restartBtn" type="button">Start Over</button>
+          </div>
+
+          <div class="win" id="winPanel" role="status">
+            <div class="stars-big" id="winStars" aria-hidden="true">⭐⭐⭐</div>
+            <h3 id="winTitle">You did it!</h3>
+            <p id="winText"></p>
+            <div class="actions">
+              <button class="btn btn-primary" id="nextBtn" type="button">Next Ladder →</button>
+              <button class="btn btn-ghost" id="againBtn" type="button">Play This One Again</button>
+            </div>
+          </div>
+
+          <div class="keyboard" aria-label="Letter keyboard">
+            <div class="row" id="keyRow1"></div>
+            <div class="row" id="keyRow2" style="margin-top:8px"></div>
+            <div class="row" style="margin-top:8px">
+              <button class="key wide" id="delKey" type="button">⌫ Back</button>
+              <button class="key wide" id="checkKey" type="button">✓ Check</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel picker" aria-label="Choose a ladder" style="margin-top:14px">
+        <h2>Choose a ladder</h2>
+        <p>Pick any ladder. A ⭐ means you finished it. Try them all!</p>
+        <div id="picker"></div>
+        <div class="actions" style="justify-content:flex-start">
+          <button class="btn btn-ghost" id="surpriseBtn" type="button">🎲 Surprise Me</button>
+        </div>
+      </section>
+    </main>
+
+    <aside class="panel howto" aria-label="How to play">
+      <h2>How to play</h2>
+      <ol>
+        <li><b>Start</b> with the first word.</li>
+        <li><b>Change one letter</b> to make a new, real word.</li>
+        <li>Keep going until you reach the <b>target word</b>.</li>
+        <li>Stuck? Tap <b>Hint</b> — it shows you a good next step.</li>
+      </ol>
+      <div class="example" aria-label="Example ladder">
+        <div class="ex-word">C <b>A</b> T</div>
+        <div class="ex-arrow" aria-hidden="true">↓</div>
+        <div class="ex-word"><b>H</b> A T</div>
+        <div class="ex-arrow" aria-hidden="true">↓</div>
+        <div class="ex-word">H A <b>M</b></div>
+        <p><b>CAT → HAT → HAM.</b> Only one letter changes each time — and HAT and HAM are both real words.</p>
+      </div>
+      <h3 style="margin-top:16px">Grown-up tip</h3>
+      <p>Say each new word out loud. Ask: “Does it sound like a real word? Which letter changed?” The gold letter shows the change.</p>
+      <h3 style="margin-top:14px">Keyboard</h3>
+      <p>You can also type letters on a real keyboard. Press Enter to check, and the arrow keys to move between letters.</p>
+    </aside>
+  </div>
+
+  <footer>Every step changes one letter. Every step is a real word. Have fun climbing!</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var WORDS_3 = "and ant ape ark arm art ash ask bag bat bed bee beg bet big bit bow box boy bug bun bus but can cap car cat cob cod cog cot cow cry cub cue cup cut dam day den dew did dig dim din dip dog dot dry ear eat egg elf elm end fan far fat fed fig fin fir fit fix fog for fox fun fur gap gas gem get gig gin got gum gun ham hat hay hen her hey hid him hip his hit hog hop hot how hug hut ice ill ink jam jar jet job jog joy jut keg kid kin kit lab lad lag lap law lay leg let lid lip lit log lot low mad man map mat may men met mix mob mom mop mud mug nap net new nip nod nor not now nut oak oar oat odd off oil old one opt orb ore our out owl own pad pal pan pat paw pay pen pet pie pig pin pit pod pop pot pup put rag ram ran rat raw red rib rid rig rim rip rob rod rot row rub rug run rut sad sag sap saw say sea see set sew she shy sin sip sir sit six ski sky sob sod son sow spy sty sub sum sun tab tad tag tan tap tar tea ten the tie tin tip toe ton top tot tow toy try tub tug two use van vat vet wag war was wax way web wed wet wig win wit wok won yak yam yap yaw yes yet you zip zoo";
+  var WORDS_4 = "back ball band bank bare bark barn base bath beam bean bear beat beef been beer bell belt bend bent best bill bird bite blew blue boat body bold bolt book boom boot bore born bowl bulk bump burn bush bust busy buzz cake calf call calm came camp cane cape care cart case cash cast cave cell cent chap chat chef chew chin chip chop city clad clam clan clap claw clay clip club clue coal coat code cold colt comb come cook cool cord core cork corn cost crab crew crop dare dark dash date dawn dead deaf deal dear deck deed deer desk dice dish dock door dose dove down drag draw drew drop drum duck dull dusk dust duty each earn ease east easy edge else even ever face fact fail fair fall fame fare farm fast fear feat feed feel feet fell felt file fill film find fine fire firm fish fist flag flat flaw fled flew flex flip flow foam fold folk fond food foot ford fork form fort four free frog from fuel full fund gain game gate gave gear gift girl give glad glow glue goal goat goes gold gone good grew grin grip grow hair half hall hand hard harm hate have haze head heal heap hear heat held help herd here hero hide high hike hill hint hire hold hole holy home hood hook hope horn hose host hour huge hunt hurt idea inch into iron item joke jump just keen keep kept kick kind king kiss kite knee knew knit knot know lady lake lamb lamp land lane lark last late lazy leaf leak lean leap left lend lens lent less liar lick life lift like limb lime line link lion list live load loan lock loft lone long look loom loop lord lose loss lost lots loud love luck made mail main make male mall malt mane many mare mark mars mask mass mate math maze meal mean meat meek meet melt memo mend menu mere mesh mess mild milk mill mind mine mint miss mist mode mold mole monk mood moon moor moot more morn most moth move much mule muse mush must mute myth name navy near neat neck need nest news next nice nick nine node none noon norm nose note noun once only onto open oral oven over pace pack page paid pain pair pale palm park part pass past path peak pear peek peel peep peer pelt perk pest pick pile pine pink pint pipe plan play plot plug plum plus poem poet poke pole poll pond pony pool poor pope pork port pose post pour pout pray prep prey prop pull pulp pump pure push putt quit quiz race rack rage raid rail rain rake rang rank rant rare rash rate read real rear redo reed reef reel rein rent rest rice rich ride ring riot ripe rise risk road roam roar robe rock rode role roll roof room root rope rose rosy rout rule rush rust safe saga said sail sale salt same sand sane sang sank save scan scar seat seed seek seem seen self sell send sent sewn ship shoe shop show shut sick side sigh sign silk sing sink size skin skip slab slam slap sled slid slim slip slit slow slug slum slay snap snip snow soap soar sock soda sofa soft soil sold sole solo some song soon sore sort soul soup sour span spar spin spot stay stem step stir stop stub stud suit sure surf swam swim tail take tale talk tall tame tank tape task taxi team tear teen tell tend tent term test text than that thaw them then they thin this tide tidy tile till tilt time tine tint tiny tire toad told toll tomb tone took tool torn tour town trap tray tree trek trim trio trip true tune turf turn twin type ugly undo unit upon urge used user vain vary vast vent verb very veto view vine void vote wade wage wait wake walk wall wand want ward warm warn warp wart wash wave weak wear week weep weld well went were west what when whim whip whom wide wife wild will wind wine wing wink wipe wire wise wish with wolf wood wool word wore work worm worn wrap yard yarn year yell yoga your zero zest zinc zone zoom";
+
+  var WORD_SET = {};
+  WORDS_3.split(" ").forEach(function(w){ WORD_SET[w.toUpperCase()] = true; });
+  WORDS_4.split(" ").forEach(function(w){ WORD_SET[w.toUpperCase()] = true; });
+
+  var PUZZLES = [
+    {start:"CAT", target:"HAM", level:"Easy", path:["CAT","HAT","HAM"]},
+    {start:"BAT", target:"BEE", level:"Easy", path:["BAT","BET","BEE"]},
+    {start:"PIG", target:"BAG", level:"Easy", path:["PIG","BIG","BAG"]},
+    {start:"SUN", target:"FAN", level:"Easy", path:["SUN","FUN","FAN"]},
+    {start:"HEN", target:"TIN", level:"Easy", path:["HEN","TEN","TIN"]},
+    {start:"TOP", target:"MAP", level:"Easy", path:["TOP","MOP","MAP"]},
+    {start:"DOG", target:"LEG", level:"Easy", path:["DOG","LOG","LEG"]},
+    {start:"BUS", target:"HUG", level:"Easy", path:["BUS","BUG","HUG"]},
+    {start:"CAT", target:"DOG", level:"Medium", path:["CAT","COT","DOT","DOG"]},
+    {start:"HAT", target:"BED", level:"Medium", path:["HAT","BAT","BET","BED"]},
+    {start:"RUN", target:"FIT", level:"Medium", path:["RUN","FUN","FIN","FIT"]},
+    {start:"FOX", target:"TOY", level:"Medium", path:["FOX","BOX","BOY","TOY"]},
+    {start:"RED", target:"BAT", level:"Medium", path:["RED","BED","BET","BAT"]},
+    {start:"BEAR", target:"DEER", level:"Challenge", path:["BEAR","BEER","DEER"]},
+    {start:"LOVE", target:"LIKE", level:"Challenge", path:["LOVE","LIVE","LIKE"]},
+    {start:"COLD", target:"WARM", level:"Challenge", path:["COLD","CORD","CARD","WARD","WARM"]},
+    {start:"RAIN", target:"HAIR", level:"Challenge", path:["RAIN","PAIN","PAIR","HAIR"]},
+    {start:"STAR", target:"PLAY", level:"Challenge", path:["STAR","STAY","SLAY","PLAY"]},
+    {start:"NEST", target:"BOAT", level:"Challenge", path:["NEST","BEST","BEAT","BOAT"]}
+  ];
+
+  var state = {
+    index: 0,
+    history: [],
+    draft: [],
+    selected: 0,
+    hints: 0,
+    soundOn: true,
+    solved: {},
+    totalStars: 0,
+    won: false
+  };
+
+  var els = {};
+  ["startWord","targetWord","stepsLeft","shortestWay","hintsUsed","sessionStars","ladder","tiles","warmth","feedback","checkBtn","hintBtn","undoBtn","restartBtn","winPanel","winStars","winTitle","winText","nextBtn","againBtn","picker","surpriseBtn","soundBtn","hearBtn","keyRow1","keyRow2","delKey","checkKey","confetti","ladderHeading"].forEach(function(id){ els[id] = document.getElementById(id); });
+
+  function upper(s){ return String(s).toUpperCase(); }
+  function diffCount(a,b){
+    var n=0;
+    for(var i=0;i<a.length;i++){ if(a[i]!==b[i]) n++; }
+    return n;
+  }
+  function diffPositions(a,b){
+    var out=[];
+    for(var i=0;i<a.length;i++){ if(a[i]!==b[i]) out.push(i); }
+    return out;
+  }
+  function matchingCount(a,b){
+    var n=0;
+    for(var i=0;i<a.length;i++){ if(a[i]===b[i]) n++; }
+    return n;
+  }
+  function neighbors(word){
+    var out=[];
+    var letters="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    for(var i=0;i<word.length;i++){
+      for(var j=0;j<26;j++){
+        var c=letters[j];
+        if(c===word[i]) continue;
+        var w=word.slice(0,i)+c+word.slice(i+1);
+        if(WORD_SET[w]) out.push(w);
+      }
+    }
+    return out;
+  }
+  function bfsPath(start,target){
+    if(start===target) return [start];
+    var queue=[start], parent={}, seen={};
+    seen[start]=true;
+    while(queue.length){
+      var cur=queue.shift();
+      var ns=neighbors(cur);
+      for(var i=0;i<ns.length;i++){
+        var w=ns[i];
+        if(seen[w]) continue;
+        seen[w]=true; parent[w]=cur;
+        if(w===target){
+          var path=[w], node=w;
+          while(node!==start){ node=parent[node]; path.unshift(node); }
+          return path;
+        }
+        queue.push(w);
+      }
+    }
+    return null;
+  }
+  function currentPuzzle(){ return PUZZLES[state.index]; }
+  function lastWord(){ return state.history[state.history.length-1]; }
+  function solutionSteps(p){ return p.path.length-1; }
+  function maxSteps(p){ return solutionSteps(p)+3; }
+  function stepsUsed(){ return state.history.length-1; }
+
+  function speak(text){
+    if(!state.soundOn || !("speechSynthesis" in window)) return;
+    try{
+      window.speechSynthesis.cancel();
+      var u=new SpeechSynthesisUtterance(text);
+      u.rate=0.95; u.pitch=1;
+      var voices=window.speechSynthesis.getVoices()||[];
+      var pick=null;
+      for(var i=0;i<voices.length;i++){
+        var v=voices[i];
+        if(v.lang && v.lang.toLowerCase().indexOf("en-ca")===0 && /natural|neural|google/i.test(v.name)){ pick=v; break; }
+      }
+      if(!pick){
+        for(var k=0;k<voices.length;k++){
+          if(voices[k].lang && voices[k].lang.toLowerCase().indexOf("en-ca")===0){ pick=voices[k]; break; }
+        }
+      }
+      if(!pick){
+        for(var m=0;m<voices.length;m++){
+          if(voices[m].lang && voices[m].lang.toLowerCase().indexOf("en-us")===0 && /natural|neural|google/i.test(voices[m].name)){ pick=voices[m]; break; }
+        }
+      }
+      if(pick) u.voice=pick;
+      window.speechSynthesis.speak(u);
+    }catch(e){ /* speech unavailable */ }
+  }
+  if("speechSynthesis" in window){ try{ window.speechSynthesis.getVoices(); }catch(e){} }
+
+  var audioCtx=null;
+  function tone(freq,dur,type,when){
+    if(!state.soundOn) return;
+    try{
+      if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+      if(audioCtx.state==="suspended") audioCtx.resume();
+      var o=audioCtx.createOscillator(), g=audioCtx.createGain();
+      o.type=type||"sine"; o.frequency.value=freq;
+      var t=audioCtx.currentTime+(when||0);
+      g.gain.setValueAtTime(0.0001,t);
+      g.gain.exponentialRampToValueAtTime(0.12,t+0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(t); o.stop(t+dur+0.05);
+    }catch(e){ /* audio unavailable */ }
+  }
+  function happySound(){ tone(523,.18,"sine",0); tone(659,.18,"sine",.12); tone(784,.28,"sine",.24); }
+  function softSound(){ tone(440,.12,"sine",0); tone(554,.16,"sine",.1); }
+  function oopsSound(){ tone(220,.18,"triangle",0); }
+
+  function confetti(){
+    var colors=["#0f766e","#f59e0b","#e76f51","#15803d","#fbbf24","#2dd4bf"];
+    for(var i=0;i<42;i++){
+      var p=document.createElement("div");
+      p.className="confetti-piece";
+      p.style.left=(Math.random()*100)+"%";
+      p.style.background=colors[i%colors.length];
+      p.style.animationDuration=(1.8+Math.random()*1.6)+"s";
+      p.style.animationDelay=(Math.random()*0.4)+"s";
+      p.style.transform="rotate("+(Math.random()*360)+"deg)";
+      els.confetti.appendChild(p);
+      (function(el){ setTimeout(function(){ el.remove(); },4200); })(p);
+    }
+  }
+
+  function setFeedback(text,kind){
+    els.feedback.textContent=text;
+    els.feedback.className="feedback"+(kind?(" "+kind):"");
+  }
+
+  function renderHeader(){
+    var p=currentPuzzle();
+    els.startWord.textContent=p.start;
+    els.targetWord.textContent=p.target;
+    els.shortestWay.textContent=solutionSteps(p)+(solutionSteps(p)===1?" step":" steps");
+    els.hintsUsed.textContent=state.hints;
+    els.stepsLeft.textContent=Math.max(0,maxSteps(p)-stepsUsed());
+    els.sessionStars.textContent="⭐ "+state.totalStars+" star"+(state.totalStars===1?"":"s");
+    els.ladderHeading.textContent="Your ladder: "+p.start+" to "+p.target;
+  }
+
+  function tileRow(word,prevWord,opts){
+    opts=opts||{};
+    var row=document.createElement("div");
+    row.className="mini-tiles";
+    var changed=prevWord?diffPositions(prevWord,word):[];
+    for(var i=0;i<word.length;i++){
+      var t=document.createElement("span");
+      t.className="mini-tile";
+      if(opts.ghost){ t.classList.add("ghost"); t.textContent="?"; }
+      else if(opts.target){ t.classList.add("target-tile"); }
+      else if(changed.indexOf(i)>-1){ t.classList.add("changed"); }
+      if(!opts.ghost) t.textContent=word[i];
+      row.appendChild(t);
+    }
+    return row;
+  }
+
+  function renderLadder(){
+    var p=currentPuzzle();
+    els.ladder.innerHTML="";
+    var items=[];
+    var prev=null;
+    for(var i=0;i<state.history.length;i++){
+      items.push({kind:"word", word:state.history[i], prev:prev, label:(i===0?"START":"Step "+i)});
+      prev=state.history[i];
+    }
+    if(!state.won){
+      var remaining=bfsPath(lastWord(),p.target);
+      var need=remaining?remaining.length-1:0;
+      for(var g=0;g<Math.min(Math.max(need-1,0),3);g++){
+        items.push({kind:"ghost", word:p.target, prev:null, label:"···"});
+      }
+    }
+    items.push({kind:"target", word:p.target, prev:(state.won?prev:null), label:"TARGET"});
+    items.forEach(function(item,idx){
+      var li=document.createElement("li");
+      li.className="rung";
+      var lab=document.createElement("span");
+      lab.className="mini left";
+      lab.textContent=item.label;
+      li.appendChild(lab);
+      if(item.kind==="ghost") li.appendChild(tileRow(item.word,null,{ghost:true}));
+      else if(item.kind==="target") li.appendChild(tileRow(item.word,item.prev,{target:true}));
+      else li.appendChild(tileRow(item.word,item.prev,{}));
+      li.appendChild(document.createElement("span"));
+      els.ladder.appendChild(li);
+      if(idx<items.length-1){
+        var arr=document.createElement("li");
+        arr.className="down-arrow";
+        arr.setAttribute("aria-hidden","true");
+        arr.textContent="↓";
+        els.ladder.appendChild(arr);
+      }
+    });
+  }
+
+  function renderTiles(){
+    els.tiles.innerHTML="";
+    var prev=lastWord();
+    var changed=diffPositions(prev,state.draft.join(""));
+    for(var i=0;i<state.draft.length;i++){
+      (function(idx){
+        var b=document.createElement("button");
+        b.type="button";
+        b.className="tile"+(idx===state.selected?" selected":"")+(changed.indexOf(idx)>-1?" changed-now":"");
+        b.textContent=state.draft[idx];
+        b.setAttribute("aria-label","Letter "+(idx+1)+", "+state.draft[idx]+". Tap to choose this letter.");
+        b.addEventListener("click",function(){
+          state.selected=idx;
+          renderTiles();
+        });
+        els.tiles.appendChild(b);
+      })(i);
+    }
+    var p=currentPuzzle();
+    var match=matchingCount(state.draft.join(""),p.target);
+    els.warmth.innerHTML="Letters already matching <b>"+p.target+"</b>: <b>"+match+" of "+p.target.length+"</b> — the gold letter is the one you changed.";
+  }
+
+  function renderPicker(){
+    els.picker.innerHTML="";
+    var levels=["Easy","Medium","Challenge"];
+    levels.forEach(function(level){
+      var group=document.createElement("div");
+      group.className="picker-group";
+      var h=document.createElement("h3");
+      h.textContent=level;
+      group.appendChild(h);
+      var grid=document.createElement("div");
+      grid.className="picker-grid";
+      PUZZLES.forEach(function(p,idx){
+        if(p.level!==level) return;
+        var b=document.createElement("button");
+        b.type="button";
+        b.className="pick"+(idx===state.index?" current":"")+(state.solved[idx]?" done":"");
+        b.setAttribute("aria-label",level+" ladder: "+p.start+" to "+p.target+", "+solutionSteps(p)+" steps"+(state.solved[idx]?", finished":""));
+        var name=document.createElement("span");
+        name.className="ladder-name";
+        name.textContent=p.start+" → "+p.target;
+        var meta=document.createElement("span");
+        meta.className="meta";
+        meta.textContent=solutionSteps(p)+" steps · "+p.start.length+" letters";
+        b.appendChild(name);
+        b.appendChild(document.createElement("br"));
+        b.appendChild(meta);
+        b.addEventListener("click",function(){ loadPuzzle(idx,false); });
+        grid.appendChild(b);
+      });
+      group.appendChild(grid);
+      els.picker.appendChild(group);
+    });
+  }
+
+  function loadPuzzle(idx,keepMessage){
+    state.index=idx;
+    var p=currentPuzzle();
+    state.history=[p.start];
+    state.draft=p.start.split("");
+    state.selected=0;
+    state.hints=0;
+    state.won=false;
+    els.winPanel.classList.remove("show");
+    els.checkBtn.disabled=false;
+    els.hintBtn.disabled=false;
+    renderHeader();
+    renderLadder();
+    renderTiles();
+    renderPicker();
+    if(!keepMessage){
+      setFeedback("Change one letter in "+p.start+" to make a new word. Your goal is "+p.target+".","");
+      speak("Climb from "+p.start.split("").join(" ")+" to "+p.target.split("").join(" ")+". Change one letter at a time.");
+    }
+  }
+
+  function checkWord(){
+    if(state.won) return;
+    var p=currentPuzzle();
+    var draftWord=state.draft.join("");
+    var prev=lastWord();
+    var d=diffCount(prev,draftWord);
+
+    if(draftWord===prev){
+      setFeedback("That's the same word — change just one letter to make a new word!","try");
+      oopsSound();
+      return;
+    }
+    if(d!==1){
+      setFeedback("Oops — that changes "+d+" letters. Change just ONE letter from "+prev+".","try");
+      oopsSound();
+      speak("That changes "+d+" letters. Change just one letter.");
+      return;
+    }
+    if(!WORD_SET[draftWord]){
+      setFeedback("Hmm, I don't know the word "+draftWord+". Try a different word!","try");
+      oopsSound();
+      speak("I don't know that word. Try a different word.");
+      return;
+    }
+    // Accepted
+    state.history.push(draftWord);
+    if(draftWord===p.target){
+      state.won=true;
+      var steps=stepsUsed();
+      var stars=3;
+      if(state.hints>1) stars=1;
+      else if(state.hints===1 || steps>solutionSteps(p)) stars=2;
+      if(!state.solved[state.index]) state.totalStars+=stars;
+      else if(stars>state.solved[state.index]) state.totalStars+=(stars-state.solved[state.index]);
+      state.solved[state.index]=Math.max(state.solved[state.index]||0,stars);
+      els.winStars.textContent="⭐".repeat(stars);
+      els.winTitle.textContent="You did it! "+p.start+" → "+p.target+"!";
+      els.winText.textContent="Your ladder: "+state.history.join(" → ")+". You finished in "+steps+" step"+(steps===1?"":"s")+(state.hints?(" with "+state.hints+" hint"+(state.hints===1?"":"s")):" with no hints")+".";
+      els.winPanel.classList.add("show");
+      setFeedback("Yes! That's right! ⭐ You reached "+p.target+"!","good");
+      happySound();
+      speak("Yes! You did it! "+p.start+" to "+p.target+". Great climbing!");
+      confetti();
+      els.checkBtn.disabled=true;
+      els.hintBtn.disabled=true;
+      renderHeader(); renderLadder(); renderPicker();
+      return;
+    }
+    // Not yet at target
+    if(stepsUsed()>=maxSteps(p)){
+      setFeedback("You're out of steps on this climb. Tap Hint to see the way, or Start Over and try a different path!","hint-note");
+      oopsSound();
+      speak("You are out of steps. Try the hint, or start over.");
+      renderHeader(); renderLadder(); renderTiles();
+      return;
+    }
+    var changedPos=diffPositions(prev,draftWord)[0];
+    var match=matchingCount(draftWord,p.target);
+    setFeedback("Good word! ⭐ "+draftWord+" is one step closer. You changed letter "+(changedPos+1)+". Now climb toward "+p.target+"!","good");
+    softSound();
+    speak(draftWord+". Good word!");
+    state.draft=draftWord.split("");
+    state.selected=0;
+    renderHeader(); renderLadder(); renderTiles();
+  }
+
+  function giveHint(){
+    if(state.won) return;
+    var p=currentPuzzle();
+    var cur=lastWord();
+    var path=bfsPath(cur,p.target);
+    if(!path || path.length<2){
+      setFeedback("Hmm, I can't find a next step from here. Try Undo, then a different word!","try");
+      return;
+    }
+    var next=path[1];
+    var pos=diffPositions(cur,next)[0];
+    state.draft=next.split("");
+    state.selected=pos;
+    state.hints++;
+    setFeedback("Hint: try "+next+" — it changes letter "+(pos+1)+" of "+cur+". Tap Check Word when you're ready!","hint-note");
+    speak("Hint. Try "+next.split("").join(" ")+".");
+    renderHeader(); renderTiles();
+  }
+
+  function undo(){
+    if(state.history.length<=1 || state.won) return;
+    state.history.pop();
+    state.draft=lastWord().split("");
+    state.selected=0;
+    setFeedback("Undone. You're back at "+lastWord()+". Try a different letter!","");
+    renderHeader(); renderLadder(); renderTiles();
+  }
+
+  // Keyboard
+  var ROW1="QWERTYUIOP", ROW2="ASDFGHJKL";
+  var ROW3="ZXCVBNM";
+  function makeKeys(rowStr,rowEl){
+    for(var i=0;i<rowStr.length;i++){
+      (function(letter){
+        var b=document.createElement("button");
+        b.type="button"; b.className="key"; b.textContent=letter;
+        b.setAttribute("aria-label","Letter "+letter);
+        b.addEventListener("click",function(){ pressLetter(letter); });
+        rowEl.appendChild(b);
+      })(rowStr[i]);
+    }
+  }
+  makeKeys(ROW1,els.keyRow1);
+  makeKeys(ROW2,els.keyRow2);
+  // third row letters go into row2 container area: create its own row by appending to keyRow2's parent
+  var row3=document.createElement("div");
+  row3.className="row"; row3.style.marginTop="8px";
+  els.keyRow2.parentNode.insertBefore(row3,els.keyRow2.nextSibling);
+  makeKeys(ROW3,row3);
+
+  function pressLetter(letter){
+    if(state.won) return;
+    state.draft[state.selected]=letter;
+    if(state.selected<state.draft.length-1) state.selected++;
+    renderTiles();
+    tone(600,.06,"sine",0);
+  }
+  els.delKey.addEventListener("click",function(){
+    if(state.won) return;
+    if(state.selected>0) state.selected--;
+    renderTiles();
+  });
+  els.checkKey.addEventListener("click",checkWord);
+  els.checkBtn.addEventListener("click",checkWord);
+  els.hintBtn.addEventListener("click",giveHint);
+  els.undoBtn.addEventListener("click",undo);
+  els.restartBtn.addEventListener("click",function(){ loadPuzzle(state.index,false); });
+  els.nextBtn.addEventListener("click",function(){
+    loadPuzzle((state.index+1)%PUZZLES.length,false);
+  });
+  els.againBtn.addEventListener("click",function(){ loadPuzzle(state.index,false); });
+  els.surpriseBtn.addEventListener("click",function(){
+    var idx;
+    do{ idx=Math.floor(Math.random()*PUZZLES.length); }while(PUZZLES.length>1 && idx===state.index);
+    loadPuzzle(idx,false);
+  });
+  els.soundBtn.addEventListener("click",function(){
+    state.soundOn=!state.soundOn;
+    els.soundBtn.textContent=state.soundOn?"🔊 Sound On":"🔇 Sound Off";
+    els.soundBtn.setAttribute("aria-pressed",String(state.soundOn));
+    if(!state.soundOn && "speechSynthesis" in window){ try{ window.speechSynthesis.cancel(); }catch(e){} }
+  });
+  els.hearBtn.addEventListener("click",function(){
+    var p=currentPuzzle();
+    speak("Start word: "+p.start.split("").join(" ")+". Target word: "+p.target.split("").join(" ")+". You are on "+lastWord().split("").join(" ")+". Your next word is "+state.draft.join("").split("").join(" ")+".");
+  });
+
+  document.addEventListener("keydown",function(e){
+    var tag=(e.target && e.target.tagName)||"";
+    if(tag==="INPUT"||tag==="TEXTAREA") return;
+    if(e.key>="a" && e.key<="z" || e.key>="A" && e.key<="Z"){
+      pressLetter(upper(e.key));
+      e.preventDefault();
+    } else if(e.key==="Enter"){
+      checkWord(); e.preventDefault();
+    } else if(e.key==="Backspace"){
+      if(state.selected>0) state.selected--;
+      renderTiles(); e.preventDefault();
+    } else if(e.key==="ArrowRight"){
+      if(state.selected<state.draft.length-1){ state.selected++; renderTiles(); }
+    } else if(e.key==="ArrowLeft"){
+      if(state.selected>0){ state.selected--; renderTiles(); }
+    }
+  });
+
+  loadPuzzle(0,false);
+})();
+</script>
+</body>
+</html>

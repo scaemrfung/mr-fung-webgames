@@ -1,0 +1,835 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:," />
+<title>Odd or Even</title>
+<style>
+  :root{
+    --bg:#FFF7E8;
+    --card:#FFFFFF;
+    --card-2:#FFF1D6;
+    --ink:#26332F;
+    --muted:#5F6E69;
+    --line:#E8DCC3;
+    --odd:#E0522E;
+    --odd-dark:#B93E20;
+    --odd-soft:#FDE8E0;
+    --even:#0E7C74;
+    --even-dark:#0A5F59;
+    --even-soft:#DDF2EF;
+    --gold:#E9A800;
+    --gold-soft:#FDEFC2;
+    --shadow:0 6px 24px rgba(38,51,47,.10);
+    --radius:20px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#141F1C;
+      --card:#1D2C28;
+      --card-2:#24382F;
+      --ink:#F3EFE3;
+      --muted:#B7C2BC;
+      --line:#33463F;
+      --odd:#FF7A52;
+      --odd-dark:#FF8A66;
+      --odd-soft:#3A241E;
+      --even:#45C4B4;
+      --even-dark:#5ED3C3;
+      --even-soft:#1E3A36;
+      --gold:#F2BC33;
+      --gold-soft:#3A2F14;
+      --shadow:0 6px 24px rgba(0,0,0,.35);
+    }
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:ui-rounded,"SF Pro Rounded","Segoe UI","Trebuchet MS",system-ui,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.45;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:860px;margin:0 auto;padding:16px 16px 40px}
+  /* Home */
+  .topbar{display:flex;justify-content:flex-start;margin-bottom:6px}
+  .home-btn{
+    display:inline-flex;align-items:center;gap:8px;
+    background:var(--card);color:var(--ink);border:2px solid var(--line);
+    border-radius:999px;padding:9px 18px;font-size:17px;font-weight:700;
+    text-decoration:none;box-shadow:var(--shadow);
+  }
+  .home-btn:hover{border-color:var(--even)}
+  .home-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .home-btn svg{width:20px;height:20px;flex:none}
+  /* Heading */
+  h1{
+    font-size:clamp(34px,6vw,52px);line-height:1.05;margin:10px 0 4px;
+    letter-spacing:-.01em;text-align:center;
+  }
+  h1 .o{color:var(--odd)}
+  h1 .e{color:var(--even)}
+  .tagline{text-align:center;color:var(--muted);font-size:18px;margin:0 0 14px}
+  .rule-bar{
+    display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:0 0 16px;
+  }
+  .rule-chip{
+    background:var(--card);border:2px solid var(--line);border-radius:999px;
+    padding:7px 14px;font-size:16px;font-weight:700;
+  }
+  .rule-chip b.even-t{color:var(--even)}
+  .rule-chip b.odd-t{color:var(--odd)}
+  /* Mode + range pills */
+  .pill-row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:14px}
+  .pill{
+    border:2px solid var(--line);background:var(--card);color:var(--ink);
+    border-radius:999px;padding:11px 20px;font-size:17px;font-weight:800;
+    cursor:pointer;font-family:inherit;
+  }
+  .pill[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+  .pill:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .range-label{width:100%;text-align:center;color:var(--muted);font-size:15px;font-weight:700;margin:2px 0 -4px}
+  /* Status row */
+  .status-row{
+    display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;
+    margin-bottom:12px;
+  }
+  .chips{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{
+    background:var(--card);border:2px solid var(--line);border-radius:999px;
+    padding:6px 13px;font-size:15px;font-weight:800;
+  }
+  .chip .star{color:var(--gold)}
+  .icon-btns{display:flex;gap:8px}
+  .small-btn{
+    border:2px solid var(--line);background:var(--card);color:var(--ink);
+    border-radius:999px;padding:8px 14px;font-size:15px;font-weight:800;
+    cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px;
+  }
+  .small-btn:hover{border-color:var(--even)}
+  .small-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .small-btn svg{width:17px;height:17px}
+  /* Dots */
+  .dots{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin:2px 0 12px;min-height:14px}
+  .dot{
+    width:14px;height:14px;border-radius:50%;border:2.5px solid var(--line);background:var(--card);
+  }
+  .dot.done{background:var(--gold);border-color:var(--gold)}
+  .dot.star-dot{background:var(--gold);border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-soft)}
+  .dot.now{border-color:var(--ink);transform:scale(1.25)}
+  /* Game card */
+  .card{
+    background:var(--card);border:2px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:22px 20px 20px;text-align:center;position:relative;overflow:hidden;
+  }
+  .prompt{font-size:21px;font-weight:800;margin:0 0 6px}
+  .prompt-sub{color:var(--muted);font-size:16px;margin:0 0 10px}
+  /* Big number */
+  .big-number{
+    font-size:clamp(72px,16vw,120px);font-weight:900;line-height:1;letter-spacing:-.03em;
+    margin:6px 0 4px;font-variant-numeric:tabular-nums;
+  }
+  .big-number .last{
+    display:inline-block;background:var(--gold-soft);color:var(--ink);
+    border:3px solid var(--gold);border-radius:18px;padding:0 14px;margin-left:2px;
+  }
+  .last-note{font-size:16px;color:var(--muted);font-weight:700;margin:0 0 8px}
+  .last-note b{color:var(--ink)}
+  /* Pair dots */
+  .pairs-wrap{margin:10px auto 4px;max-width:340px}
+  .pairs{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+  .pair{display:flex;gap:6px;background:var(--card-2);border:2px solid var(--line);border-radius:999px;padding:5px 7px}
+  .pdot{width:22px;height:22px;border-radius:50%;background:var(--even)}
+  .pdot.leftover{background:var(--gold);box-shadow:0 0 0 3px var(--gold-soft)}
+  .pairs-caption{font-size:15px;color:var(--muted);font-weight:700;margin:8px 0 0}
+  .pairs-caption b{color:var(--ink)}
+  /* Bins */
+  .bins{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+  .bin{
+    border:3px solid;border-radius:18px;padding:18px 10px 16px;cursor:pointer;
+    font-family:inherit;background:var(--card);min-height:132px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  }
+  .bin:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+  .bin .bin-word{font-size:clamp(28px,6vw,40px);font-weight:900;line-height:1}
+  .bin .bin-hint{font-size:15px;font-weight:700;color:var(--muted)}
+  .bin .bin-count{font-size:14px;font-weight:800;margin-top:4px}
+  .bin-odd{border-color:var(--odd);background:var(--odd-soft)}
+  .bin-odd .bin-word{color:var(--odd)}
+  .bin-even{border-color:var(--even);background:var(--even-soft)}
+  .bin-even .bin-word{color:var(--even)}
+  .bin:hover{transform:translateY(-2px)}
+  .bin:active{transform:translateY(0)}
+  .bin.correct-flash{box-shadow:0 0 0 5px var(--gold)}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+  .bin.shake{animation:shake .4s ease}
+  /* Pattern sequence */
+  .sequence{
+    display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:center;
+    margin:14px 0 6px;
+  }
+  .seq-num{
+    min-width:64px;padding:12px 10px;border-radius:14px;background:var(--card-2);
+    border:2px solid var(--line);font-size:clamp(28px,6vw,40px);font-weight:900;line-height:1;
+    font-variant-numeric:tabular-nums;
+  }
+  .seq-num.missing{background:var(--gold-soft);border:3px dashed var(--gold);color:var(--ink)}
+  .seq-num.odd-n{border-bottom:5px solid var(--odd)}
+  .seq-num.even-n{border-bottom:5px solid var(--even)}
+  .seq-sep{font-size:28px;font-weight:900;color:var(--muted)}
+  .choices{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+  .choice{
+    border:3px solid var(--line);background:var(--card);border-radius:16px;
+    padding:16px 8px;font-size:clamp(20px,5vw,28px);font-weight:900;cursor:pointer;
+    font-family:inherit;color:var(--ink);line-height:1.15;min-height:74px;
+  }
+  .choice:hover{border-color:var(--even)}
+  .choice:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .choice.correct-flash{border-color:var(--gold);background:var(--gold-soft);box-shadow:0 0 0 4px var(--gold-soft)}
+  .choice.shake{animation:shake .4s ease}
+  .choice:disabled{opacity:.55;cursor:default}
+  /* Feedback */
+  .feedback{
+    min-height:56px;margin:16px 0 0;font-size:18px;font-weight:700;
+    border-radius:14px;padding:12px 14px;display:flex;align-items:center;justify-content:center;
+  }
+  .feedback.idle{background:transparent;color:var(--muted);font-weight:600}
+  .feedback.good{background:var(--gold-soft);color:var(--ink)}
+  .feedback.try{background:var(--card-2);color:var(--ink)}
+  .feedback .fstar{color:var(--gold);font-size:22px;margin-right:6px}
+  /* Next / actions */
+  .actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:12px}
+  .big-btn{
+    border:none;border-radius:999px;padding:14px 28px;font-size:19px;font-weight:900;
+    cursor:pointer;font-family:inherit;background:var(--ink);color:var(--bg);
+    box-shadow:var(--shadow);
+  }
+  .big-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .big-btn.secondary{background:var(--card);color:var(--ink);border:2px solid var(--line);box-shadow:none}
+  .big-btn:disabled{opacity:.5;cursor:default}
+  /* End panel */
+  .end-stars{font-size:44px;letter-spacing:6px;color:var(--gold);margin:6px 0}
+  .end-stars .empty{color:var(--line)}
+  .end-title{font-size:30px;font-weight:900;margin:8px 0 4px}
+  .end-text{color:var(--muted);font-size:18px;max-width:480px;margin:0 auto 6px}
+  /* Teach section */
+  .teach{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+  .teach-card{
+    background:var(--card);border:2px solid var(--line);border-radius:18px;padding:16px;
+    text-align:left;
+  }
+  .teach-card h2{font-size:20px;margin:0 0 6px}
+  .teach-card.odd-card h2{color:var(--odd)}
+  .teach-card.even-card h2{color:var(--even)}
+  .teach-card p{margin:0 0 8px;color:var(--muted);font-size:16px}
+  .teach-card .digits{font-size:22px;font-weight:900;letter-spacing:4px}
+  .teach-card .digits span{display:inline-block;border:2px solid var(--line);border-radius:10px;padding:2px 8px;margin-right:4px;background:var(--card-2)}
+  .footer-note{text-align:center;color:var(--muted);font-size:15px;margin-top:16px}
+  /* Confetti */
+  .confetti{position:absolute;top:-8px;width:10px;height:16px;border-radius:2px;pointer-events:none;animation:fall 1.1s ease-in forwards;z-index:5}
+  @keyframes fall{to{transform:translateY(340px) rotate(540deg);opacity:0}}
+  @media (max-width:560px){
+    .bins{gap:10px}
+    .bin{min-height:118px;padding:14px 8px}
+    .choices{grid-template-columns:1fr;gap:10px}
+    .choice{min-height:60px}
+    .teach{grid-template-columns:1fr}
+    .status-row{justify-content:center}
+    .card{padding:18px 14px}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .bin:hover{transform:none}
+    .bin.shake,.choice.shake{animation:none}
+    .confetti{animation-duration:.01s}
+  }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="topbar">
+    <a class="home-btn" href="https://scaemrfung.github.io/mr-fung-webgames/" aria-label="Home — back to Fun Playground">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9.5 21v-6h5v6"/></svg>
+      Home
+    </a>
+  </div>
+
+  <h1><span class="o">Odd</span> or <span class="e">Even</span>?</h1>
+  <p class="tagline">Sort the numbers. Spot the patterns.</p>
+
+  <div class="rule-bar" aria-label="How to tell odd from even">
+    <span class="rule-chip"><b class="even-t">Even</b> ends in 0 · 2 · 4 · 6 · 8</span>
+    <span class="rule-chip"><b class="odd-t">Odd</b> ends in 1 · 3 · 5 · 7 · 9</span>
+  </div>
+
+  <div class="pill-row" role="group" aria-label="Choose a game">
+    <button class="pill" id="mode-sort" type="button" aria-pressed="true">Sort Numbers</button>
+    <button class="pill" id="mode-pattern" type="button" aria-pressed="false">Patterns</button>
+  </div>
+
+  <div class="pill-row" id="range-row" role="group" aria-label="Choose a number range">
+    <span class="range-label" id="range-label">Pick your numbers</span>
+    <button class="pill" type="button" data-range="20" aria-pressed="true">1–20</button>
+    <button class="pill" type="button" data-range="50" aria-pressed="false">1–50</button>
+    <button class="pill" type="button" data-range="100" aria-pressed="false">1–100</button>
+  </div>
+
+  <div class="status-row">
+    <div class="chips">
+      <span class="chip" id="round-chip">Round 1 of 10</span>
+      <span class="chip"><span class="star" aria-hidden="true">★</span> <span id="star-count">0</span> stars</span>
+    </div>
+    <div class="icon-btns">
+      <button class="small-btn" id="hear-btn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>
+        Hear It
+      </button>
+      <button class="small-btn" id="sound-btn" type="button" aria-pressed="true">Sound: On</button>
+    </div>
+  </div>
+
+  <div class="dots" id="dots" aria-label="Game progress"></div>
+
+  <section class="card" id="game-card" aria-live="polite">
+    <!-- Sort view -->
+    <div id="sort-view">
+      <p class="prompt">Is this number odd or even?</p>
+      <p class="prompt-sub">Look at the last digit. Tap the right box.</p>
+      <div class="big-number" id="big-number" aria-label="Current number"></div>
+      <p class="last-note" id="last-note"></p>
+      <div class="pairs-wrap">
+        <div class="pairs" id="pairs" aria-hidden="true"></div>
+        <p class="pairs-caption" id="pairs-caption"></p>
+      </div>
+      <div class="bins">
+        <button class="bin bin-odd" id="bin-odd" type="button">
+          <span class="bin-word">ODD</span>
+          <span class="bin-hint">ends in 1 · 3 · 5 · 7 · 9</span>
+          <span class="bin-count" id="odd-count">Odd pile: 0</span>
+        </button>
+        <button class="bin bin-even" id="bin-even" type="button">
+          <span class="bin-word">EVEN</span>
+          <span class="bin-hint">ends in 0 · 2 · 4 · 6 · 8</span>
+          <span class="bin-count" id="even-count">Even pile: 0</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Pattern view -->
+    <div id="pattern-view" hidden>
+      <p class="prompt" id="pattern-prompt">What comes next?</p>
+      <p class="prompt-sub" id="pattern-sub">Read the pattern. Odd numbers are underlined in orange, even in teal.</p>
+      <div class="sequence" id="sequence"></div>
+      <div class="choices" id="choices"></div>
+    </div>
+
+    <p class="feedback idle" id="feedback" role="status">Tap an answer to begin.</p>
+
+    <div class="actions">
+      <button class="big-btn" id="next-btn" type="button" disabled>Next Number</button>
+      <button class="big-btn secondary" id="new-btn" type="button">New Game</button>
+    </div>
+
+    <!-- End view -->
+    <div id="end-view" hidden>
+      <div class="end-stars" id="end-stars" aria-label="Stars earned"></div>
+      <p class="end-title" id="end-title">Great sorting!</p>
+      <p class="end-text" id="end-text"></p>
+      <div class="actions">
+        <button class="big-btn" id="again-btn" type="button">Play Again</button>
+        <button class="big-btn secondary" id="switch-btn" type="button">Try the Other Game</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="teach" aria-label="Odd and even reminders">
+    <div class="teach-card odd-card">
+      <h2>Odd numbers</h2>
+      <p>When you pair the dots up, one dot is always left over. Odd numbers end in:</p>
+      <p class="digits" aria-label="1, 3, 5, 7, 9"><span>1</span><span>3</span><span>5</span><span>7</span><span>9</span></p>
+    </div>
+    <div class="teach-card even-card">
+      <h2>Even numbers</h2>
+      <p>When you pair the dots up, every dot has a partner. Even numbers end in:</p>
+      <p class="digits" aria-label="0, 2, 4, 6, 8"><span>0</span><span>2</span><span>4</span><span>6</span><span>8</span></p>
+    </div>
+  </section>
+
+  <p class="footer-note">Tip for the board: ask “What is the last digit?” before anyone taps.</p>
+</main>
+
+<script>
+(function(){
+  "use strict";
+  var ROUNDS = 10;
+  var mode = "sort"; // "sort" | "pattern"
+  var rangeMax = 20;
+  var deck = [];
+  var patternDeck = [];
+  var index = 0;
+  var stars = 0;
+  var attempted = false;
+  var answered = false;
+  var oddPile = 0, evenPile = 0;
+  var roundStars = []; // true if first-try star
+  var soundOn = true;
+  var audioCtx = null;
+
+  var $ = function(id){ return document.getElementById(id); };
+  var dotsEl = $("dots"), feedbackEl = $("feedback"), nextBtn = $("next-btn");
+  var sortView = $("sort-view"), patternView = $("pattern-view"), endView = $("end-view");
+  var bigNumberEl = $("big-number"), lastNoteEl = $("last-note");
+  var pairsEl = $("pairs"), pairsCaptionEl = $("pairs-caption");
+
+  function shuffle(arr){
+    for(var i=arr.length-1;i>0;i--){
+      var j=Math.floor(Math.random()*(i+1));
+      var t=arr[i]; arr[i]=arr[j]; arr[j]=t;
+    }
+    return arr;
+  }
+  function isEven(n){ return n % 2 === 0; }
+  function lastDigit(n){ return Math.abs(n) % 10; }
+
+  /* ---------- sound ---------- */
+  function ensureAudio(){
+    if(!audioCtx){
+      try{ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){ audioCtx = null; }
+    }
+    if(audioCtx && audioCtx.state === "suspended"){ audioCtx.resume(); }
+  }
+  function tone(freq, start, dur){
+    if(!soundOn || !audioCtx) return;
+    var o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.type = "sine"; o.frequency.value = freq;
+    g.gain.setValueAtTime(0.0001, audioCtx.currentTime + start);
+    g.gain.exponentialRampToValueAtTime(0.18, audioCtx.currentTime + start + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + start + dur);
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(audioCtx.currentTime + start); o.stop(audioCtx.currentTime + start + dur + 0.05);
+  }
+  function playGood(){ ensureAudio(); tone(660, 0, 0.16); tone(880, 0.12, 0.22); }
+  function playTry(){ ensureAudio(); tone(300, 0, 0.14); }
+
+  /* ---------- speech ---------- */
+  function pickVoice(){
+    var voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
+    function find(pred){ for(var i=0;i<voices.length;i++){ if(pred(voices[i])) return voices[i]; } return null; }
+    return find(function(v){ return /en-CA/i.test(v.lang) && /natural|neural|google/i.test(v.name); })
+        || find(function(v){ return /en-CA/i.test(v.lang); })
+        || find(function(v){ return /en-US/i.test(v.lang) && /natural|neural|google/i.test(v.name); })
+        || find(function(v){ return /^en/i.test(v.lang); });
+  }
+  function speak(text){
+    if(!soundOn || !("speechSynthesis" in window)) return;
+    try{
+      window.speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      u.rate = 0.95;
+      var v = pickVoice(); if(v) u.voice = v;
+      window.speechSynthesis.speak(u);
+    }catch(e){}
+  }
+
+  /* ---------- confetti ---------- */
+  var confettiColors = ["#E0522E","#0E7C74","#E9A800","#3DBDB0","#FF7A52"];
+  function confetti(){
+    var card = $("game-card");
+    for(var i=0;i<18;i++){
+      var s = document.createElement("span");
+      s.className = "confetti";
+      s.style.left = (6 + Math.random()*88) + "%";
+      s.style.background = confettiColors[i % confettiColors.length];
+      s.style.animationDelay = (Math.random()*0.25) + "s";
+      card.appendChild(s);
+      (function(el){ setTimeout(function(){ el.remove(); }, 1600); })(s);
+    }
+  }
+
+  /* ---------- progress ---------- */
+  function renderDots(){
+    dotsEl.innerHTML = "";
+    for(var i=0;i<ROUNDS;i++){
+      var d = document.createElement("span");
+      d.className = "dot";
+      if(i < index) d.classList.add(roundStars[i] ? "star-dot" : "done");
+      if(i === index) d.classList.add("now");
+      d.title = "Round " + (i+1);
+      dotsEl.appendChild(d);
+    }
+  }
+  function renderChips(){
+    $("round-chip").textContent = "Round " + Math.min(index+1, ROUNDS) + " of " + ROUNDS;
+    $("star-count").textContent = stars;
+  }
+
+  function setFeedback(kind, html){
+    feedbackEl.className = "feedback " + kind;
+    feedbackEl.innerHTML = html;
+  }
+
+  /* ---------- sort game ---------- */
+  function newSortDeck(){
+    var pool = [];
+    for(var n=1;n<=rangeMax;n++) pool.push(n);
+    shuffle(pool);
+    deck = pool.slice(0, ROUNDS);
+  }
+  function renderPairs(n){
+    pairsEl.innerHTML = "";
+    var show, caption;
+    if(n <= 20){
+      show = n;
+      caption = isEven(n)
+        ? "Every dot has a partner — <b>no dot left over</b>."
+        : "The dots pair up, but <b>one dot is left over</b>.";
+    } else {
+      show = lastDigit(n);
+      caption = "Big number? Only the last digit decides. Look at the dots for <b>" + lastDigit(n) + "</b>.";
+      if(show === 0){
+        pairsCaptionEl.innerHTML = "Big number? Only the last digit decides. Look at the dots for <b>0</b> — there are no ones to pair.";
+        pairsEl.innerHTML = "";
+        return;
+      }
+    }
+    var fullPairs = Math.floor(show / 2), leftover = show % 2;
+    for(var p=0;p<fullPairs;p++){
+      var pair = document.createElement("span");
+      pair.className = "pair";
+      pair.innerHTML = '<span class="pdot"></span><span class="pdot"></span>';
+      pairsEl.appendChild(pair);
+    }
+    if(leftover){
+      var lp = document.createElement("span");
+      lp.className = "pair";
+      lp.innerHTML = '<span class="pdot leftover"></span>';
+      pairsEl.appendChild(lp);
+    }
+    pairsCaptionEl.innerHTML = caption;
+  }
+  function renderSort(){
+    var n = deck[index];
+    var rest = String(n).slice(0, -1);
+    bigNumberEl.innerHTML = "";
+    if(rest){
+      var pre = document.createElement("span"); pre.textContent = rest; bigNumberEl.appendChild(pre);
+    }
+    var last = document.createElement("span"); last.className = "last"; last.textContent = String(lastDigit(n));
+    bigNumberEl.appendChild(last);
+    bigNumberEl.setAttribute("aria-label", "Current number: " + n);
+    lastNoteEl.innerHTML = "The last digit is <b>" + lastDigit(n) + "</b>. That is the digit that decides.";
+    renderPairs(n);
+    $("odd-count").textContent = "Odd pile: " + oddPile;
+    $("even-count").textContent = "Even pile: " + evenPile;
+    nextBtn.disabled = true;
+    nextBtn.textContent = "Next Number";
+    setFeedback("idle", "Tap an answer to begin.");
+    $("bin-odd").classList.remove("shake","correct-flash");
+    $("bin-even").classList.remove("shake","correct-flash");
+  }
+  function answerSort(choice){
+    if(answered) return;
+    ensureAudio();
+    var n = deck[index];
+    var correct = (choice === "odd") ? !isEven(n) : isEven(n);
+    var word = isEven(n) ? "even" : "odd";
+    var btn = choice === "odd" ? $("bin-odd") : $("bin-even");
+    if(correct){
+      answered = true;
+      btn.classList.add("correct-flash");
+      if(choice === "odd") oddPile++; else evenPile++;
+      if(!attempted){
+        stars++;
+        roundStars[index] = true;
+        confetti();
+        setFeedback("good", '<span class="fstar" aria-hidden="true">★</span> Yes! ' + n + ' is ' + word + ' — it ends in ' + lastDigit(n) + '. Star earned!');
+      } else {
+        roundStars[index] = false;
+        setFeedback("good", "Yes! " + n + " is " + word + " — it ends in " + lastDigit(n) + ".");
+      }
+      playGood();
+      speak(n + " is " + word + ".");
+      $("odd-count").textContent = "Odd pile: " + oddPile;
+      $("even-count").textContent = "Even pile: " + evenPile;
+      nextBtn.disabled = false;
+      renderDots(); renderChips();
+    } else {
+      attempted = true;
+      btn.classList.remove("shake"); void btn.offsetWidth; btn.classList.add("shake");
+      playTry();
+      setFeedback("try", "Not quite — look at the last digit, " + lastDigit(n) + ". Try the other box!");
+    }
+  }
+
+  /* ---------- pattern game ---------- */
+  function randInt(a,b){ return a + Math.floor(Math.random()*(b-a+1)); }
+  function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+  function makePatternQuestion(){
+    var types = ["up2","up2","down2","up1","missing","identify"];
+    var type = pick(types);
+    var q = { type: type, prompt: "What comes next?", sub: "Read the pattern. Odd numbers are underlined in orange, even in teal." };
+
+    if(type === "up2"){
+      var start = Math.random() < 0.5 ? randInt(1,9)*2 : randInt(0,9)*2+1; // even or odd start
+      var seq = [start, start+2, start+4, start+6];
+      q.seq = seq; q.answer = start+8;
+      q.explain = "Counting by 2s from " + start + ". " + (isEven(start) ? "All even numbers!" : "All odd numbers!");
+      q.choices = uniqueChoices(q.answer, [q.answer+2, q.answer-2, q.answer+1, q.answer+10]);
+    } else if(type === "down2"){
+      var s2 = randInt(6,14)*2; // even start, stays positive
+      var seq2 = [s2, s2-2, s2-4, s2-6];
+      q.seq = seq2; q.answer = s2-8;
+      q.explain = "Counting back by 2s. All even numbers!";
+      q.choices = uniqueChoices(q.answer, [q.answer+2, q.answer-2, q.answer+1, q.answer+4]);
+    } else if(type === "up1"){
+      var s3 = randInt(1, 20);
+      var seq3 = [s3, s3+1, s3+2, s3+3];
+      q.seq = seq3; q.answer = s3+4;
+      q.explain = "Counting by 1s — odd, even, odd, even, and so on. The next one is " + (isEven(q.answer) ? "even" : "odd") + ".";
+      q.choices = uniqueChoices(q.answer, [q.answer+1, q.answer-1, q.answer+2]);
+    } else if(type === "missing"){
+      var s4 = Math.random() < 0.5 ? randInt(1,9)*2+1 : randInt(1,9)*2;
+      var full = [s4, s4+2, s4+4, s4+6];
+      var missIdx = randInt(1,2);
+      q.seq = full.slice(); q.missingIdx = missIdx; q.answer = full[missIdx];
+      q.prompt = "What number is missing?";
+      q.explain = "Counting by 2s from " + s4 + ". The missing number is " + q.answer + " — " + (isEven(q.answer) ? "even" : "odd") + ", like the rest.";
+      q.choices = uniqueChoices(q.answer, [q.answer+2, q.answer-2, q.answer+1, q.answer-1]);
+    } else { // identify
+      var kind = pick(["allOdd","allEven","mixed"]);
+      var base, seq5;
+      if(kind === "allOdd"){ base = randInt(0,8)*2+1; seq5 = [base, base+2, base+4, base+6]; }
+      else if(kind === "allEven"){ base = randInt(1,9)*2; seq5 = [base, base+2, base+4, base+6]; }
+      else { base = randInt(1,18); seq5 = [base, base+1, base+2, base+3]; }
+      q.seq = seq5;
+      q.prompt = "What kind of pattern is this?";
+      q.sub = "Look at every number in the row.";
+      q.identifyKind = kind;
+      q.answer = kind === "allOdd" ? "All odd" : kind === "allEven" ? "All even" : "Odd and even mixed";
+      q.choices = ["All odd", "All even", "Odd and even mixed"];
+      q.explain = kind === "allOdd" ? "Every number ends in 1, 3, 5, 7, or 9 — all odd!"
+        : kind === "allEven" ? "Every number ends in 0, 2, 4, 6, or 8 — all even!"
+        : "The numbers take turns: odd, even, odd, even. They are mixed!";
+    }
+    return q;
+  }
+  function uniqueChoices(answer, candidates){
+    var set = [], seen = {};
+    set.push(answer); seen[answer] = true;
+    shuffle(candidates);
+    for(var i=0;i<candidates.length && set.length<3;i++){
+      var c = candidates[i];
+      if(c < 0 || c > 120 || seen[c]) continue;
+      seen[c] = true; set.push(c);
+    }
+    // safety fill
+    var d = 1;
+    while(set.length < 3){ var f = answer + d*3; if(!seen[f] && f >= 0){ seen[f]=true; set.push(f);} d++; }
+    return shuffle(set);
+  }
+  function newPatternDeck(){
+    patternDeck = [];
+    for(var i=0;i<ROUNDS;i++) patternDeck.push(makePatternQuestion());
+  }
+  function renderPattern(){
+    var q = patternDeck[index];
+    $("pattern-prompt").textContent = q.prompt;
+    $("pattern-sub").textContent = q.sub;
+    var seqEl = $("sequence");
+    seqEl.innerHTML = "";
+    q.seq.forEach(function(n, i){
+      if(q.missingIdx !== undefined && i === q.missingIdx){
+        var m = document.createElement("span");
+        m.className = "seq-num missing"; m.textContent = "?";
+        m.setAttribute("aria-label", "Missing number");
+        seqEl.appendChild(m);
+      } else {
+        var s = document.createElement("span");
+        s.className = "seq-num " + (isEven(n) ? "even-n" : "odd-n");
+        s.textContent = n;
+        seqEl.appendChild(s);
+      }
+      if(i < q.seq.length - 1){
+        var sep = document.createElement("span"); sep.className = "seq-sep"; sep.textContent = "›"; seqEl.appendChild(sep);
+      }
+    });
+    if(q.missingIdx === undefined && q.type !== "identify"){
+      var sep2 = document.createElement("span"); sep2.className = "seq-sep"; sep2.textContent = "›"; seqEl.appendChild(sep2);
+      var qm = document.createElement("span"); qm.className = "seq-num missing"; qm.textContent = "?";
+      qm.setAttribute("aria-label", "What comes next?");
+      seqEl.appendChild(qm);
+    }
+    var chEl = $("choices");
+    chEl.innerHTML = "";
+    q.choices.forEach(function(c){
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "choice"; b.textContent = c;
+      b.addEventListener("click", function(){ answerPattern(c, b); });
+      chEl.appendChild(b);
+    });
+    nextBtn.disabled = true;
+    nextBtn.textContent = "Next Pattern";
+    setFeedback("idle", "Tap an answer to begin.");
+  }
+  function answerPattern(choice, btn){
+    if(answered) return;
+    ensureAudio();
+    var q = patternDeck[index];
+    if(String(choice) === String(q.answer)){
+      answered = true;
+      btn.classList.add("correct-flash");
+      var btns = $("choices").querySelectorAll(".choice");
+      btns.forEach(function(b){ b.disabled = true; });
+      if(!attempted){
+        stars++; roundStars[index] = true; confetti();
+        setFeedback("good", '<span class="fstar" aria-hidden="true">★</span> Yes! ' + q.explain + " Star earned!");
+      } else {
+        roundStars[index] = false;
+        setFeedback("good", "Yes! " + q.explain);
+      }
+      playGood();
+      speak(q.explain);
+      nextBtn.disabled = false;
+      renderDots(); renderChips();
+    } else {
+      attempted = true;
+      btn.classList.remove("shake"); void btn.offsetWidth; btn.classList.add("shake");
+      playTry();
+      if(q.type === "identify"){
+        setFeedback("try", "Not quite — check the last digit of every number. Try again!");
+      } else {
+        setFeedback("try", "Not quite — say the pattern out loud and try again!");
+      }
+    }
+  }
+
+  /* ---------- game flow ---------- */
+  function startGame(){
+    index = 0; stars = 0; attempted = false; answered = false;
+    oddPile = 0; evenPile = 0;
+    roundStars = [];
+    endView.hidden = true;
+    if(mode === "sort"){
+      sortView.hidden = false; patternView.hidden = true;
+      newSortDeck(); renderSort();
+    } else {
+      sortView.hidden = true; patternView.hidden = false;
+      newPatternDeck(); renderPattern();
+    }
+    renderDots(); renderChips();
+  }
+  function nextRound(){
+    index++;
+    attempted = false; answered = false;
+    if(index >= ROUNDS){ showEnd(); return; }
+    if(mode === "sort") renderSort(); else renderPattern();
+    renderDots(); renderChips();
+  }
+  function showEnd(){
+    sortView.hidden = true; patternView.hidden = true;
+    endView.hidden = false;
+    nextBtn.disabled = true;
+    var filled = "", i;
+    for(i=0;i<ROUNDS;i++) filled += (i < stars) ? "★" : "☆";
+    var starSpan = document.createElement("span");
+    // Build stars with empty styling via spans
+    var html = "";
+    for(i=0;i<ROUNDS;i++) html += i < stars ? "★" : '<span class="empty">☆</span>';
+    $("end-stars").innerHTML = html;
+    $("round-chip").textContent = "Game over";
+    if(stars === ROUNDS){
+      $("end-title").textContent = "Perfect! 10 out of 10!";
+      $("end-text").textContent = "Every single one right on the first try. You really know odd and even!";
+    } else if(stars >= 7){
+      $("end-title").textContent = "Great work!";
+      $("end-text").textContent = "You earned " + stars + " of 10 stars. Keep looking at that last digit!";
+    } else if(stars >= 4){
+      $("end-title").textContent = "Good trying!";
+      $("end-text").textContent = "You earned " + stars + " of 10 stars. Play again and watch the last digit — 0, 2, 4, 6, 8 is even!";
+    } else {
+      $("end-title").textContent = "Nice effort!";
+      $("end-text").textContent = "You earned " + stars + " of 10 stars. Remember: odd ends in 1, 3, 5, 7, 9. Try again!";
+    }
+    setFeedback("idle", "");
+    feedbackEl.style.display = "none";
+    confetti();
+    speak($("end-title").textContent + " You earned " + stars + " stars.");
+    renderDots();
+  }
+  function hideEndFeedback(){
+    feedbackEl.style.display = "";
+  }
+
+  /* ---------- events ---------- */
+  $("bin-odd").addEventListener("click", function(){ answerSort("odd"); });
+  $("bin-even").addEventListener("click", function(){ answerSort("even"); });
+  nextBtn.addEventListener("click", function(){ hideEndFeedback(); nextRound(); });
+  $("new-btn").addEventListener("click", function(){ hideEndFeedback(); startGame(); });
+  $("again-btn").addEventListener("click", function(){ hideEndFeedback(); startGame(); });
+  $("switch-btn").addEventListener("click", function(){
+    hideEndFeedback();
+    setMode(mode === "sort" ? "pattern" : "sort");
+  });
+
+  function setMode(m){
+    mode = m;
+    $("mode-sort").setAttribute("aria-pressed", m === "sort" ? "true" : "false");
+    $("mode-pattern").setAttribute("aria-pressed", m === "pattern" ? "true" : "false");
+    $("range-row").style.display = m === "sort" ? "flex" : "none";
+    hideEndFeedback();
+    startGame();
+  }
+  $("mode-sort").addEventListener("click", function(){ if(mode !== "sort") setMode("sort"); });
+  $("mode-pattern").addEventListener("click", function(){ if(mode !== "pattern") setMode("pattern"); });
+
+  var rangeBtns = document.querySelectorAll("[data-range]");
+  rangeBtns.forEach(function(b){
+    b.addEventListener("click", function(){
+      rangeMax = parseInt(b.getAttribute("data-range"), 10);
+      rangeBtns.forEach(function(x){ x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
+      hideEndFeedback();
+      startGame();
+    });
+  });
+
+  $("sound-btn").addEventListener("click", function(){
+    soundOn = !soundOn;
+    $("sound-btn").textContent = soundOn ? "Sound: On" : "Sound: Off";
+    $("sound-btn").setAttribute("aria-pressed", soundOn ? "true" : "false");
+    if(!soundOn && "speechSynthesis" in window){ try{ window.speechSynthesis.cancel(); }catch(e){} }
+    if(soundOn) ensureAudio();
+  });
+
+  $("hear-btn").addEventListener("click", function(){
+    ensureAudio();
+    if(endView.hidden === false) return;
+    if(mode === "sort"){
+      var n = deck[index];
+      speak("Is " + n + " odd or even? The last digit is " + lastDigit(n) + ".");
+    } else {
+      var q = patternDeck[index];
+      var spoken = q.seq.map(function(v, i){
+        return (q.missingIdx !== undefined && i === q.missingIdx) ? "what is missing" : String(v);
+      }).join(", ");
+      if(q.type === "identify"){
+        speak("What kind of pattern is this? " + spoken + ".");
+      } else if(q.missingIdx !== undefined){
+        speak("What number is missing? " + spoken + ".");
+      } else {
+        speak("What comes next? " + spoken + ", what comes next?");
+      }
+    }
+  });
+
+  if("speechSynthesis" in window){
+    try{ window.speechSynthesis.getVoices(); window.speechSynthesis.onvoiceschanged = function(){}; }catch(e){}
+  }
+
+  startGame();
+})();
+</script>
+</body>
+</html>
