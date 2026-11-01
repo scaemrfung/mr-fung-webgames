@@ -116,13 +116,34 @@
         display:grid;
         grid-template-columns:1fr;
         gap:20px;
-        margin-top:28px;
+        margin-top:18px;
       }
       @media (min-width:680px){
         .grid{ grid-template-columns:1fr 1fr; gap:22px; }
       }
       @media (min-width:1020px){
         .wrap{ padding-left:28px; padding-right:28px; }
+      }
+
+
+      /* Skill groups */
+      .group{ margin-top:38px; }
+      .group:first-child{ margin-top:30px; }
+      .group-head{
+        display:flex; align-items:baseline; gap:12px; flex-wrap:wrap;
+        padding-bottom:10px;
+        border-bottom:3px solid var(--surface-border);
+      }
+      .group-head h2{
+        font-family:"Fredoka","Nunito",sans-serif;
+        font-weight:700;
+        font-size:clamp(1.6rem, 3.4vw, 2.1rem);
+        line-height:1.1;
+        margin:0;
+        color:var(--header-ink);
+      }
+      .group-count{
+        font-weight:900; font-size:.95rem; color:var(--ink-soft);
       }
 
       .card{
@@ -150,7 +171,7 @@
       @media (prefers-color-scheme: dark){
         .icon{ background:color-mix(in srgb, var(--accent) 22%, var(--surface)); }
       }
-      .card h2{
+      .card h3{
         font-family:"Fredoka","Nunito",sans-serif;
         font-weight:600;
         font-size:1.65rem;
@@ -196,7 +217,7 @@
         .wrap{ padding:16px 14px 36px; }
         .card{ padding:20px 18px 18px; border-radius:20px; }
         .icon{ width:60px; height:60px; border-radius:16px; }
-        .card h2{ font-size:1.5rem; }
+        .card h3{ font-size:1.5rem; }
         .back-btn{ font-size:1rem; padding:13px 18px 13px 14px; }
       }
       @media (prefers-reduced-motion: no-preference){
@@ -224,15 +245,128 @@
         <span class="count-pill">19 games to play</span>
       </header>
 
-      <main class="grid" aria-label="Reading games list">
+      <main aria-label="Reading games list">
 
+        <section class="group" aria-labelledby="letters-heading">
+          <div class="group-head">
+            <h2 id="letters-heading">Letters</h2>
+            <span class="group-count">2 games</span>
+          </div>
+          <div class="grid">
+        <article class="card" style="--accent:#0284C7">
+          <div class="card-top">
+            <div class="icon" aria-hidden="true">
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M3 16c2.5 1.6 5 1.6 7.5 0S15.5 14.4 18 16s3 1.4 3 1.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 3v9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 12c0 2 1.2 3 2.6 3 1 0 1.9-.7 1.9-1.7 0-.6-.4-1.1-.9-1.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="3" r="1.4" fill="currentColor"/></svg>
+            </div>
+            <div>
+              <h3>Hooked on Letters!</h3>
+              <p>Go fishing in the pond! Catch a letter and spell a word.</p>
+            </div>
+          </div>
+          <a class="play" href="https://scaemrfung.github.io/mr-fung-webgames/hooked-on-letters/">Play <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg></a>
+        </article>
+
+        <article class="card" style="--accent:#15803D">
+          <div class="card-top">
+            <div class="icon" aria-hidden="true">
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M5 6h9M5 12h9M5 18h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M17.5 4v16M14.5 16.5l3 3 3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div>
+              <h3>Alphabet Order</h3>
+              <p>Put the letters in order from A to Z and finish the alphabet!</p>
+            </div>
+          </div>
+          <a class="play" href="https://scaemrfung.github.io/mr-fung-webgames/alphabet-order/">Play <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg></a>
+        </article>
+          </div>
+        </section>
+
+        <section class="group" aria-labelledby="sounds-heading">
+          <div class="group-head">
+            <h2 id="sounds-heading">Sounds &amp; Phonics</h2>
+            <span class="group-count">5 games</span>
+          </div>
+          <div class="grid">
+        <article class="card" style="--accent:#0891B2">
+          <div class="card-top">
+            <div class="icon" aria-hidden="true">
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M8.5 4.5H5a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1h3.5M15.5 4.5H19a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-3.5" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/><circle cx="9.3" cy="12" r="1.3" fill="currentColor"/><circle cx="14.7" cy="12" r="1.3" fill="currentColor"/><path d="M11.5 12h1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" opacity=".55"/></svg>
+            </div>
+            <div>
+              <h3>Beginning and Ending Sounds</h3>
+              <p>Look at the picture! Which sound does the word start with — and end with?</p>
+            </div>
+          </div>
+          <a class="play" href="https://scaemrfung.github.io/mr-fung-webgames/beginning-and-ending-sounds/">Play <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg></a>
+        </article>
+
+        <article class="card" style="--accent:#1D4ED8">
+          <div class="card-top">
+            <div class="icon" aria-hidden="true">
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" stroke-width="2.2"/><path d="M15.5 15.5 21 21" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M8 10.2c.5.9 1 .9 1.5 0M11.5 10.2c.5.9 1 .9 1.5 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            </div>
+            <div>
+              <h3>Digraph Detective</h3>
+              <p>Be a digraph detective! Listen and find ch, sh, th, and wh hiding in words.</p>
+            </div>
+          </div>
+          <a class="play" href="https://scaemrfung.github.io/mr-fung-webgames/digraph-detective/">Play <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg></a>
+        </article>
+
+        <article class="card" style="--accent:#DC2626">
+          <div class="card-top">
+            <div class="icon" aria-hidden="true">
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" stroke-width="2.2"/><path d="M15.5 15.5 21 21" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M8 13.8 10.5 7.4l2.5 6.4M8.9 11.8h3.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div>
+              <h3>Vowel Detective</h3>
+              <p>Be a vowel detective! Find the missing vowel hiding in each word.</p>
+            </div>
+          </div>
+          <a class="play" href="https://scaemrfung.github.io/mr-fung-webgames/vowel-detective/">Play <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg></a>
+        </article>
+
+        <article class="card" style="--accent:#65A30D">
+          <div class="card-top">
+            <div class="icon" aria-hidden="true">
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M4 11.5 12 4l8 7.5" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.5 10v9h11v-9" stroke="currentColor" stroke-width="2.1" stroke-linejoin="round"/><path d="M9.8 19v-4.2c0-.8 1-1.3 2.2-1.3s2.2.5 2.2 1.3V19" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+            </div>
+            <div>
+              <h3>Word Family Builder</h3>
+              <p>Pick a word family and build lots of words that end the same — cat, hat, bat!</p>
+            </div>
+          </div>
+          <a class="play" href="https://scaemrfung.github.io/mr-fung-webgames/word-family-builder/">Play <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg></a>
+        </article>
+
+        <article class="card" style="--accent:#DB2777">
+          <div class="card-top">
+            <div class="icon" aria-hidden="true">
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M4 8.5c2-2 4-2 6 0v7c-2-2-4-2-6 0v-7ZM14 8.5c2-2 4-2 6 0v7c-2-2-4-2-6 0v-7Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M7 11h.1M17 11h.1M7 13.2h2M15 13.2h2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+            </div>
+            <div>
+              <h3>Rhyming Match</h3>
+              <p>Tap the word that rhymes with the target word!</p>
+            </div>
+          </div>
+          <a class="play" href="https://scaemrfung.github.io/mr-fung-webgames/rhyming-match/">Play <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg></a>
+        </article>
+          </div>
+        </section>
+
+        <section class="group" aria-labelledby="words-heading">
+          <div class="group-head">
+            <h2 id="words-heading">Words</h2>
+            <span class="group-count">9 games</span>
+          </div>
+          <div class="grid">
         <article class="card" style="--accent:#0E7C6B">
           <div class="card-top">
             <div class="icon" aria-hidden="true">
               <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" stroke-width="2.2"/><path d="M15.5 15.5 21 21" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M7.5 10.5h6M10.5 7.5v6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" opacity=".55"/></svg>
             </div>
             <div>
-              <h2>Word Search Fun!</h2>
+              <h3>Word Search Fun!</h3>
               <p>Find school words hiding in the letters. Pick a lesson, or type in your own words!</p>
             </div>
           </div>
@@ -245,24 +379,11 @@
               <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="3" stroke="currentColor" stroke-width="2.2"/><path d="M7.5 15.5v-7l2.2 4 2.3-4v7M14.5 15.5l2-7 2 7M15.3 13h2.4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </div>
             <div>
-              <h2>My Word Remake</h2>
+              <h3>My Word Remake</h3>
               <p>Letters flip up one by one. Call the word first — the team with the most cards wins!</p>
             </div>
           </div>
           <a class="play" href="https://scaemrfung.github.io/mr-fung-webgames/my-word-remake/">Play <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg></a>
-        </article>
-
-        <article class="card" style="--accent:#0284C7">
-          <div class="card-top">
-            <div class="icon" aria-hidden="true">
-              <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M3 16c2.5 1.6 5 1.6 7.5 0S15.5 14.4 18 16s3 1.4 3 1.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 3v9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 12c0 2 1.2 3 2.6 3 1 0 1.9-.7 1.9-1.7 0-.6-.4-1.1-.9-1.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="3" r="1.4" fill="currentColor"/></svg>
-            </div>
-            <div>
-              <h2>Hooked on Letters!</h2>
-              <p>Go fishing in the pond! Catch a letter and spell a word.</p>
-            </div>
-          </div>
-          <a class="play" href="https://scaemrfung.github.io/mr-fung-webgames/hooked-on-letters/">Play <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg></a>
         </article>
 
         <article class="card" style="--accent:#C2410C">
@@ -271,24 +392,11 @@
               <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><rect x="3" y="8" width="5.5" height="5.5" rx="1.2" stroke="currentColor" stroke-width="1.9"/><rect x="9.5" y="8" width="5.5" height="5.5" rx="1.2" stroke="currentColor" stroke-width="1.9"/><rect x="16" y="8" width="5.5" height="5.5" rx="1.2" stroke="currentColor" stroke-width="1.9"/><path d="M5.7 12.2h.1M12.2 10v2.5M18.7 12.2h.1" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="M4 18.5h16" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" opacity=".55"/></svg>
             </div>
             <div>
-              <h2>Word Builder</h2>
+              <h3>Word Builder</h3>
               <p>Build Grade One words from scrambled letters, or match the starting letter to the picture!</p>
             </div>
           </div>
           <a class="play" href="https://scaemrfung.github.io/mr-fung-webgames/word-builder/">Play <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg></a>
-        </article>
-
-        <article class="card" style="--accent:#7C3AED">
-          <div class="card-top">
-            <div class="icon" aria-hidden="true">
-              <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><rect x="3.5" y="4.5" width="7" height="9" rx="1.6" stroke="currentColor" stroke-width="1.9"/><rect x="13.5" y="4.5" width="7" height="9" rx="1.6" stroke="currentColor" stroke-width="1.9"/><path d="M6.8 10.8c.6.9 1 .9 1.6 0M16.8 10.8c.6.9 1 .9 1.6 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M6 17.5h12M6 20.5h8" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" opacity=".55"/></svg>
-            </div>
-            <div>
-              <h2>Memory Game</h2>
-              <p>Flip the cards and find the match! Letters, numbers, and Grade One words with pictures.</p>
-            </div>
-          </div>
-          <a class="play" href="https://scaemrfung.github.io/mr-fung-webgames/memory-game/">Play <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg></a>
         </article>
 
         <article class="card" style="--accent:#059669">
@@ -297,128 +405,11 @@
               <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="2"/><path d="M9.3 4v16M14.6 4v16M4 9.3h16M4 14.6h16" stroke="currentColor" stroke-width="1.5" opacity=".6"/><circle cx="11.9" cy="11.9" r="1.7" fill="currentColor"/></svg>
             </div>
             <div>
-              <h2>Sight Word Bingo</h2>
+              <h3>Sight Word Bingo</h3>
               <p>Call a sight word and tap it on your bingo board!</p>
             </div>
           </div>
           <a class="play" href="https://scaemrfung.github.io/mr-fung-webgames/sight-word-bingo/">Play <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg></a>
-        </article>
-
-        <article class="card" style="--accent:#DB2777">
-          <div class="card-top">
-            <div class="icon" aria-hidden="true">
-              <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M4 8.5c2-2 4-2 6 0v7c-2-2-4-2-6 0v-7ZM14 8.5c2-2 4-2 6 0v7c-2-2-4-2-6 0v-7Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M7 11h.1M17 11h.1M7 13.2h2M15 13.2h2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
-            </div>
-            <div>
-              <h2>Rhyming Match</h2>
-              <p>Tap the word that rhymes with the target word!</p>
-            </div>
-          </div>
-          <a class="play" href="https://scaemrfung.github.io/mr-fung-webgames/rhyming-match/">Play <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg></a>
-        </article>
-
-        <article class="card" style="--accent:#2563EB">
-          <div class="card-top">
-            <div class="icon" aria-hidden="true">
-              <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="7" height="5" rx="1.4" stroke="currentColor" stroke-width="1.8"/><rect x="11.5" y="6" width="9.5" height="5" rx="1.4" stroke="currentColor" stroke-width="1.8"/><rect x="6" y="13.5" width="12" height="5" rx="1.4" stroke="currentColor" stroke-width="1.8"/><path d="M5.5 8.5h2M14 8.5h4M9 16h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" opacity=".6"/></svg>
-            </div>
-            <div>
-              <h2>Sentence Builder</h2>
-              <p>Tap the tiles in order to build a silly sentence!</p>
-            </div>
-          </div>
-          <a class="play" href="https://scaemrfung.github.io/mr-fung-webgames/sentence-builder/">Play <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg></a>
-        </article>
-
-        <article class="card" style="--accent:#65A30D">
-          <div class="card-top">
-            <div class="icon" aria-hidden="true">
-              <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M4 11.5 12 4l8 7.5" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.5 10v9h11v-9" stroke="currentColor" stroke-width="2.1" stroke-linejoin="round"/><path d="M9.8 19v-4.2c0-.8 1-1.3 2.2-1.3s2.2.5 2.2 1.3V19" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
-            </div>
-            <div>
-              <h2>Word Family Builder</h2>
-              <p>Pick a word family and build lots of words that end the same — cat, hat, bat!</p>
-            </div>
-          </div>
-          <a class="play" href="https://scaemrfung.github.io/mr-fung-webgames/word-family-builder/">Play <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg></a>
-        </article>
-
-        <article class="card" style="--accent:#DC2626">
-          <div class="card-top">
-            <div class="icon" aria-hidden="true">
-              <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" stroke-width="2.2"/><path d="M15.5 15.5 21 21" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M8 13.8 10.5 7.4l2.5 6.4M8.9 11.8h3.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </div>
-            <div>
-              <h2>Vowel Detective</h2>
-              <p>Be a vowel detective! Find the missing vowel hiding in each word.</p>
-            </div>
-          </div>
-          <a class="play" href="https://scaemrfung.github.io/mr-fung-webgames/vowel-detective/">Play <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg></a>
-        </article>
-
-        <article class="card" style="--accent:#0891B2">
-          <div class="card-top">
-            <div class="icon" aria-hidden="true">
-              <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M8.5 4.5H5a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1h3.5M15.5 4.5H19a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-3.5" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/><circle cx="9.3" cy="12" r="1.3" fill="currentColor"/><circle cx="14.7" cy="12" r="1.3" fill="currentColor"/><path d="M11.5 12h1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" opacity=".55"/></svg>
-            </div>
-            <div>
-              <h2>Beginning and Ending Sounds</h2>
-              <p>Look at the picture! Which sound does the word start with — and end with?</p>
-            </div>
-          </div>
-          <a class="play" href="https://scaemrfung.github.io/mr-fung-webgames/beginning-and-ending-sounds/">Play <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg></a>
-        </article>
-
-        <article class="card" style="--accent:#9333EA">
-          <div class="card-top">
-            <div class="icon" aria-hidden="true">
-              <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M4 5.5C5.8 4.6 8 4.2 12 5.2c4-1 6.2-.6 8 .3v13.2c-1.8-.9-4-1.3-8-.3-4-1-6.2-.6-8 .3V5.5Z" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><path d="M12 5.2v13.2" stroke="currentColor" stroke-width="1.9"/><path d="M8.2 10.2h.1M15.7 10.2h.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M7.6 12.6c.9 1 2.1 1 3 0M13.4 12.6c.9 1 2.1 1 3 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-            </div>
-            <div>
-              <h2>Silly Sentence Reader</h2>
-              <p>Read the silly sentence out loud, then tap to hear it read to you!</p>
-            </div>
-          </div>
-          <a class="play" href="https://scaemrfung.github.io/mr-fung-webgames/silly-sentence-reader/">Play <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg></a>
-        </article>
-
-        <article class="card" style="--accent:#E11D48">
-          <div class="card-top">
-            <div class="icon" aria-hidden="true">
-              <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2.5" stroke="currentColor" stroke-width="2"/><circle cx="8.5" cy="10" r="1.6" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 17.5 9 12.5l3.5 3.5 3-3 5 4.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </div>
-            <div>
-              <h2>Picture Word Match</h2>
-              <p>Look at the picture and tap the word that matches it!</p>
-            </div>
-          </div>
-          <a class="play" href="https://scaemrfung.github.io/mr-fung-webgames/picture-word-match/">Play <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg></a>
-        </article>
-
-        <article class="card" style="--accent:#1D4ED8">
-          <div class="card-top">
-            <div class="icon" aria-hidden="true">
-              <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" stroke-width="2.2"/><path d="M15.5 15.5 21 21" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M8 10.2c.5.9 1 .9 1.5 0M11.5 10.2c.5.9 1 .9 1.5 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-            </div>
-            <div>
-              <h2>Digraph Detective</h2>
-              <p>Be a digraph detective! Listen and find ch, sh, th, and wh hiding in words.</p>
-            </div>
-          </div>
-          <a class="play" href="https://scaemrfung.github.io/mr-fung-webgames/digraph-detective/">Play <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg></a>
-        </article>
-
-        <article class="card" style="--accent:#15803D">
-          <div class="card-top">
-            <div class="icon" aria-hidden="true">
-              <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M5 6h9M5 12h9M5 18h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M17.5 4v16M14.5 16.5l3 3 3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </div>
-            <div>
-              <h2>Alphabet Order</h2>
-              <p>Put the letters in order from A to Z and finish the alphabet!</p>
-            </div>
-          </div>
-          <a class="play" href="https://scaemrfung.github.io/mr-fung-webgames/alphabet-order/">Play <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg></a>
         </article>
 
         <article class="card" style="--accent:#C026D3">
@@ -427,11 +418,24 @@
               <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><rect x="3.5" y="4.5" width="7" height="9" rx="1.6" stroke="currentColor" stroke-width="1.9"/><rect x="13.5" y="4.5" width="7" height="9" rx="1.6" stroke="currentColor" stroke-width="1.9"/><path d="M7 8.5l.9 1.8 2-2.1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M16.2 8.2l.8 1.7 1.8-1.9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 17.5h12M6 20.5h8" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" opacity=".55"/></svg>
             </div>
             <div>
-              <h2>Sight Word Memory</h2>
+              <h3>Sight Word Memory</h3>
               <p>Flip the cards and match the sight words that are the same!</p>
             </div>
           </div>
           <a class="play" href="https://scaemrfung.github.io/mr-fung-webgames/sight-word-memory/">Play <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg></a>
+        </article>
+
+        <article class="card" style="--accent:#E11D48">
+          <div class="card-top">
+            <div class="icon" aria-hidden="true">
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2.5" stroke="currentColor" stroke-width="2"/><circle cx="8.5" cy="10" r="1.6" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 17.5 9 12.5l3.5 3.5 3-3 5 4.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div>
+              <h3>Picture Word Match</h3>
+              <p>Look at the picture and tap the word that matches it!</p>
+            </div>
+          </div>
+          <a class="play" href="https://scaemrfung.github.io/mr-fung-webgames/picture-word-match/">Play <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg></a>
         </article>
 
         <article class="card" style="--accent:#B45309">
@@ -440,7 +444,7 @@
               <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M6 4v16M18 4v16M6 8h12M6 16h12" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/><path d="M6 12h12" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" opacity=".55"/></svg>
             </div>
             <div>
-              <h2>Word Ladder</h2>
+              <h3>Word Ladder</h3>
               <p>Change just one letter at a time to climb from the start word to the target word!</p>
             </div>
           </div>
@@ -453,7 +457,7 @@
               <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M9.5 4.5H5a1 1 0 0 0-1 1v4.5a2.5 2.5 0 1 0 0 5v4.5a1 1 0 0 0 1 1h4.5a2.5 2.5 0 1 0 5 0V4.5a2.5 2.5 0 1 0-5 0Z" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><path d="M19.5 7.5H20a1 1 0 0 1 1 1v4a2.5 2.5 0 1 1 0 5v1a1 1 0 0 1-1 1h-.5a2.5 2.5 0 1 1-5 0v-12a2.5 2.5 0 1 1 5 0Z" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/></svg>
             </div>
             <div>
-              <h2>Compound Words</h2>
+              <h3>Compound Words</h3>
               <p>Join two little words together to make one big compound word — like sun + flower!</p>
             </div>
           </div>
@@ -466,12 +470,69 @@
               <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><circle cx="8" cy="12" r="4.5" stroke="currentColor" stroke-width="2"/><circle cx="14" cy="12" r="4.5" stroke="currentColor" stroke-width="2" opacity=".65"/><circle cx="19.5" cy="12" r="3.2" stroke="currentColor" stroke-width="2" opacity=".4"/><path d="M8 9.5c.8 1.2 1.6 1.2 2.4 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
             </div>
             <div>
-              <h2>Plurals</h2>
+              <h3>Plurals</h3>
               <p>Add the right ending to make one thing into more than one!</p>
             </div>
           </div>
           <a class="play" href="https://scaemrfung.github.io/mr-fung-webgames/plurals/">Play <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg></a>
         </article>
+          </div>
+        </section>
+
+        <section class="group" aria-labelledby="sentences-heading">
+          <div class="group-head">
+            <h2 id="sentences-heading">Sentences &amp; Reading</h2>
+            <span class="group-count">2 games</span>
+          </div>
+          <div class="grid">
+        <article class="card" style="--accent:#2563EB">
+          <div class="card-top">
+            <div class="icon" aria-hidden="true">
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="7" height="5" rx="1.4" stroke="currentColor" stroke-width="1.8"/><rect x="11.5" y="6" width="9.5" height="5" rx="1.4" stroke="currentColor" stroke-width="1.8"/><rect x="6" y="13.5" width="12" height="5" rx="1.4" stroke="currentColor" stroke-width="1.8"/><path d="M5.5 8.5h2M14 8.5h4M9 16h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" opacity=".6"/></svg>
+            </div>
+            <div>
+              <h3>Sentence Builder</h3>
+              <p>Tap the tiles in order to build a silly sentence!</p>
+            </div>
+          </div>
+          <a class="play" href="https://scaemrfung.github.io/mr-fung-webgames/sentence-builder/">Play <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg></a>
+        </article>
+
+        <article class="card" style="--accent:#9333EA">
+          <div class="card-top">
+            <div class="icon" aria-hidden="true">
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M4 5.5C5.8 4.6 8 4.2 12 5.2c4-1 6.2-.6 8 .3v13.2c-1.8-.9-4-1.3-8-.3-4-1-6.2-.6-8 .3V5.5Z" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><path d="M12 5.2v13.2" stroke="currentColor" stroke-width="1.9"/><path d="M8.2 10.2h.1M15.7 10.2h.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M7.6 12.6c.9 1 2.1 1 3 0M13.4 12.6c.9 1 2.1 1 3 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            </div>
+            <div>
+              <h3>Silly Sentence Reader</h3>
+              <p>Read the silly sentence out loud, then tap to hear it read to you!</p>
+            </div>
+          </div>
+          <a class="play" href="https://scaemrfung.github.io/mr-fung-webgames/silly-sentence-reader/">Play <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg></a>
+        </article>
+          </div>
+        </section>
+
+        <section class="group" aria-labelledby="mixed-heading">
+          <div class="group-head">
+            <h2 id="mixed-heading">Mixed Practice</h2>
+            <span class="group-count">1 game</span>
+          </div>
+          <div class="grid">
+        <article class="card" style="--accent:#7C3AED">
+          <div class="card-top">
+            <div class="icon" aria-hidden="true">
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><rect x="3.5" y="4.5" width="7" height="9" rx="1.6" stroke="currentColor" stroke-width="1.9"/><rect x="13.5" y="4.5" width="7" height="9" rx="1.6" stroke="currentColor" stroke-width="1.9"/><path d="M6.8 10.8c.6.9 1 .9 1.6 0M16.8 10.8c.6.9 1 .9 1.6 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M6 17.5h12M6 20.5h8" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" opacity=".55"/></svg>
+            </div>
+            <div>
+              <h3>Memory Game</h3>
+              <p>Flip the cards and find the match! Letters, numbers, and Grade One words with pictures.</p>
+            </div>
+          </div>
+          <a class="play" href="https://scaemrfung.github.io/mr-fung-webgames/memory-game/">Play <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg></a>
+        </article>
+          </div>
+        </section>
 
       </main>
 
