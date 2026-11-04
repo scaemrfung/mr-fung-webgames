@@ -181,9 +181,12 @@
   .live-row .tally-marks{order:4;flex-basis:100%;padding-left:56px}
   .live-row .lcount{margin-left:auto;font-weight:900;font-size:22px;min-width:34px;text-align:right;flex:none}
   .tally-marks{font-family:"Baloo 2",sans-serif;font-size:19px;letter-spacing:1px;color:var(--ink);line-height:1}
-  .tally-group{display:inline-flex;position:relative;margin-right:7px;vertical-align:middle}
-  .tally-group i{display:block;width:3px;height:20px;background:var(--ink);border-radius:2px;margin-right:3px}
-  .tally-group i.diag{position:absolute;left:-1px;top:9px;width:24px;height:3px;transform:rotate(-68deg);transform-origin:left center;margin:0}
+  .tally-group{display:inline-flex;gap:5px;position:relative;height:22px;margin-right:8px;vertical-align:middle}
+  .tally-group i{display:block;width:3px;height:22px;background:var(--ink);border-radius:2px;flex:none}
+  /* Fifth mark: one shallow diagonal, centred on the group, long enough to
+     cross all four uprights with a small overhang at each end. At -30deg
+     across 35px it meets the uprights at evenly spaced heights. */
+  .tally-group i.diag{position:absolute;left:-4px;top:9.5px;width:35px;height:3px;margin:0;transform:rotate(-30deg);transform-origin:center}
   .tally-empty{color:var(--muted);font-size:16px;font-weight:700}
   .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
   .big-btn{

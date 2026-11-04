@@ -324,6 +324,57 @@
         white-space: nowrap;
       }
       .fish.caught { transition: transform 0.62s cubic-bezier(0.5, -0.1, 0.3, 1), opacity 0.62s ease; z-index: 30; pointer-events: none; }
+      .fish.eaten { transition: transform 0.38s ease-in, opacity 0.38s ease-in; z-index: 27; pointer-events: none; }
+
+      /* Friendly shark — swims in for a wrong fish, munches it gently, swims away */
+      .shark {
+        position: absolute;
+        width: clamp(180px, 32vw, 252px);
+        z-index: 28;
+        pointer-events: none;
+        display: none;
+        transition: left 0.85s ease-in-out;
+        filter: drop-shadow(0 6px 8px rgba(6, 60, 80, 0.3));
+      }
+      .shark.show { display: block; }
+      .shark .shark-flip { width: 100%; }
+      .shark .shark-flip svg { width: 100%; height: auto; display: block; }
+      .shark.facing-left .shark-flip { transform: scaleX(-1); }
+      .shark.chomping .shark-flip { animation: sharkChomp 0.5s ease; }
+      @keyframes sharkChomp {
+        0%, 100% { transform: scale(1) rotate(0deg); }
+        30% { transform: scale(1.05) rotate(-2deg) translateY(2px); }
+        60% { transform: scale(1.02) rotate(1.5deg); }
+      }
+      .shark.facing-left.chomping .shark-flip { animation-name: sharkChompFlip; }
+      @keyframes sharkChompFlip {
+        0%, 100% { transform: scaleX(-1) scale(1) rotate(0deg); }
+        30% { transform: scaleX(-1) scale(1.05) rotate(2deg) translateY(2px); }
+        60% { transform: scaleX(-1) scale(1.02) rotate(-1.5deg); }
+      }
+      .shark-nom {
+        position: absolute;
+        left: 50%; top: 2px;
+        transform: translateX(-50%) rotate(-3deg) scale(0.6);
+        background: #fff;
+        color: var(--ink);
+        font-family: "Fredoka", sans-serif;
+        font-weight: 600;
+        font-size: 21px;
+        padding: 6px 14px 7px;
+        border-radius: 999px;
+        box-shadow: 0 4px 12px rgba(6, 60, 80, 0.25);
+        opacity: 0;
+        transition: opacity 0.18s ease, transform 0.18s ease;
+        white-space: nowrap;
+      }
+      .shark-nom::after {
+        content: ""; position: absolute; left: 50%; bottom: -7px;
+        transform: translateX(-50%);
+        border-left: 8px solid transparent; border-right: 8px solid transparent;
+        border-top: 9px solid #fff;
+      }
+      .shark-nom.show { opacity: 1; transform: translateX(-50%) rotate(-3deg) scale(1); }
 
       /* Hook */
       .hook {
@@ -468,6 +519,8 @@
       }
       @media (prefers-reduced-motion: reduce) {
         .bubble, .tile.next { animation: none; }
+        .shark { transition-duration: 0.01s; }
+        .shark.chomping .shark-flip { animation: none; }
       }
     </style>
   </head>
@@ -529,6 +582,28 @@
         <svg class="weed right" width="44" height="70" viewBox="0 0 54 86" aria-hidden="true"><path d="M12 86 C6 58 18 42 10 14 C22 38 18 62 22 86 Z" fill="var(--weed)"/><path d="M32 86 C28 60 38 46 34 22 C44 44 38 64 42 86 Z" fill="var(--weed)" opacity="0.7"/></svg>
         <div class="sand"></div>
         <div class="hook" id="hook"><div class="line" id="hookLine"></div><div class="head" id="hookHead"></div></div>
+        <div class="shark" id="shark" aria-hidden="true">
+          <div class="shark-nom" id="sharkNom">Nom nom!</div>
+          <div class="shark-flip">
+            <svg viewBox="0 0 260 140" aria-hidden="true">
+              <path d="M42 68 C30 52 16 40 6 36 C14 54 16 62 16 68 C16 74 14 82 6 100 C16 96 30 84 42 68 Z" fill="#4d8fb5"/>
+              <path d="M118 26 C124 6 138 2 150 20 C138 22 128 24 118 26 Z" fill="#4d8fb5"/>
+              <path d="M40 70 C55 30 125 12 190 24 C225 31 248 48 250 62 C252 76 230 92 195 102 C140 116 70 108 40 70 Z" fill="#63a6cc"/>
+              <path d="M58 84 C95 104 160 106 205 86 C190 100 150 112 110 106 C82 102 66 96 58 84 Z" fill="#eaf7fb"/>
+              <path d="M118 96 C128 112 146 118 158 112 C148 100 134 94 118 96 Z" fill="#4d8fb5"/>
+              <path d="M168 48 Q162 62 168 76" fill="none" stroke="#3d7fa8" stroke-width="3" stroke-linecap="round"/>
+              <path d="M156 48 Q150 62 156 76" fill="none" stroke="#3d7fa8" stroke-width="3" stroke-linecap="round"/>
+              <circle cx="188" cy="72" r="8" fill="#ffb3c1" opacity="0.75"/>
+              <circle cx="202" cy="52" r="11" fill="#fff"/>
+              <circle cx="205" cy="54" r="5.5" fill="#12333d"/>
+              <circle cx="207" cy="51" r="2" fill="#fff"/>
+              <path d="M210 66 Q236 60 249 63 Q246 78 228 84 Q214 84 210 66 Z" fill="#8e4a5e"/>
+              <path d="M220 65 L227 64 L224 73 Z" fill="#fff"/>
+              <path d="M232 63 L239 62 L236 71 Z" fill="#fff"/>
+              <path d="M222 81 Q232 79 237 73 Q234 84 222 83 Z" fill="#ff8fab"/>
+            </svg>
+          </div>
+        </div>
         <div class="celebration" id="celebration" hidden>
           <div class="cele-card">
             <div class="big-stars" aria-hidden="true">★ ★ ★</div>
@@ -569,6 +644,9 @@
         var hook = document.getElementById("hook");
         var hookLine = document.getElementById("hookLine");
         var hookHead = document.getElementById("hookHead");
+        var sharkEl = document.getElementById("shark");
+        var sharkNom = document.getElementById("sharkNom");
+        var sharkTimers = [];
 
         var mode = "catch";
         var soundOn = true;
@@ -634,6 +712,12 @@
         }
         function sfxHappy() { tone(523, 0, 0.16, "sine", 0.25); tone(659, 0.09, 0.16, "sine", 0.25); tone(784, 0.18, 0.3, "sine", 0.28); }
         function sfxWiggle() { tone(220, 0, 0.14, "square", 0.08, 140); tone(190, 0.1, 0.14, "square", 0.07, 120); }
+        function sfxShark() {
+          tone(392, 0, 0.14, "triangle", 0.2, 523);
+          tone(523, 0.14, 0.14, "triangle", 0.2, 392);
+          tone(330, 0.9, 0.12, "sine", 0.22, 262);
+          tone(294, 1.04, 0.16, "sine", 0.22, 220);
+        }
         function sfxFanfare() {
           var notes = [523, 659, 784, 1047, 784, 1047];
           for (var i = 0; i < notes.length; i++) { tone(notes[i], i * 0.13, 0.28, "triangle", 0.26); }
@@ -910,13 +994,79 @@
           if (f.letter === neededLetter() && f.fishCase === neededCase()) { catchFish(f); }
           else { wrongFish(f); }
         }
+        /* ---- Friendly shark: eats the wrong fish, no penalty, target stays ---- */
+        function sharkLater(fn, ms) {
+          var id = setTimeout(fn, ms);
+          sharkTimers.push(id);
+          return id;
+        }
+        function clearSharkTimers() {
+          for (var i = 0; i < sharkTimers.length; i++) { clearTimeout(sharkTimers[i]); }
+          sharkTimers = [];
+        }
+        function hideShark() {
+          clearSharkTimers();
+          sharkEl.classList.remove("show", "chomping", "facing-left");
+          sharkNom.classList.remove("show");
+          sharkEl.style.transition = "";
+          sharkEl.style.left = "";
+          sharkEl.style.top = "";
+        }
         function wrongFish(f) {
-          sfxWiggle();
-          f.burstUntil = performance.now() + 900;
+          /* Gentle, fun visit: the shark munches only the wrong fish.
+             No star is lost, roundCaught / wordIndex are untouched, and the
+             target letter stays exactly the same. */
+          busy = true;
+          f.state = "eaten";
           f.el.classList.remove("wiggling");
-          void f.el.offsetWidth;
-          f.el.classList.add("wiggling");
-          setTimeout(function () { f.el.classList.remove("wiggling"); }, 520);
+          sfxShark();
+          var cx = f.x + f.w / 2;
+          var cy = f.y + f.h / 2;
+          var pw = pondW(), ph = pondH();
+          sharkEl.classList.remove("chomping", "facing-left");
+          sharkNom.classList.remove("show");
+          sharkEl.classList.add("show");
+          var sharkW = sharkEl.offsetWidth || 220;
+          var sharkH = sharkEl.offsetHeight || 120;
+          var fromLeft = cx < pw / 2;
+          if (!fromLeft) sharkEl.classList.add("facing-left");
+          /* Mouth sits near the nose: ~86% across when facing right,
+             ~14% across when facing left. */
+          var mouthFrac = fromLeft ? 0.86 : 0.14;
+          var stopLeft = cx - mouthFrac * sharkW;
+          stopLeft = Math.max(-sharkW * 0.3, Math.min(stopLeft, pw - sharkW * 0.7));
+          var top = Math.max(4, Math.min(cy - sharkH / 2, Math.max(4, ph - sharkH - 30)));
+          var startLeft = fromLeft ? -sharkW - 12 : pw + 12;
+          sharkEl.style.transition = "none";
+          sharkEl.style.left = startLeft + "px";
+          sharkEl.style.top = top + "px";
+          void sharkEl.offsetWidth;
+          sharkEl.style.transition = "left 0.85s ease-in-out";
+          requestAnimationFrame(function () { sharkEl.style.left = stopLeft + "px"; });
+          sharkLater(function () {
+            sharkEl.classList.add("chomping");
+            sharkNom.classList.add("show");
+            f.el.classList.add("eaten");
+            f.el.style.transform = "translate(" + (cx - f.w / 2) + "px," + (cy - f.h / 2) + "px) scale(0.15)";
+            f.el.style.opacity = "0";
+          }, 900);
+          sharkLater(function () {
+            removeFish(f);
+            sharkNom.classList.remove("show");
+            sharkEl.classList.remove("chomping");
+            sharkEl.style.transition = "left 1s ease-in-out";
+            sharkEl.style.left = (fromLeft ? pw + 12 : -sharkW - 12) + "px";
+          }, 1450);
+          sharkLater(function () {
+            sharkEl.classList.remove("show", "facing-left");
+            sharkEl.style.transition = "";
+            sharkEl.style.left = "";
+            sharkEl.style.top = "";
+            spawnFish(true);
+            ensureNeededPresent();
+            busy = false;
+            speak("Try again. " + targetSpeech());
+          }, 2550);
         }
         function catchFish(f) {
           busy = true;
@@ -1095,6 +1245,7 @@
         /* ---------------- Reset / modes ---------------- */
         function resetGame() {
           busy = false; roundOver = false;
+          hideShark();
           celebration.hidden = true;
           for (var i = fishes.length - 1; i >= 0; i--) removeFish(fishes[i]);
           fishes = [];
